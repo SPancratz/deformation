@@ -1,0 +1,125 @@
+*******************************************************************************
+
+    Memory management
+
+    The data type \code{mat_csr_t} stores $m \times n$ matrices in a variant 
+    of the compressed row format.
+
+    On a technical note, the \code{mat_csr_t} object is an array of length 
+    one for a \code{mat_csr} structure.
+
+    A \code{mat_csr} structure for an $m \times n$ matrix comprises the 
+    following data:
+    \begin{itemize}
+    \item Two positive \code{long} integers \code{m} and \code{n}, holding 
+          the matrix dimensions.  These are set at creation time and are 
+          not allowed to be changed during the lifetime of this structure.
+    \item A non-negative \code{long} integer \code{alloc} which morally 
+          denotes the length of the arrays \code{x} and \code{j}.  If 
+          \code{alloc} is zero, these two arrays might be \code{NULL}.
+    \item An array \code{x}, which is either \code{NULL} or of length 
+          \code{alloc} times \code{ctx->size}, where \code{ctx} is the 
+          context at the time of creation.  That is, \code{x} has space 
+          for \code{alloc} elements of the type of the base ring.
+    \item An array \code{j}, which is either \code{NULL} or of length 
+          \code{alloc}.
+    \item An array \code{p} of length~\code{m} such that \code{p[i]} 
+          gives the least index into \code{x} and \code{j} referring to 
+          an element in row~\code{i}.
+    \item An array \code{lenr} of length~\code{m} such that \code{lenr[i]} 
+          gives the number of non-zero elements in row~\code{i}.
+    \end{itemize}
+
+    We assume that the non-zero entries of any one row of the matrix 
+    are stored in contiguous blocks in the arrays \code{x} and \code{j}. 
+    However, unless specifically stated otherwise, we do not enforce 
+    any particular ordering of the entries within each such block, and 
+    we do not enforce any particular ordering of the rows.  Thus, the 
+    common way to access the data is:
+    \begin{lstlisting}[language=c]
+    mat_ctx_t ctx;
+    mat_csr_t A;
+    long i, q;
+
+    for (i = 0; i < A->m; i++)
+    {
+        for (q = p[i]; q < p[i] + A->lenr[i]; q++)
+        {
+            long j  = A->j[q];
+            void *x = A->x + (q * ctx->size);
+
+            /* Non-zero entry at (i, j) with value *x */
+        }
+    }
+    \end{lstlisting}
+
+*******************************************************************************
+
+void mat_csr_init(mat_csr_t A, long m, long n, const mat_ctx_t ctx)
+
+void mat_csr_init2(mat_csr_t A, long m, long n, long alloc, const mat_ctx_t ctx)
+
+void mat_csr_realloc(mat_csr_t A, long alloc, const mat_ctx_t ctx)
+
+void mat_csr_clear(mat_csr_t A, const mat_ctx_t ctx)
+
+void mat_csr_fit_length(mat_csr_t A, long len, const mat_ctx_t ctx)
+
+*******************************************************************************
+
+    Assignment
+
+*******************************************************************************
+
+void mat_csr_set_array3(mat_csr_t A, char *mem, long len, int copy, const mat_ctx_t ctx)
+
+void mat_csr_zero(mat_csr_t A, const mat_ctx_t ctx)
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int mat_csr_is_zero(const mat_csr_t A, const mat_ctx_t ctx)
+
+*******************************************************************************
+
+    Higher level algorithms
+
+*******************************************************************************
+
+long _zfdiagonal(long *pi, long n, const long *j, const long *p, 
+                           const long *lenr, long *w)
+
+    Expects a temporary array $w$ of length $5 n$.
+
+long zfdiagonal(long *pi, const mat_csr_t A)
+
+    Computes a permutation $\pi$ of rows, which we denote by $P$, such that 
+    the matrix $P A$ has the greatest possible number of non-zero elements on 
+    the diagonal.  This number is the return value.  For a structurally 
+    non-singular matrix $A$, a permutation matrix $P$ can be found such that 
+    the diagonal is zero-free.
+
+    The permutation matrix $P$ is derived from the array $\pi$ of length $n$ 
+    as follows:
+    \begin{equation*}
+    P_{ij} = \begin{cases} 1 & \text{if $j = \pi_i$} \\
+                           0 & \text{otherwise} \end{cases}
+    \end{equation*}
+
+    Assumes that $m = n \geq 1$.
+
+    Note that this function only works with the structural data of the 
+    sparse matrix $A$.  That is to say, the array \code{A->x} is never 
+    read.
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+int mat_csr_debug(const mat_csr_t A, const mat_ctx_t ctx)
+

@@ -1,0 +1,60 @@
+#ifndef MAT_CSR_H
+#define MAT_CSR_H
+
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "mat.h"
+
+typedef struct
+{
+    long m;       /* # of rows    */
+    long n;       /* # of columns */
+
+    long alloc;   /* Allocated length of a */
+    char *x;      /* Values */
+    long *j;      /* Column indices */
+    long *p;      /* p[i] is the pointer into x (or j) to the first non-zero element in row i */
+    long *lenr;   /* Number of non-zero elements in row i */
+} mat_csr;
+
+typedef mat_csr mat_csr_t[1];
+
+/* Memory management *********************************************************/
+
+void mat_csr_init(mat_csr_t A, long m, long n, const mat_ctx_t ctx);
+
+void mat_csr_init2(mat_csr_t A, long m, long n, long alloc, const mat_ctx_t ctx);
+
+void mat_csr_realloc(mat_csr_t A, long alloc, const mat_ctx_t ctx);
+
+void mat_csr_clear(mat_csr_t A, const mat_ctx_t ctx);
+
+void mat_csr_fit_length(mat_csr_t A, long len, const mat_ctx_t ctx);
+
+/* Assignment ****************************************************************/
+
+void mat_csr_set_array3(mat_csr_t A, char *mem, long len, int copy, const mat_ctx_t ctx);
+
+void mat_csr_zero(mat_csr_t A, const mat_ctx_t ctx);
+
+/* Comparison ****************************************************************/
+
+int mat_csr_is_zero(const mat_csr_t A, const mat_ctx_t ctx);
+
+
+/* Higher level algorithms ***************************************************/
+
+long _mat_csr_zfdiagonal(long *pi, long n, const long *j, const long *p, 
+                           const long *lenr, long *w);
+
+long mat_csr_zfdiagonal(long *pi, const mat_csr_t A);
+
+/* Input and output **********************************************************/
+
+int mat_csr_debug(const mat_csr_t A, const mat_ctx_t ctx);
+
+int mat_csr_print_dense(const mat_csr_t A, const mat_ctx_t ctx);
+
+#endif
+
