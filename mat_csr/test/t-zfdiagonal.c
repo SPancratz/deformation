@@ -68,6 +68,7 @@ main(void)
 
         mat_csr_set_array3(A, mem, len, 0, ctx);
 
+        printf("Matrix A:\n");
         mat_csr_print_dense(A, ctx);
         printf("\n");
 
@@ -79,6 +80,10 @@ main(void)
         _ulong_vec_print(pi, m);
         printf("}\n");
         printf("numnz = %ld\n", numnz);
+
+        printf("Matrix A:\n");
+        mat_csr_permute_rows(A, pi, ctx);
+        mat_csr_print_dense(A, ctx);
 
         free(mem);
         free(pi);

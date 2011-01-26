@@ -89,6 +89,14 @@ int mat_csr_is_zero(const mat_csr_t A, const mat_ctx_t ctx)
 
 *******************************************************************************
 
+void _mat_csr_permute_rows(long m, long *p, long *lenr, const long *pi)
+
+void mat_csr_permute_rows(mat_csr_t A, const long *pi, const mat_ctx_t ctx)
+
+    Permutes the rows of $A$ according to the permutation $\pi$.  This 
+    means that the $i$th row of the matrix on exit is the same as the 
+    $\pi_i$th row of the matrix on entry to this function.
+
 long _zfdiagonal(long *pi, long n, const long *j, const long *p, 
                            const long *lenr, long *w)
 

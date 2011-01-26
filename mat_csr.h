@@ -42,8 +42,11 @@ void mat_csr_zero(mat_csr_t A, const mat_ctx_t ctx);
 
 int mat_csr_is_zero(const mat_csr_t A, const mat_ctx_t ctx);
 
-
 /* Higher level algorithms ***************************************************/
+
+void _mat_csr_permute_rows(long m, long *p, long *lenr, const long *pi);
+
+void mat_csr_permute_rows(mat_csr_t A, const long *pi, const mat_ctx_t ctx);
 
 long _mat_csr_zfdiagonal(long *pi, long n, const long *j, const long *p, 
                            const long *lenr, long *w);
