@@ -3,7 +3,7 @@
 #include "mat_csr.h"
 
 int 
-_mat_csr_print_dense(long m, long n, const void *x, const long *j, 
+_mat_csr_print_dense(long m, long n, const char *x, const long *j, 
                                      const long *p, const long *lenr, 
                                      const mat_ctx_t ctx)
 {
@@ -23,7 +23,7 @@ _mat_csr_print_dense(long m, long n, const void *x, const long *j,
             else
                 printf("0");
         }
-        if (j != n - 1)
+        if (c != n - 1)
             printf(" ");
         printf("]");
         if (i != m - 1)

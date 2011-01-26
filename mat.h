@@ -96,7 +96,7 @@ static void mat_ctx_clear(mat_ctx_t ctx)
     random permutation without retries.
  */
 
-static void _ulong_vec_randperm(ulong *vec, long n, flint_rand_t state)
+static void _long_vec_randperm(long *vec, long n, flint_rand_t state)
 {
     long i, j, t;
 
@@ -112,7 +112,7 @@ static void _ulong_vec_randperm(ulong *vec, long n, flint_rand_t state)
     }
 }
 
-static int _ulong_vec_print(const ulong *vec, long len)
+static int _long_vec_print(const long *vec, long len)
 {
     long i;
 
