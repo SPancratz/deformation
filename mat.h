@@ -23,7 +23,8 @@ typedef struct
     void (*zero)(void *rop);
     void (*one)(void *rop);
 
-    void (*randtest0)(void *rop, flint_rand_t state);
+    void (*randtest)(void *rop, flint_rand_t state);
+    void (*randtest_not_zero)(void *rop, flint_rand_t state);
 
     int (*equal)(const void *op1, const void *op2);
     int (*is_zero)(const void *op);
@@ -56,8 +57,10 @@ static void ld_zero(void *rop)
     { *(long *) rop = 0; }
 static void ld_one(void *rop)
     { *(long *) rop = 1; }
-static void ld_randtest0(void *rop, flint_rand_t state)
+static void ld_randtest(void *rop, flint_rand_t state)
     { *(long *) rop = z_randtest(state); }
+static void ld_randtest_not_zero(void *rop, flint_rand_t state)
+    { *(long *) rop = z_randtest_not_zero(state); }
 static int ld_equal(const void *op1, const void *op2)
     { return *(long *) op1 == *(long *) op2; }
 static int ld_is_zero(const void *op)
@@ -69,19 +72,20 @@ static int ld_print(const void *op)
 
 static void mat_ctx_init_long(mat_ctx_t ctx)
 {
-    ctx->size    = sizeof(long);
+    ctx->size              = sizeof(long);
 
-    ctx->init      = &ld_init;
-    ctx->clear     = &ld_clear;
-    ctx->set       = &ld_set;
-    ctx->swap      = &ld_swap;
-    ctx->zero      = &ld_zero;
-    ctx->one       = &ld_one;
-    ctx->randtest0 = &ld_randtest0;
-    ctx->equal     = &ld_equal;
-    ctx->is_zero   = &ld_is_zero;
-    ctx->is_one    = &ld_is_one;
-    ctx->print     = &ld_print;
+    ctx->init              = &ld_init;
+    ctx->clear             = &ld_clear;
+    ctx->set               = &ld_set;
+    ctx->swap              = &ld_swap;
+    ctx->zero              = &ld_zero;
+    ctx->one               = &ld_one;
+    ctx->randtest          = &ld_randtest;
+    ctx->randtest_not_zero = &ld_randtest_not_zero;
+    ctx->equal             = &ld_equal;
+    ctx->is_zero           = &ld_is_zero;
+    ctx->is_one            = &ld_is_one;
+    ctx->print             = &ld_print;
 }
 
 static void mat_ctx_clear(mat_ctx_t ctx)
