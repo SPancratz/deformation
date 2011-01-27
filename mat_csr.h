@@ -38,6 +38,10 @@ void mat_csr_set_array3(mat_csr_t A, char *mem, long len, int copy, const mat_ct
 
 void mat_csr_zero(mat_csr_t A, const mat_ctx_t ctx);
 
+/* Randomisation *************************************************************/
+
+void mat_csr_randtest(mat_csr_t A, flint_rand_t state, double d, const mat_ctx_t ctx);
+
 /* Comparison ****************************************************************/
 
 int mat_csr_is_zero(const mat_csr_t A, const mat_ctx_t ctx);
@@ -48,10 +52,20 @@ void _mat_csr_permute_rows(long m, long *p, long *lenr, const long *pi);
 
 void mat_csr_permute_rows(mat_csr_t A, const long *pi, const mat_ctx_t ctx);
 
+void _mat_csr_permute_cols(long m, long n, long *j, long *p, long *lenr, const long *pi);
+
+void mat_csr_permute_cols(mat_csr_t A, const long *pi, const mat_ctx_t ctx);
+
 long _mat_csr_zfdiagonal(long *pi, long n, const long *j, const long *p, 
                            const long *lenr, long *w);
 
 long mat_csr_zfdiagonal(long *pi, const mat_csr_t A);
+
+long _mat_csr_block_triangularise(long *arp, long *b, long n, const long *j, 
+                                  const long *p, const long *lenr, long *w);
+
+long mat_csr_block_triangularise(long *pi, long *b, const mat_csr_t A, 
+                                                    const mat_ctx_t ctx);
 
 /* Input and output **********************************************************/
 

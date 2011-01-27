@@ -77,6 +77,17 @@ void mat_csr_zero(mat_csr_t A, const mat_ctx_t ctx)
 
 *******************************************************************************
 
+    Randomisation
+
+*******************************************************************************
+
+void mat_csr_randtest(mat_csr_t A, 
+                      flint_rand_t state, double d, const mat_ctx_t ctx)
+
+    Sets $A$ to a random matrix of density $d$.
+
+*******************************************************************************
+
     Comparison
 
 *******************************************************************************
@@ -96,6 +107,24 @@ void mat_csr_permute_rows(mat_csr_t A, const long *pi, const mat_ctx_t ctx)
     Permutes the rows of $A$ according to the permutation $\pi$.  This 
     means that the $i$th row of the matrix on exit is the same as the 
     $\pi_i$th row of the matrix on entry to this function.
+
+long _mat_csr_block_triangularise(long *arp, long *b, long n, const long *j, 
+                                  const long *p, const long *lenr, long *w)
+
+long mat_csr_block_triangularise(long *pi, long *b, const mat_csr_t A, 
+                                                    const mat_ctx_t ctx)
+
+    Given a square $n \times n$ matrix $A$, computes a permutation $\pi$ 
+    represented by a permutation matrix $Q$ such that $Q A Q^t$ is lower 
+    block triangular.
+
+    Returns an integer $\beta$ with $1 \leq \beta \leq n$ that denotes 
+    the number of blocks.  On entry the array $b$ is expected to be of 
+    length $n$, which is the maximum possible number of blocks.  On exit, 
+    for $0 \leq k < \beta$, \code{b[k]} is the lowest row index in the 
+    $k$th block.
+
+    All the above mentioned \emph{blocks} are square.
 
 long _zfdiagonal(long *pi, long n, const long *j, const long *p, 
                            const long *lenr, long *w)

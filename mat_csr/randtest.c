@@ -1,0 +1,50 @@
+#include "mat_csr.h"
+
+void 
+mat_csr_randtest(mat_csr_t A, 
+                 flint_rand_t state, double d, const mat_ctx_t ctx)
+{
+    char *mem;
+    long f, i, j, k, len, u;
+
+    d = FLINT_MAX(d, 0.0);
+    d = FLINT_MIN(d, 1.0);
+    f = 100 * d;
+
+    mat_csr_zero(A, ctx);
+
+    if (f == 0)
+        return;
+
+    u   = 2 * sizeof(long) + ctx->size;
+    len = A->m * A->n;
+    mem = malloc(u * len);
+
+    if (!mem)
+    {
+        printf("ERROR (mat_csr_randtest).\n\n");
+        abort();
+    }
+
+    k = 0;
+    for (i = 0; i < A->m; i++)
+    {
+        for (j = 0; j < A->n; j++)
+        {
+            *(long *) (mem + k * u)                = i;
+            *(long *) (mem + k * u + sizeof(long)) = j;
+            if (n_randint(state, 100) <= f)
+            {
+                ctx->randtest_not_zero(mem + k * u + 2 * sizeof(long), state);
+            }
+            else
+            {
+                ctx->zero(mem + k * u + 2 * sizeof(long));
+            }
+            k++;
+        }
+    }
+
+    mat_csr_set_array3(A, mem, len, 0, ctx);
+    free(mem);
+}
