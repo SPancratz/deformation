@@ -30,6 +30,11 @@ typedef struct
     int (*is_zero)(const void *op);
     int (*is_one)(const void *op);
 
+    void (*add)(void *rop, const void *op1, const void *op2);
+    void (*sub)(void *rop, const void *op1, const void *op2);
+    void (*mul)(void *rop, const void *op1, const void *op2);
+    void (*div)(void *rop, const void *op1, const void *op2);
+
     int (*print)(const void *op);
 
 } mat_ctx;
@@ -67,6 +72,14 @@ static int ld_is_zero(const void *op)
     { return *(long *) op == 0; }
 static int ld_is_one(const void *op)
     { return *(long *) op == 1; }
+static void ld_add(void *rop, const void *op1, const void *op2)
+    { *(long *) rop = *(long *) op1 + *(long *) op2; }
+static void ld_sub(void *rop, const void *op1, const void *op2)
+    { *(long *) rop = *(long *) op1 - *(long *) op2; }
+static void ld_mul(void *rop, const void *op1, const void *op2)
+    { *(long *) rop = *(long *) op1 * *(long *) op2; }
+static void ld_div(void *rop, const void *op1, const void *op2)
+    { *(long *) rop = *(long *) op1 / *(long *) op2; }
 static int ld_print(const void *op)
     { return printf("%ld", *(long *) op); }
 
@@ -85,6 +98,10 @@ static void mat_ctx_init_long(mat_ctx_t ctx)
     ctx->equal             = &ld_equal;
     ctx->is_zero           = &ld_is_zero;
     ctx->is_one            = &ld_is_one;
+    ctx->add               = &ld_add;
+    ctx->sub               = &ld_sub;
+    ctx->mul               = &ld_mul;
+    ctx->div               = &ld_div;
     ctx->print             = &ld_print;
 }
 
