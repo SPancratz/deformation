@@ -152,6 +152,13 @@ long zfdiagonal(long *pi, const mat_csr_t A)
     sparse matrix $A$.  That is to say, the array \code{A->x} is never 
     read.
 
+void mat_csr_lupdecompose(mat_csr_t L, mat_csr_t U, long *pi, 
+                          const mat_csr_t A, const mat_ctx ctx)
+
+    Asserts that the dimensions of the matrices $L$ and $U$ are the same 
+    of that of the square $n \times n$ matrix $A$.  Assumes that the array 
+    $\pi$ is an array of length $n$.  Assumes that $A$ is non-singular.
+
 *******************************************************************************
 
     Input and output
