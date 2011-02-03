@@ -31,6 +31,20 @@ void mat_coo_fit_length(mat_coo_t A, long len, const mat_ctx_t ctx);
 
 void mat_coo_set_entry(mat_coo_t A, long i, long j, const void *x, const mat_ctx_t ctx);
 
+void mat_coo_zero(mat_coo_t A, const mat_ctx_t ctx);
+
+/* Randomisation *************************************************************/
+
+void mat_coo_randtest(mat_coo_t A, flint_rand_t state, double d, const mat_ctx_t ctx);
+
+/* Comparison ****************************************************************/
+
+static __inline__
+int mat_coo_is_zero(const mat_coo_t A, const mat_ctx_t ctx)
+{
+    return (A->length == 0);
+}
+
 /* Input and output **********************************************************/
 
 int mat_coo_debug(const mat_coo_t A, const mat_ctx_t ctx);
