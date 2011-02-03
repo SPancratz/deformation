@@ -16,13 +16,16 @@ mat_coo_set_entry(mat_coo_t A, long i, long j, const void *x,
             break;
 
     if (k < A->length)
+    {
         ctx->set(A->list + k * u + 2 * sizeof(long), x);
+    }
     else
     {
         mat_coo_fit_length(A, A->length + 1, ctx);
         A->length += 1;
         *(long *) (A->list + k * u) = i;
         *(long *) (A->list + k * u + sizeof(long)) = j;
+        ctx->init(A->list + k * u + 2 * sizeof(long));
         ctx->set(A->list + k * u + 2 * sizeof(long), x);
     }
 }

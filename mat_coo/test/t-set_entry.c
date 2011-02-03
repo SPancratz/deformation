@@ -56,6 +56,7 @@ main(void)
         mat_ctx_clear(ctx);
     }
 
+    /* Unmanaged type (long) */
     for (i = 0; i < 1000; i++)
     {
         long m, n, z;
@@ -81,6 +82,43 @@ main(void)
             col = n_randint(state, n);
             x   = z_randtest_not_zero(state);
             mat_coo_set_entry(A, row, col, &x, ctx);
+        }
+
+        mat_coo_clear(A, 1, ctx);
+        mat_ctx_clear(ctx);
+    }
+
+    /* Managed type (mpq_t) */
+    for (i = 0; i < 1000; i++)
+    {
+        long m, n, z;
+        double d;
+        mat_ctx_t ctx;
+        mat_coo_t A;
+
+        m = n_randint(state, 100) + 1;
+        n = n_randint(state, 100) + 1;
+        d = (double) n_randint(state, 101) / (double) 100;
+
+        mat_ctx_init_mpq(ctx);
+        mat_coo_init(A, m, n, ctx);
+
+        mat_coo_randtest(A, state, d, ctx);
+
+        for (z = 0; z < 10; z++)
+        {
+            long row, col;
+            mpq_t x;
+
+            row = n_randint(state, m);
+            col = n_randint(state, n);
+
+            mpq_init(x);
+            ctx->randtest_not_zero(x, state);
+
+            mat_coo_set_entry(A, row, col, &x, ctx);
+
+            mpq_clear(x);
         }
 
         mat_coo_clear(A, 1, ctx);
