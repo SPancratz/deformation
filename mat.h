@@ -43,7 +43,7 @@ typedef mat_ctx mat_ctx_t[1];
 
 /* Predefined contexts *******************************************************/
 
-/* long */
+/* long **********************************************************************/
 
 static void ld_init(void *op)
     { *(long *) op = 0; }
@@ -103,6 +103,74 @@ static void mat_ctx_init_long(mat_ctx_t ctx)
     ctx->mul               = &ld_mul;
     ctx->div               = &ld_div;
     ctx->print             = &ld_print;
+}
+
+/* mpq_t **********************************************************************/
+
+static void _mpq_init(void *op)
+    { mpq_init(op); }
+static void _mpq_clear(void *op)
+    { mpq_clear(op); }
+static void _mpq_set(void *rop, const void *op)
+    { mpq_set(rop, op); }
+static void _mpq_swap(void *op1, void *op2)
+    { mpq_swap(op1, op2); }
+static void _mpq_zero(void *rop)
+    { mpq_set_ui(rop, 0, 1); }
+static void _mpq_one(void *rop)
+    { mpq_set_ui(rop, 1, 1); }
+static void _mpq_randtest(void *rop, flint_rand_t state)
+{
+    mpz_rrandomb(mpq_numref((__mpq_struct *) rop), (__gmp_randstate_struct *) state, FLINT_BITS);
+    while (mpz_sgn(mpq_denref((__mpq_struct *) rop)) == 0)
+        mpz_rrandomb(mpq_denref((__mpq_struct *) rop), (__gmp_randstate_struct *) state, FLINT_BITS);
+    mpq_canonicalize(rop);
+}
+static void _mpq_randtest_not_zero(void *rop, flint_rand_t state)
+{
+    while (mpz_sgn(mpq_numref((__mpq_struct *) rop)) == 0)
+        mpz_rrandomb(mpq_numref((__mpq_struct *) rop), (__gmp_randstate_struct *) state, FLINT_BITS);
+    while (mpz_sgn(mpq_denref((__mpq_struct *) rop)) == 0)
+        mpz_rrandomb(mpq_denref((__mpq_struct *) rop), (__gmp_randstate_struct *) state, FLINT_BITS);
+    mpq_canonicalize(rop);
+}
+static int _mpq_equal(const void *op1, const void *op2)
+    { return mpq_equal(op1, op2); }
+static int _mpq_is_zero(const void *op)
+    { return mpq_sgn((__mpq_struct *) op) == 0; }
+static int _mpq_is_one(const void *op)
+    { return mpq_cmp_ui((__mpq_struct *) op, 1, 1); }
+static void _mpq_add(void *rop, const void *op1, const void *op2)
+    { mpq_add(rop, op1, op2); }
+static void _mpq_sub(void *rop, const void *op1, const void *op2)
+    { mpq_sub(rop, op1, op2); }
+static void _mpq_mul(void *rop, const void *op1, const void *op2)
+    { mpq_mul(rop, op1, op2); }
+static void _mpq_div(void *rop, const void *op1, const void *op2)
+    { mpq_div(rop, op1, op2); }
+static int _mpq_print(const void *op)
+    { return gmp_printf("%Qd", op); }
+
+static void mat_ctx_init_mpq(mat_ctx_t ctx)
+{
+    ctx->size              = sizeof(__mpq_struct);
+
+    ctx->init              = &_mpq_init;
+    ctx->clear             = &_mpq_clear;
+    ctx->set               = &_mpq_set;
+    ctx->swap              = &_mpq_swap;
+    ctx->zero              = &_mpq_zero;
+    ctx->one               = &_mpq_one;
+    ctx->randtest          = &_mpq_randtest;
+    ctx->randtest_not_zero = &_mpq_randtest_not_zero;
+    ctx->equal             = &_mpq_equal;
+    ctx->is_zero           = &_mpq_is_zero;
+    ctx->is_one            = &_mpq_is_one;
+    ctx->add               = &_mpq_add;
+    ctx->sub               = &_mpq_sub;
+    ctx->mul               = &_mpq_mul;
+    ctx->div               = &_mpq_div;
+    ctx->print             = &_mpq_print;
 }
 
 static void mat_ctx_clear(mat_ctx_t ctx)
