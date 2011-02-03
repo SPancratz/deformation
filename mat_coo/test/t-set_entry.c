@@ -3,6 +3,7 @@
 int
 main(void)
 {
+    int i;
     flint_rand_t state;
 
     printf("set_entry\n");
@@ -50,6 +51,37 @@ main(void)
         printf("Matrix A:\n");
         mat_coo_print_dense(A, ctx);
         printf("\n");
+
+        mat_coo_clear(A, 1, ctx);
+        mat_ctx_clear(ctx);
+    }
+
+    for (i = 0; i < 1000; i++)
+    {
+        long m, n, z;
+        double d;
+        mat_ctx_t ctx;
+        mat_coo_t A;
+
+        m = n_randint(state, 100) + 1;
+        n = n_randint(state, 100) + 1;
+        d = (double) n_randint(state, 101) / (double) 100;
+
+        mat_ctx_init_long(ctx);
+        mat_coo_init(A, m, n, ctx);
+
+        mat_coo_randtest(A, state, d, ctx);
+
+        for (z = 0; z < 10; z++)
+        {
+            long row, col;
+            long x;
+
+            row = n_randint(state, m);
+            col = n_randint(state, n);
+            x   = z_randtest_not_zero(state);
+            mat_coo_set_entry(A, row, col, &x, ctx);
+        }
 
         mat_coo_clear(A, 1, ctx);
         mat_ctx_clear(ctx);
