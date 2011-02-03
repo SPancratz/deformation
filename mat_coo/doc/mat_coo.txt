@@ -28,6 +28,12 @@
           the row index, the column index, and the value of the entry.
     \end{itemize}
 
+    For managed element types such as arbitrary precision integers etc., 
+    it should be noted that only the first \code{length} entries in the 
+    list are initialised and carry their non-zero values.  The entries 
+    between \code{length} and \code{alloc} have not yet been initialised 
+    with \code{ctx->init()}.
+
     Unless explicitly stated otherwise, we do not assume a particular 
     ordering of the entries in the list.
 

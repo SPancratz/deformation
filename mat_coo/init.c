@@ -28,9 +28,6 @@ void mat_coo_init2(mat_coo_t A, long m, long n, long alloc, const mat_ctx_t ctx)
             printf("ERROR (mat_coo_init2).  Could not allocate memory.\n\n");
             abort();
         }
-
-        for (k = 0; k < alloc; k++)
-            ctx->init(A->list + k * u + 2 * sizeof(long));
     }
     else
     {

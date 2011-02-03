@@ -13,7 +13,7 @@ void mat_coo_realloc(mat_coo_t A, long alloc, const mat_ctx_t ctx)
 
     if (A->alloc)
     {
-        for (k = alloc; k < A->alloc; k++)
+        for (k = alloc; k < A->length; k++)
             ctx->clear(A->list + k * u + 2 * sizeof(long));
 
         A->list = realloc(A->list, alloc * u);
@@ -23,9 +23,6 @@ void mat_coo_realloc(mat_coo_t A, long alloc, const mat_ctx_t ctx)
             printf("ERROR (mat_coo_realloc).  Could not allocate memory.\n\n");
             abort();
         }
-
-        for (k = A->alloc; k < alloc; k++)
-            ctx->init(A->list + k * u + 2 * sizeof(long));
 
         if (alloc < A->length)
             A->length = alloc;
@@ -42,9 +39,6 @@ void mat_coo_realloc(mat_coo_t A, long alloc, const mat_ctx_t ctx)
             printf("ERROR (mat_coo_realloc).  Could not allocate memory.\n\n");
             abort();
         }
-
-        for (k = 0; k < alloc; k++)
-            ctx->init(A->list + k * u + 2 * sizeof(long));
     }
 }
 
