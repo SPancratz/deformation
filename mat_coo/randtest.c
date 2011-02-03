@@ -1,5 +1,7 @@
 #include "mat_coo.h"
 
+#define N  1000
+
 void mat_coo_randtest(mat_coo_t A, flint_rand_t state, double d, const mat_ctx_t ctx)
 {
     long i, j;
@@ -8,7 +10,7 @@ void mat_coo_randtest(mat_coo_t A, flint_rand_t state, double d, const mat_ctx_t
 
     d = FLINT_MAX(d, 0.0);
     d = FLINT_MIN(d, 1.0);
-    f = 100 * d;
+    f = N * d;
     z = d * A->m * A->n;
 
     mat_coo_zero(A, ctx);
@@ -20,8 +22,7 @@ void mat_coo_randtest(mat_coo_t A, flint_rand_t state, double d, const mat_ctx_t
 
     for (i = 0; z && i < A->m; i++)
         for (j = 0; z && j < A->n; j++)
-        {
-            if (n_randint(state, 100) <= f)
+            if (n_randint(state, N) <= f)
             {
                 char *off = A->list + k * u;
 
@@ -34,5 +35,6 @@ void mat_coo_randtest(mat_coo_t A, flint_rand_t state, double d, const mat_ctx_t
                 k++;
                 z--;
             }
-        }
+
+    A->length = k;
 }
