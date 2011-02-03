@@ -30,6 +30,6 @@ clean:
 
 check: library
 	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS) -ldeformation;)
-	$(foreach prog, $(TESTS), valgrind --leak-check=full $(prog);)
+	$(foreach prog, $(TESTS), valgrind --leak-check=full --show-reachable=yes $(prog);)
 
 .PHONY: profile clean check all
