@@ -43,7 +43,7 @@
 
     for (i = 0; i < A->m; i++)
     {
-        for (q = p[i]; q < p[i] + A->lenr[i]; q++)
+        for (q = A->p[i]; q < A->p[i] + A->lenr[i]; q++)
         {
             long j  = A->j[q];
             void *x = A->x + (q * ctx->size);
@@ -71,9 +71,26 @@ void mat_csr_fit_length(mat_csr_t A, long len, const mat_ctx_t ctx)
 
 *******************************************************************************
 
-void mat_csr_set_array3(mat_csr_t A, char *mem, long len, int copy, const mat_ctx_t ctx)
+void mat_csr_set_array3(mat_csr_t A, char *mem, long len, int copy, 
+                        const mat_ctx_t ctx)
+
+    Sets $A$ to the sparse matrix given by the array \code{mem} in 
+    coordinate list format.
+
+    The array \code{mem} contains \code{len} elements, each in the form 
+    of row and column indices as \code{long}s followed by the entry, 
+    requiring memory of size \code{2 * sizeof(long) + ctx->size}.  The 
+    entries are allowed to be zero, and no particular ordering of the 
+    list is assumed.
+
+    If \code{copy} is non-zero, the entries are copied into the 
+    matrix $A$ and the caller is responsible for clearing the list 
+    \code{mem} appropriately, which is important for managed entry 
+    types.  Otherwise, it suffices that the caller frees \code{mem}.
 
 void mat_csr_zero(mat_csr_t A, const mat_ctx_t ctx)
+
+    Sets the matrix $A$ to zero.
 
 *******************************************************************************
 
@@ -94,11 +111,24 @@ void mat_csr_randtest(mat_csr_t A,
 
 int mat_csr_is_zero(const mat_csr_t A, const mat_ctx_t ctx)
 
+    Returns whether the matrix $A$ is zero.
+
 *******************************************************************************
 
     Higher level algorithms
 
 *******************************************************************************
+
+void _mat_csr_permute_cols(long m, long n, long *j, long *p, long *lenr, 
+                           const long *pi)
+
+void mat_csr_permute_cols(mat_csr_t A, const long *pi, const mat_ctx_t ctx)
+
+    Permutes the columns of $A$ according to the permutation $\pi$.  This 
+    means that if $Q$ is the permutation matrix corresponding to $\pi$, 
+    this function sets $A$ to $A Q^t$.
+
+    See \code{mat_csr_permute_rows()}.
 
 void _mat_csr_permute_rows(long m, long *p, long *lenr, const long *pi)
 
@@ -106,7 +136,13 @@ void mat_csr_permute_rows(mat_csr_t A, const long *pi, const mat_ctx_t ctx)
 
     Permutes the rows of $A$ according to the permutation $\pi$.  This 
     means that the $i$th row of the matrix on exit is the same as the 
-    $\pi_i$th row of the matrix on entry to this function.
+    $\pi_i$th row of the matrix on entry to this function.  In terms of 
+    permutation matrices, if $P$ is defined by 
+    \begin{equation*}
+    P_{ij} = \begin{cases} 1 & \text{if $j = \pi_i$} \\
+                           0 & \text{otherwise} \end{cases}
+    \end{equation*}
+    then this function sets $A$ to $P A$.
 
 long _mat_csr_block_triangularise(long *arp, long *b, long n, const long *j, 
                                   const long *p, const long *lenr, long *w)
@@ -166,4 +202,10 @@ void mat_csr_lupdecompose(mat_csr_t L, mat_csr_t U, long *pi,
 *******************************************************************************
 
 int mat_csr_debug(const mat_csr_t A, const mat_ctx_t ctx)
+
+    Prints some debugging information about $A$ to \code{stdout}.
+
+int mat_csr_print_dense(const mat_csr_t A, const mat_ctx_t ctx)
+
+    Prints a dense representation of $A$ to \code{stdout}.
 

@@ -2,9 +2,6 @@
 
 void mat_csr_clear(mat_csr_t A, const mat_ctx_t ctx)
 {
-    free(A->p);
-    free(A->lenr);
-
     if (A->alloc)
     {
         long k;
@@ -16,4 +13,7 @@ void mat_csr_clear(mat_csr_t A, const mat_ctx_t ctx)
         free(A->x);
         free(A->j);
     }
+
+    free(A->p);
+    free(A->lenr);
 }

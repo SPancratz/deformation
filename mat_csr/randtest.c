@@ -17,7 +17,7 @@ mat_csr_randtest(mat_csr_t A,
         return;
 
     u   = 2 * sizeof(long) + ctx->size;
-    len = A->m * A->n;
+    len = d * A->m * A->n;
     mem = malloc(u * len);
 
     if (!mem)
@@ -27,24 +27,20 @@ mat_csr_randtest(mat_csr_t A,
     }
 
     k = 0;
-    for (i = 0; i < A->m; i++)
-    {
-        for (j = 0; j < A->n; j++)
+    for (i = 0; (k < len) && (i < A->m); i++)
+        for (j = 0; (k < len) && (j < A->n); j++)
         {
-            *(long *) (mem + k * u)                = i;
-            *(long *) (mem + k * u + sizeof(long)) = j;
             if (n_randint(state, 100) <= f)
             {
+                *(long *) (mem + k * u) = i;
+                *(long *) (mem + k * u + sizeof(long)) = j;
+                ctx->init(mem + k * u + 2 * sizeof(long));
                 ctx->randtest_not_zero(mem + k * u + 2 * sizeof(long), state);
+                k++;
             }
-            else
-            {
-                ctx->zero(mem + k * u + 2 * sizeof(long));
-            }
-            k++;
         }
-    }
 
-    mat_csr_set_array3(A, mem, len, 0, ctx);
+    mat_csr_set_array3(A, mem, k, 0, ctx);
+
     free(mem);
 }

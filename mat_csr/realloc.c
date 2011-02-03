@@ -28,14 +28,14 @@ void mat_csr_realloc(mat_csr_t A, long alloc, const mat_ctx_t ctx)
         for (k = A->alloc; k < alloc; k++)
             ctx->init(A->x + k * (ctx->size));
         for (k = A->alloc; k < alloc; k++)
-            A->j[k] = 0L;
+            A->j[k] = 0;
 
         A->alloc = alloc;
     }
     else
     {
         A->alloc = alloc;
-        A->x     = calloc(alloc, ctx->size);
+        A->x     = malloc(alloc * ctx->size);
         A->j     = calloc(alloc, sizeof(long));
 
         if (!(A->x) || !(A->j) || !(A->p) || !(A->lenr))

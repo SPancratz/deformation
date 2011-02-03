@@ -38,7 +38,7 @@ void mat_csr_init2(mat_csr_t A, long m, long n, long alloc, const mat_ctx_t ctx)
         long k;
 
         A->alloc = alloc;
-        A->x     = calloc(alloc, ctx->size);
+        A->x     = malloc(alloc * ctx->size);
         A->j     = calloc(alloc, sizeof(long));
 
         if (!(A->x) || !(A->j))
