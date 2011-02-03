@@ -1,0 +1,119 @@
+*******************************************************************************
+
+    Memory management
+
+    The data type \code{mat_coo_t} stores $m \times n$ matrices in the 
+    \emph{coordinate list} format.
+
+    On a technical note, the \code{mat_coo_t} object is an array of length 
+    one for a \code{mat_coo} structure.
+
+    A \code{mat_coo} structure for an $m \times n$ matrix comprises the 
+    following data:
+    \begin{itemize}
+    \item Two positive \code{long} integers \code{m} and \code{n}, holding 
+          the matrix dimensions.  These are set at creation time and are 
+          not allowed to be changed during the lifetime of this structure.
+    \item A non-negative \code{long} \code{alloc} which gives the number 
+          of coefficients for which there is space in the array \code{list}. 
+          If \code{alloc} is zero, \code{list} is \code{NULL}.
+    \item A non-negative \code{long} \code{length} which is at most 
+          \code{alloc}.  This gives the number of coefficients stored 
+          in the list.
+    \item An array \code{list} with elements of type \code{char}.  This 
+          array will grow dynamically as needed, although the function 
+          \code{mat_coo_fit_length()} is available to explicitly ensure 
+          a minimum size of the list.  An element of the list takes 
+          up space \code{2 * sizeof(long) + ctx->size}, needed to store 
+          the row index, the column index, and the value of the entry.
+    \end{itemize}
+
+    Unless explicitly stated otherwise, we do not assume a particular 
+    ordering of the entries in the list.
+
+*******************************************************************************
+
+void mat_coo_init(mat_coo_t A, long m, long n, const mat_ctx_t ctx)
+
+    Initialises the $m \times n$ matrix $A$.
+
+void mat_coo_init2(mat_coo_t A, long m, long n, long alloc, 
+                   const mat_ctx_t ctx)
+
+    Initialises the $m \times n$ matrix $A$ to have space for at least 
+    \code{alloc} non-zero entries.
+
+void mat_coo_realloc(mat_coo_t A, long alloc, const mat_ctx_t ctx)
+
+    Reallocates the underlying list of the matrix to have space for 
+    precisely \code{alloc} non-zero entries.
+
+    If the list currently contains more than \code{alloc} entries, the 
+    last ones in the list are deleted.  Note that, unless some explicit 
+    ordering of the entries is ensured, there is no guarantee which 
+    entries in the matrix will be deleted.
+
+void mat_coo_clear(mat_coo_t A, int clear, const mat_ctx_t ctx)
+
+    Clears the matrix $A$.  If \code{clear} is non-zero, the entries 
+    of this matrix are cleared calling \code{ctx->clear()};  otherwise, 
+    only a shallow deletion of the matrix structure takes place.
+
+void mat_coo_fit_length(mat_coo_t A, long len, const mat_ctx_t ctx)
+
+    Ensures that the matrix $A$ has space for at least \code{len} 
+    coefficients.
+
+*******************************************************************************
+
+    Assignment
+
+*******************************************************************************
+
+void mat_coo_set_entry(mat_coo_t A, long i, long j, const void *x, 
+                       const mat_ctx_t ctx)
+
+    Sets the entry in position $(i, j)$ to the value given at \code{*x}.
+
+    Note that the runtime of this operation is linear in the number of 
+    non-zero entries in $A$.
+
+void mat_coo_zero(mat_coo_t A, const mat_ctx_t ctx)
+
+    Sets the matrix $A$ to the zero matrix.
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void mat_coo_randtest(mat_coo_t A, 
+                      flint_rand_t state, double d, const mat_ctx_t ctx)
+
+    Sets $A$ to a random matrix of density $d$.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int mat_coo_is_zero(const mat_coo_t A, const mat_ctx_t ctx)
+
+    Returns whether $A$ is zero.
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+int mat_coo_debug(const mat_coo_t A, const mat_ctx_t ctx)
+
+    Prints some debugging information about the matrix $A$ to \code{stdout}.
+
+int mat_coo_print_dense(const mat_coo_t A, const mat_ctx_t ctx)
+
+    Prints a dense representation of the matrix $A$ to \code{stdout}.
+
