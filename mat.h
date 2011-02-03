@@ -15,8 +15,8 @@ typedef struct
 {
     size_t size;
 
-    void (*init)(void *op); /* Used */
-    void (*clear)(void *op); /* Used */
+    void (*init)(void *op);
+    void (*clear)(void *op);
 
     void (*set)(void *rop, const void *op);
     void (*swap)(void *op1, void *op2);
