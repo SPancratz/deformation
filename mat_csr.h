@@ -16,9 +16,9 @@ typedef struct
     long *j;      /* Column indices */
     long *p;      /* p[i] is the pointer into x (or j) to the first non-zero element in row i */
     long *lenr;   /* Number of non-zero elements in row i */
-} mat_csr;
+} __mat_csr_struct;
 
-typedef mat_csr mat_csr_t[1];
+typedef __mat_csr_struct mat_csr_t[1];
 
 /* Memory management *********************************************************/
 
