@@ -139,7 +139,7 @@ static int _mpq_equal(const void *op1, const void *op2)
 static int _mpq_is_zero(const void *op)
     { return mpq_sgn((__mpq_struct *) op) == 0; }
 static int _mpq_is_one(const void *op)
-    { return mpq_cmp_ui((__mpq_struct *) op, 1, 1); }
+    { return mpq_cmp_ui((__mpq_struct *) op, 1, 1) == 0; }
 static void _mpq_add(void *rop, const void *op1, const void *op2)
     { mpq_add(rop, op1, op2); }
 static void _mpq_sub(void *rop, const void *op1, const void *op2)
