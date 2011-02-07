@@ -1,0 +1,102 @@
+/******************************************************************************
+
+    Copyright (C) 2010 Sebastian Pancratz
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void mat_dense_init(mat_dense_t mat, long m, long n, const mat_ctx_t)
+
+    Initialises the $m \times n$ matrix \code{mat} for use.
+
+void mat_dense_set(mat_dense_t mat1, const mat_dense_t mat2, 
+                   const mat_ctx_t ctx)
+
+    Sets the matrix \code{mat1} to a (deep) copy of the matrix \code{mat2}. 
+    Assumes that the dimensions of \code{mat1} and \code{mat2} are the same.
+
+void mat_dense_clear(mat_dense_t mat, const mat_ctx_t ctx);
+
+    Clears the memory used by the matrix \code{mat}.
+
+void mat_dense_entry(mat_dense_t mat, long i, long j, mat_ctx_t ctx)
+
+    Returns a pointer to the entry in position $(i, j)$ in the matrix.
+
+void mat_dense_zero(mat_dense_t mat, const mat_ctx_t ctx)
+
+    Sets the matrix \code{mat} to the zero matrix.
+
+void mat_dense_one(mat_dense_t mat, const mat_ctx_t ctx)
+
+    Sets the matrix \code{mat} to the identity matrix.  Assumes that the 
+    matrix is a square matrix.
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void mat_dense_randtest(mat_dense_t mat, flint_rand_t state, 
+                        const mat_ctx_t ctx)
+
+    Sets the matrix \code{mat} to a random dense matrix.
+
+void mat_dense_randrank(mat_dense_t mat, flint_rand_t state, long rank, 
+                        const mat_ctx_t ctx);
+
+    Sets the matrix \code{mat} to a dense matrix of the given rank.
+
+    This function only sets the first \code{rank} diagonal entries 
+    to non-zero random values.  The caller can use the function 
+    \code{mat_dense_randops()} to ensure a certain density of the 
+    matrix.
+
+void mat_dense_randops(mat_dense_t mat, flint_rand_t state, long count, 
+                       const mat_ctx_t ctx);
+
+    Performs at most \code{count} random row and column operations 
+    on the matrix \code{mat}.  Note that these operations do not 
+    modify the rank of the matrix.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int mat_dense_equal(const mat_dense_t mat1, const mat_dense_t mat2, 
+                    const mat_ctx_t ctx)
+
+    Returns whether the two matrices \code{mat1} and \code{mat2} 
+    are equal.
+
+int mat_dense_is_one(const mat_dense_t mat, const mat_ctx_t ctx)
+
+    Returns whether the matrix \code{mat} is the identity matrix.
+
+int mat_dense_is_zero(const mat_dense_t mat, const mat_ctx_t ctx)
+
+    Returns whether the matrix \code{mat} is the zero matrix.
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+int mat_dense_debug(const mat_dense_t mat, const mat_ctx_t ctx)
+
+    Prints some debugging information about the matrix \code{mat} 
+    to \code{stdout}.
+
+int mat_dense_print(const mat_dense_t mat, const mat_ctx_t ctx)
+
+    Prints the matrix \code{mat} to \code{stdout}, row by row.
+
