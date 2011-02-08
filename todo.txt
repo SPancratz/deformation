@@ -4,3 +4,10 @@ mat_dense
 * Write test code for "mul_vec"
 * Use the test code for "mul_vec" to write test code for "lup_solve"
 * Commit
+
+mat_csr
+=======
+
+* Implement sparse system solving using block triangularisation and 
+  LUP decomposition on the (dense) kernels
+
