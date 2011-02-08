@@ -97,11 +97,32 @@ void _mat_dense_add(char **rowsC, char ** const rowsA, char ** const rowsB,
 void mat_dense_add(mat_dense_t C, const mat_dense_t A, const mat_dense_t B, 
                    const mat_ctx_t ctx)
 
-    Sets the matrix $C$ to the sum of the matrices $A$ and $B$.
+    Sets the matrix $C$ to the sum of the $m \times n$ matrices $A$ and $B$.
 
     Assumes that the matrix dimensions of $A$, $B$, and $C$ are the same. 
     Supports aliasing of the $C$ with $A$ and $B$ if the underlying addition 
     function \code{ctx->add()} supports aliasing.
+
+*******************************************************************************
+
+    Matrix multiplication
+
+*******************************************************************************
+
+void _mat_dense_mul_classical(char **rowsC, 
+                              char ** const rowsA, char ** const rowsB, 
+                              long ell, long m, long n, const mat_ctx_t ctx);
+
+void mat_dense_mul_classical(mat_dense_t C, const mat_dense_t A, 
+                             const mat_dense_t B, const mat_ctx_t ctx);
+
+    Sets the $\ell \times n$ matrix $C$ to the product of the 
+    $\ell \times m$ matrix $A$ and the $m \times n$ matrix $B$.
+
+    Assumes that the matrices have dimensions compatible for matrix 
+    multiplication.  Assumes that the underlying addition function 
+    \code{ctx->add()} supports aliasing of the first two arguments.
+    Does not allow aliasing.
 
 *******************************************************************************
 

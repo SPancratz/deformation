@@ -56,6 +56,15 @@ void _mat_dense_add(char **rowsC, char ** const rowsA, char **const rowsB,
 void mat_dense_add(mat_dense_t C, const mat_dense_t A, const mat_dense_t B, 
                    const mat_ctx_t ctx);
 
+/* Matrix multiplication *****************************************************/
+
+void _mat_dense_mul_classical(char **rowsC, 
+                              char ** const rowsA, char ** const rowsB, 
+                              long ell, long m, long n, const mat_ctx_t ctx);
+
+void mat_dense_mul_classical(mat_dense_t C, const mat_dense_t A, 
+                             const mat_dense_t B, const mat_ctx_t ctx);
+
 /* Linear systems ************************************************************/
 
 int 
