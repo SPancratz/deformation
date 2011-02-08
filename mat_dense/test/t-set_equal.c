@@ -6,8 +6,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("set/ equal\n");
-    printf("----------\n");
+    printf("set/ equal... ");
     fflush(stdout);
 
     flint_randinit(state);

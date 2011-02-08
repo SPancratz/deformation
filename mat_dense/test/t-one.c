@@ -6,8 +6,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("one\n");
-    printf("---\n");
+    printf("one... ");
     fflush(stdout);
 
     flint_randinit(state);
