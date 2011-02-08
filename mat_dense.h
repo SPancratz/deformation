@@ -1,5 +1,5 @@
-#ifndef MAT_DENSE
-#define MAT_DENSE
+#ifndef MAT_DENSE_H
+#define MAT_DENSE_H
 
 #include "mat.h"
 
