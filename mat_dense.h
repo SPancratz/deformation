@@ -56,6 +56,14 @@ void _mat_dense_add(char **rowsC, char ** const rowsA, char **const rowsB,
 void mat_dense_add(mat_dense_t C, const mat_dense_t A, const mat_dense_t B, 
                    const mat_ctx_t ctx);
 
+/* Matrix-vector multiplication **********************************************/
+
+void _mat_dense_mul_vec(char *y, char ** const rows, long m, long n, 
+                        const char *x, const mat_ctx_t ctx);
+
+void mat_dense_mul_vec(char *y, const mat_dense_t A, const char *x, 
+                       const mat_ctx_t ctx);
+
 /* Matrix multiplication *****************************************************/
 
 void _mat_dense_mul_classical(char **rowsC, 
@@ -73,6 +81,12 @@ void mat_dense_permute_rows(mat_dense_t mat, const long *pi,
                             const mat_ctx_t ctx);
 
 /* Linear systems ************************************************************/
+
+void _mat_dense_lup_solve(char *x, char ** const rows, long m, long n, 
+                          const long *pi, const char *b, const mat_ctx_t ctx);
+
+void mat_dense_lup_solve(char *x, const mat_dense_t mat, const long *pi, 
+                         const char *b, const mat_ctx_t ctx);
 
 int 
 _mat_dense_lup_decompose(long *pi, char **rows, long m, const mat_ctx_t ctx);
