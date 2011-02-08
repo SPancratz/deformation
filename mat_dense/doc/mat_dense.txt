@@ -126,12 +126,30 @@ void mat_dense_mul_classical(mat_dense_t C, const mat_dense_t A,
 
 *******************************************************************************
 
+    Permutations
+
+*******************************************************************************
+
+void _mat_dense_permute_rows(char **rows, long m, const long *pi, char **w)
+
+    Permutes the rows of the matrix \code{(rows, m)} according to the 
+    permutation given by the array $\pi$.  Requires an array $w$ of 
+    temporary space of length $m$.
+
+void mat_dense_permute_rows(mat_dense_t mat, const long *pi, 
+                            const mat_ctx_t ctx)
+
+    Permutes the rows of the matrix \code{mat} according to the permutation 
+    given by the array $\pi$.
+
+*******************************************************************************
+
     Linear systems
 
 *******************************************************************************
 
-int mat_dense_lup_decompose(const mat_dense_t out, long *pi, mat_dense_t mat, 
-                            const mat_ctx_t ctx)
+int mat_dense_lup_decompose(mat_dense_t out, long *pi, 
+                            const mat_dense_t mat, const mat_ctx_t ctx)
 
     Sets \code{out} to the $LUP$ decomposition of \code{mat}.  Here the 
     matrix $L$ is lower unit-triangular and matrix $U$ is upper triangular. 

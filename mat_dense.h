@@ -65,12 +65,19 @@ void _mat_dense_mul_classical(char **rowsC,
 void mat_dense_mul_classical(mat_dense_t C, const mat_dense_t A, 
                              const mat_dense_t B, const mat_ctx_t ctx);
 
+/* Permutations **************************************************************/
+
+void _mat_dense_permute_rows(char **rows, long m, const long *pi, char **w);
+
+void mat_dense_permute_rows(mat_dense_t mat, const long *pi, 
+                            const mat_ctx_t ctx);
+
 /* Linear systems ************************************************************/
 
 int 
 _mat_dense_lup_decompose(long *pi, char **rows, long m, const mat_ctx_t ctx);
 
-int mat_dense_lup_decompose(mat_dense_t out, long *pi, mat_dense_t mat, 
+int mat_dense_lup_decompose(mat_dense_t out, long *pi, const mat_dense_t mat, 
                             const mat_ctx_t ctx);
 
 /* Input and output **********************************************************/

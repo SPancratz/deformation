@@ -46,10 +46,10 @@ _mat_dense_lup_decompose(long *pi, char **rows, long m, const mat_ctx_t ctx)
     return 0;
 }
 
-int mat_dense_lup_decompose(mat_dense_t out, long *pi, mat_dense_t mat, 
+int mat_dense_lup_decompose(mat_dense_t out, long *pi, const mat_dense_t mat, 
                             const mat_ctx_t ctx)
 {
-    if (!(mat->m == out->m && mat->n && out->n))
+    if (!(mat->m == out->m && mat->n && out->n && mat->m == mat->n))
     {
         printf("ERROR (mat_dense_lup_decompose).\n\n");
         abort();
@@ -57,6 +57,6 @@ int mat_dense_lup_decompose(mat_dense_t out, long *pi, mat_dense_t mat,
 
     mat_dense_set(out, mat, ctx);
 
-    return _mat_dense_lup_decompose(pi, mat->rows, mat->m, ctx);
+    return _mat_dense_lup_decompose(pi, out->rows, out->m, ctx);
 }
 
