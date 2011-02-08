@@ -87,6 +87,28 @@ int mat_dense_is_zero(const mat_dense_t mat, const mat_ctx_t ctx)
 
 *******************************************************************************
 
+    Linear systems
+
+*******************************************************************************
+
+int mat_dense_lup_decompose(const mat_dense_t out, long *pi, mat_dense_t mat, 
+                            const mat_ctx_t ctx)
+
+    Sets \code{out} to the $LUP$ decomposition of \code{mat}.  Here the 
+    matrix $L$ is lower unit-triangular and matrix $U$ is upper triangular. 
+    The matrix $P$ determined by $\pi$ is a permutation matrix such that 
+    $P A = L U$.
+
+    Returns $0$ if the matrix is non-singular and hence the computation 
+    was completed successfully.  Otherwise, returns a positive integer. 
+    This convention is chosen now so that perhaps at a later point it 
+    could be improved to return the rank deficiency.
+
+    Asserts that \code{mat} and \code{out} are square matrices of the 
+    same dimensions.
+
+*******************************************************************************
+
     Input and output
 
 *******************************************************************************

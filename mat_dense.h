@@ -48,6 +48,14 @@ int mat_dense_is_one(const mat_dense_t mat, const mat_ctx_t ctx);
 
 int mat_dense_is_zero(const mat_dense_t mat, const mat_ctx_t ctx);
 
+/* Linear systems ************************************************************/
+
+int 
+_mat_dense_lup_decompose(long *pi, char **rows, long m, const mat_ctx_t ctx);
+
+int mat_dense_lup_decompose(const mat_dense_t out, long *pi, mat_dense_t mat, 
+                            const mat_ctx_t ctx);
+
 /* Input and output **********************************************************/
 
 int mat_dense_debug(const mat_dense_t mat, const mat_ctx_t ctx);
