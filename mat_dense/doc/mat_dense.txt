@@ -87,6 +87,24 @@ int mat_dense_is_zero(const mat_dense_t mat, const mat_ctx_t ctx)
 
 *******************************************************************************
 
+    Matrix addition
+
+*******************************************************************************
+
+void _mat_dense_add(char **rowsC, char ** const rowsA, char ** const rowsB, 
+                    long m, long n, const mat_ctx_t ctx)
+
+void mat_dense_add(mat_dense_t C, const mat_dense_t A, const mat_dense_t B, 
+                   const mat_ctx_t ctx)
+
+    Sets the matrix $C$ to the sum of the matrices $A$ and $B$.
+
+    Assumes that the matrix dimensions of $A$, $B$, and $C$ are the same. 
+    Supports aliasing of the $C$ with $A$ and $B$ if the underlying addition 
+    function \code{ctx->add()} supports aliasing.
+
+*******************************************************************************
+
     Linear systems
 
 *******************************************************************************

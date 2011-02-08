@@ -48,12 +48,20 @@ int mat_dense_is_one(const mat_dense_t mat, const mat_ctx_t ctx);
 
 int mat_dense_is_zero(const mat_dense_t mat, const mat_ctx_t ctx);
 
+/* Matrix addition ***********************************************************/
+
+void _mat_dense_add(char **rowsC, char ** const rowsA, char **const rowsB, 
+                    long m, long n, const mat_ctx_t ctx);
+
+void mat_dense_add(mat_dense_t C, const mat_dense_t A, const mat_dense_t B, 
+                   const mat_ctx_t ctx);
+
 /* Linear systems ************************************************************/
 
 int 
 _mat_dense_lup_decompose(long *pi, char **rows, long m, const mat_ctx_t ctx);
 
-int mat_dense_lup_decompose(const mat_dense_t out, long *pi, mat_dense_t mat, 
+int mat_dense_lup_decompose(mat_dense_t out, long *pi, mat_dense_t mat, 
                             const mat_ctx_t ctx);
 
 /* Input and output **********************************************************/
