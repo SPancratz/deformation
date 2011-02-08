@@ -5,6 +5,10 @@ mat_dense
 * Use the test code for "mul_vec" to write test code for "lup_solve"
 * Commit
 
+* Eventually, once there is a module for generic dense vectors, 
+  re-write some parts of the test code to use these 
+  (e.g. t-mul_vec, t-lup_solve)
+
 mat_csr
 =======
 
