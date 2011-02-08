@@ -1,0 +1,6 @@
+mat_dense
+=========
+
+* Write test code for "mul_vec"
+* Use the test code for "mul_vec" to write test code for "lup_solve"
+* Commit
