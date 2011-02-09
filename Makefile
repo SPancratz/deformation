@@ -90,5 +90,5 @@ install: library
 %.o: %.c
 	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
 
-BUILD_DIRS = mat_dense mat_coo mat_csr 
+BUILD_DIRS = vec mat_dense mat_coo mat_csr
 
