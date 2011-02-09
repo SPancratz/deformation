@@ -9,6 +9,11 @@ mat_dense
 
 * Consider renaming the entire module to "mat" instead of "mat_dense"
 
+generics.h
+==========
+
+* Rename "mat_ctx_t" throughout the whole project
+
 vec
 ===
 
