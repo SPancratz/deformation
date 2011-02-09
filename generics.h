@@ -1,6 +1,10 @@
 #ifndef GENERICS_H
 #define GENERICS_H
 
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <mpir.h>
 #include "flint.h"
 #include "long_extras.h"
 
@@ -32,9 +36,9 @@ typedef struct
 
     int (*print)(const void *op);
 
-} mat_ctx;
+} __mat_ctx_struct;
 
-typedef mat_ctx mat_ctx_t[1];
+typedef __mat_ctx_struct mat_ctx_t[1];
 
 /* Predefined contexts *******************************************************/
 
