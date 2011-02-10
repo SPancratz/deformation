@@ -1,11 +1,8 @@
 mat_dense
 =========
 
-* Fix a bug in lup_solve(?)
-
 * Eventually, once there is a module for generic dense vectors, 
-  re-write some parts of the test code to use these 
-  (e.g. t-mul_vec, t-lup_solve)
+  re-write some parts of the code to use these
 
 * Consider renaming the entire module to "mat" instead of "mat_dense"
 
@@ -13,12 +10,6 @@ generics.h
 ==========
 
 * Rename "mat_ctx_t" throughout the whole project
-
-vec
-===
-
-* Start a module for generic vectors
-* init, clear, randtest, zero, add, sub, scalar_mul, scalar_div, equal, print
 
 mat_csr
 =======
