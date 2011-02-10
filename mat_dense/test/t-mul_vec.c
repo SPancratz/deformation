@@ -1,4 +1,5 @@
 #include "mat_dense.h"
+#include "vec.h"
 
 int
 main(void)
@@ -19,7 +20,6 @@ main(void)
         long m;
         mat_ctx_t ctx;
         mat_dense_t A;
-        long k;
         char *x, *y;
 
         m = n_randint(state, 50) + 1;
@@ -28,22 +28,13 @@ main(void)
         mat_dense_init(A, m, m, ctx);
         mat_dense_one(A, ctx);
 
-        x = malloc(m * ctx->size);
-        for (k = 0; k < m; k++)
-            ctx->init(x + k * ctx->size);
-        y = malloc(m * ctx->size);
-        for (k = 0; k < m; k++)
-            ctx->init(y + k * ctx->size);
-        for (k = 0; k < m; k++)
-            ctx->randtest(x + k * ctx->size, state);
+        x = _vec_init(m, ctx);
+        y = _vec_init(m, ctx);
+        _vec_randtest(x, m, state, ctx);
 
         mat_dense_mul_vec(y, A, x, ctx);
 
-        for (k = 0; k < m; k++)
-            if (!ctx->equal(x + k * ctx->size, y + k * ctx->size))
-                break;
-
-        result = (k == m);
+        result = _vec_equal(x, y, m, ctx);
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -52,12 +43,8 @@ main(void)
             printf("\n");
         }
 
-        for (k = 0; k < m; k++)
-            ctx->clear(x + k * ctx->size);
-        free(x);
-        for (k = 0; k < m; k++)
-            ctx->clear(y + k * ctx->size);
-        free(y);
+        _vec_clear(x, m, ctx);
+        _vec_clear(y, m, ctx);
 
         mat_dense_clear(A, ctx);
         mat_ctx_clear(ctx);
@@ -71,7 +58,6 @@ main(void)
         long m, n;
         mat_ctx_t ctx;
         mat_dense_t A;
-        long k;
         char *x, *y, *z1, *z2;
 
         m = n_randint(state, 50) + 1;
@@ -81,39 +67,22 @@ main(void)
         mat_dense_init(A, m, n, ctx);
         mat_dense_randtest(A, state, ctx);
 
-        x = malloc(n * ctx->size);
-        for (k = 0; k < n; k++)
-            ctx->init(x + k * ctx->size);
-        y = malloc(n * ctx->size);
-        for (k = 0; k < n; k++)
-            ctx->init(y + k * ctx->size);
-        for (k = 0; k < n; k++)
-            ctx->randtest(x + k * ctx->size, state);
-        for (k = 0; k < n; k++)
-            ctx->randtest(y + k * ctx->size, state);
+        x = _vec_init(n, ctx);
+        y = _vec_init(n, ctx);
+        _vec_randtest(x, n, state, ctx);
+        _vec_randtest(y, n, state, ctx);
 
-        z1 = malloc(m * ctx->size);
-        for (k = 0; k < m; k++)
-            ctx->init(z1 + k * ctx->size);
-        z2 = malloc(m * ctx->size);
-        for (k = 0; k < m; k++)
-            ctx->init(z2 + k * ctx->size);
+        z1 = _vec_init(m, ctx);
+        z2 = _vec_init(m, ctx);
 
         mat_dense_mul_vec(z1, A, x, ctx);
         mat_dense_mul_vec(z2, A, y, ctx);
-        for (k = 0; k < m; k++)
-            ctx->add(z2 + k * ctx->size, 
-                     z1 + k * ctx->size, z2 + k * ctx->size);
+        _vec_add(z2, z1, z2, m, ctx);
 
-        for (k = 0; k < n; k++)
-            ctx->add(x + k * ctx->size, x + k * ctx->size, y + k * ctx->size);
+        _vec_add(x, x, y, n, ctx);
         mat_dense_mul_vec(z1, A, x, ctx);
 
-        for (k = 0; k < m; k++)
-            if (!ctx->equal(z1 + k * ctx->size, z2 + k * ctx->size))
-                break;
-
-        result = (k == m);
+        result = _vec_equal(z1, z2, m, ctx);
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -122,18 +91,10 @@ main(void)
             printf("\n");
         }
 
-        for (k = 0; k < n; k++)
-            ctx->clear(x + k * ctx->size);
-        free(x);
-        for (k = 0; k < n; k++)
-            ctx->clear(y + k * ctx->size);
-        free(y);
-        for (k = 0; k < m; k++)
-            ctx->clear(z1 + k * ctx->size);
-        free(z1);
-        for (k = 0; k < m; k++)
-            ctx->clear(z2 + k * ctx->size);
-        free(z2);
+        _vec_clear(x, n, ctx);
+        _vec_clear(y, n, ctx);
+        _vec_clear(z1, m, ctx);
+        _vec_clear(z2, m, ctx);
 
         mat_dense_clear(A, ctx);
         mat_ctx_clear(ctx);

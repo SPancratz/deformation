@@ -1,4 +1,5 @@
 #include "mat_dense.h"
+#include "vec.h"
 
 int
 main(void)
@@ -34,46 +35,48 @@ main(void)
         mat_dense_randrank(A, state, m, ctx);
         mat_dense_randops(A, state, 1.5 * m, ctx);
 
-        x = malloc(m * ctx->size);
-        for (k = 0; k < m; k++)
-            ctx->init(x + k * ctx->size);
-        b = malloc(m * ctx->size);
-        for (k = 0; k < m; k++)
-            ctx->init(b + k * ctx->size);
-        c = malloc(m * ctx->size);
-        for (k = 0; k < m; k++)
-            ctx->init(c + k * ctx->size);
+        x = _vec_init(m, ctx);
+        b = _vec_init(m, ctx);
+        c = _vec_init(m, ctx);
 
-        for (k = 0; k < m; k++)
-            ctx->randtest(b + k * ctx->size, state);
+        _vec_randtest(b, m, state, ctx);
 
         mat_dense_lup_decompose(LU, pi, A, ctx);
         mat_dense_lup_solve(x, LU, pi, b, ctx);
 
         mat_dense_mul_vec(c, A, x, ctx);
 
-        for (k = 0; k < m; k++)
-            if (!ctx->equal(b + k * ctx->size, c + k * ctx->size))
-                break;
-
-        result = (k == m);
+        result = _vec_equal(b, c, m, ctx);
         if (!result)
         {
             printf("FAIL:\n\n");
             printf("Matrix A\n");
             mat_dense_print(A, ctx);
             printf("\n");
+            printf("Matrix LU\n");
+            mat_dense_print(LU, ctx);
+            printf("\n");
+            printf("pi = {%ld ", m);
+            for (k = 0; k < m; k++)
+                printf(" %ld", pi[k]);
+            printf("}\n");
+            printf("b = {");
+            _vec_print(b, m, ctx);
+            printf("}\n");
+            printf("c = {");
+            _vec_print(c, m, ctx);
+            printf("}\n");
+            printf("x = {");
+            _vec_print(x, m, ctx);
+            printf("}\n");
             abort();
         }
 
         free(pi);
 
-        for (k = 0; k < m; k++)
-            ctx->clear(x + k * ctx->size);
-        for (k = 0; k < m; k++)
-            ctx->clear(b + k * ctx->size);
-        for (k = 0; k < m; k++)
-            ctx->clear(c + k * ctx->size);
+        _vec_clear(x, m, ctx);
+        _vec_clear(b, m, ctx);
+        _vec_clear(c, m, ctx);
 
         mat_dense_clear(A, ctx);
         mat_dense_clear(LU, ctx);
