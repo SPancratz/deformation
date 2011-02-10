@@ -166,6 +166,13 @@ void mat_dense_permute_rows(mat_dense_t mat, const long *pi,
 void _mat_dense_lup_solve(char *x, char ** const rows, long m, long n, 
                           const char *pi, const char *b, const mat_ctx_t ctx)
 
+    Solves the linear system $A x = b$, where the data relevant to the 
+    $m \times n$ matrix $A$ is given in the form $P A = L U$ with \code{rows} 
+    the $L U$ part and \code{pi} the $P$ part.
+
+    In the current implementation, asserts that \code{m == n}, 
+    and \code{x != b}.
+
 void mat_dense_lup_solve(char *x, const mat_dense_t mat, const long *pi, 
                          const char *b, const mat_ctx_t ctx)
 
