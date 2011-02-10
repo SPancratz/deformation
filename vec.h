@@ -19,6 +19,8 @@ void _vec_randtest_not_zero(char *vec, long n, flint_rand_t state, const mat_ctx
 
 void _vec_set(char *vec1, const char *vec2, long n, const mat_ctx_t ctx);
 
+void _vec_swap(char *vec1, char *vec2, long n, const mat_ctx_t ctx);
+
 void _vec_zero(char *vec, long n, const mat_ctx_t ctx);
 
 /* Addition ******************************************************************/
