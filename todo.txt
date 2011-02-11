@@ -4,12 +4,16 @@ mat_dense
 * Eventually, once there is a module for generic dense vectors, 
   re-write some parts of the code to use these
 
-* Consider renaming the entire module to "mat" instead of "mat_dense"
-
 generics.h
 ==========
 
 * Rename "mat_ctx_t" throughout the whole project
+
+perm.h
+======
+
+* This is only a temporary place for the permutation generation 
+  function.  Eventually, it needs to be moved somewhere more sensible.
 
 mat_csr
 =======

@@ -1,57 +1,105 @@
-#ifndef MAT_H
-#define MAT_H
+#ifndef MAT_DENSE_H
+#define MAT_DENSE_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <mpir.h>
-
-#include "deformation.h"
 #include "generics.h"
+#include "perm.h"
 
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
-#include "long_extras.h"
+typedef struct
+{
+    char *entries;
+    long m;
+    long n;
+    char **rows;
+} __mat_struct;
+
+typedef __mat_struct mat_t[1];
+
+/* Memory management *********************************************************/
+
+void mat_init(mat_t mat, long m, long n, const mat_ctx_t);
+
+void mat_set(mat_t mat1, const mat_t mat2, 
+                   const mat_ctx_t ctx);
+
+void mat_clear(mat_t mat, const mat_ctx_t ctx);
+
+#define mat_entry(mat, i, j, ctx)  ((mat)->rows[i] + (j) * (ctx)->size)
+
+void mat_zero(mat_t mat, const mat_ctx_t ctx);
+
+void mat_one(mat_t mat, const mat_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 
-/*
-    Generates a random permutation vector of length $n$.
+void mat_randtest(mat_t mat, flint_rand_t state, 
+                        const mat_ctx_t ctx);
 
-    This function uses the Knuth shuffle to generate a uniformly 
-    random permutation without retries.
- */
+void mat_randrank(mat_t mat, flint_rand_t state, long rank, 
+                        const mat_ctx_t ctx);
 
-static void _long_vec_randperm(long *vec, long n, flint_rand_t state)
-{
-    long i, j, t;
+void mat_randops(mat_t mat, flint_rand_t state, long count, 
+                       const mat_ctx_t ctx);
 
-    for (i = 0; i < n; i++)
-        vec[i] = i;
+/* Comparison ****************************************************************/
 
-    for (i = n - 1; i > 0; i--)
-    {
-        j = n_randint(state, i + 1);
-        t = vec[i];
-        vec[i] = vec[j];
-        vec[j] = t;
-    }
-}
+int mat_equal(const mat_t mat1, const mat_t mat2, 
+                    const mat_ctx_t ctx);
 
-static int _long_vec_print(const long *vec, long len)
-{
-    long i;
+int mat_is_one(const mat_t mat, const mat_ctx_t ctx);
 
-    printf("%ld", len);
-    if (len > 0)
-    {
-        printf(" ");
-        for (i = 0; i < len; i++)
-            printf(" %ld", vec[i]);
-    }
+int mat_is_zero(const mat_t mat, const mat_ctx_t ctx);
 
-    return 1;
-}
+/* Matrix addition ***********************************************************/
+
+void _mat_add(char **rowsC, char ** const rowsA, char **const rowsB, 
+                    long m, long n, const mat_ctx_t ctx);
+
+void mat_add(mat_t C, const mat_t A, const mat_t B, 
+                   const mat_ctx_t ctx);
+
+/* Matrix-vector multiplication **********************************************/
+
+void _mat_mul_vec(char *y, char ** const rows, long m, long n, 
+                        const char *x, const mat_ctx_t ctx);
+
+void mat_mul_vec(char *y, const mat_t A, const char *x, 
+                       const mat_ctx_t ctx);
+
+/* Matrix multiplication *****************************************************/
+
+void _mat_mul_classical(char **rowsC, 
+                              char ** const rowsA, char ** const rowsB, 
+                              long ell, long m, long n, const mat_ctx_t ctx);
+
+void mat_mul_classical(mat_t C, const mat_t A, 
+                             const mat_t B, const mat_ctx_t ctx);
+
+/* Permutations **************************************************************/
+
+void _mat_permute_rows(char **rows, long m, const long *pi, char **w);
+
+void mat_permute_rows(mat_t mat, const long *pi, 
+                            const mat_ctx_t ctx);
+
+/* Linear systems ************************************************************/
+
+void _mat_lup_solve(char *x, char ** const rows, long m, long n, 
+                          const long *pi, const char *b, const mat_ctx_t ctx);
+
+void mat_lup_solve(char *x, const mat_t mat, const long *pi, 
+                         const char *b, const mat_ctx_t ctx);
+
+int 
+_mat_lup_decompose(long *pi, char **rows, long m, const mat_ctx_t ctx);
+
+int mat_lup_decompose(mat_t out, long *pi, const mat_t mat, 
+                            const mat_ctx_t ctx);
+
+/* Input and output **********************************************************/
+
+int mat_debug(const mat_t mat, const mat_ctx_t ctx);
+
+int mat_print(const mat_t mat, const mat_ctx_t ctx);
 
 #endif
 

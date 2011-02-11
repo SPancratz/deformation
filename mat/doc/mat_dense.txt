@@ -1,0 +1,236 @@
+/******************************************************************************
+
+    Copyright (C) 2010 Sebastian Pancratz
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void mat_init(mat_t mat, long m, long n, const mat_ctx_t)
+
+    Initialises the $m \times n$ matrix \code{mat} for use.
+
+void mat_set(mat_t mat1, const mat_t mat2, 
+                   const mat_ctx_t ctx)
+
+    Sets the matrix \code{mat1} to a (deep) copy of the matrix \code{mat2}. 
+    Assumes that the dimensions of \code{mat1} and \code{mat2} are the same.
+
+void mat_clear(mat_t mat, const mat_ctx_t ctx);
+
+    Clears the memory used by the matrix \code{mat}.
+
+void mat_entry(mat_t mat, long i, long j, mat_ctx_t ctx)
+
+    Returns a pointer to the entry in position $(i, j)$ in the matrix.
+
+void mat_zero(mat_t mat, const mat_ctx_t ctx)
+
+    Sets the matrix \code{mat} to the zero matrix.
+
+void mat_one(mat_t mat, const mat_ctx_t ctx)
+
+    Sets the matrix \code{mat} to the identity matrix.  Assumes that the 
+    matrix is a square matrix.
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void mat_randtest(mat_t mat, flint_rand_t state, 
+                        const mat_ctx_t ctx)
+
+    Sets the matrix \code{mat} to a random dense matrix.
+
+void mat_randrank(mat_t mat, flint_rand_t state, long rank, 
+                        const mat_ctx_t ctx);
+
+    Sets the matrix \code{mat} to a dense matrix of the given rank.
+
+    This function only sets the first \code{rank} diagonal entries 
+    to non-zero random values.  The caller can use the function 
+    \code{mat_randops()} to ensure a certain density of the 
+    matrix.
+
+void mat_randops(mat_t mat, flint_rand_t state, long count, 
+                       const mat_ctx_t ctx);
+
+    Performs at most \code{count} random row and column operations 
+    on the matrix \code{mat}.  Note that these operations do not 
+    modify the rank of the matrix.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int mat_equal(const mat_t mat1, const mat_t mat2, 
+                    const mat_ctx_t ctx)
+
+    Returns whether the two matrices \code{mat1} and \code{mat2} 
+    are equal.
+
+int mat_is_one(const mat_t mat, const mat_ctx_t ctx)
+
+    Returns whether the matrix \code{mat} is the identity matrix.
+
+int mat_is_zero(const mat_t mat, const mat_ctx_t ctx)
+
+    Returns whether the matrix \code{mat} is the zero matrix.
+
+*******************************************************************************
+
+    Matrix addition
+
+*******************************************************************************
+
+void _mat_add(char **rowsC, char ** const rowsA, char ** const rowsB, 
+                    long m, long n, const mat_ctx_t ctx)
+
+void mat_add(mat_t C, const mat_t A, const mat_t B, 
+                   const mat_ctx_t ctx)
+
+    Sets the matrix $C$ to the sum of the $m \times n$ matrices $A$ and $B$.
+
+    Assumes that the matrix dimensions of $A$, $B$, and $C$ are the same. 
+    Supports aliasing of the $C$ with $A$ and $B$ if the underlying addition 
+    function \code{ctx->add()} supports aliasing.
+
+*******************************************************************************
+
+    Matrix-vector multiplication
+
+*******************************************************************************
+
+void _mat_mul_vec(char *y, char ** const rows, long m, long n, 
+                        const char *x, const mat_ctx_t ctx)
+
+void mat_mul_vec(char *y, const mat_t A, const char *x, 
+                       const mat_ctx_t ctx)
+
+    Sets $y = A x$, where $A$ is an $m \times n$ matrix and $x$, $y$ are 
+    vectors of length $n$, $m$, respectively.
+
+*******************************************************************************
+
+    Matrix multiplication
+
+*******************************************************************************
+
+void _mat_mul_classical(char **rowsC, 
+                              char ** const rowsA, char ** const rowsB, 
+                              long ell, long m, long n, const mat_ctx_t ctx);
+
+void mat_mul_classical(mat_t C, const mat_t A, 
+                             const mat_t B, const mat_ctx_t ctx);
+
+    Sets the $\ell \times n$ matrix $C$ to the product of the 
+    $\ell \times m$ matrix $A$ and the $m \times n$ matrix $B$.
+
+    Assumes that the matrices have dimensions compatible for matrix 
+    multiplication.  Assumes that the underlying addition function 
+    \code{ctx->add()} supports aliasing of the first two arguments.
+    Does not allow aliasing.
+
+*******************************************************************************
+
+    Permutations
+
+*******************************************************************************
+
+void _mat_permute_rows(char **rows, long m, const long *pi, char **w)
+
+    Permutes the rows of the matrix \code{(rows, m)} according to the 
+    permutation given by the array $\pi$.  Requires an array $w$ of 
+    temporary space of length $m$.
+
+void mat_permute_rows(mat_t mat, const long *pi, 
+                            const mat_ctx_t ctx)
+
+    Permutes the rows of the matrix \code{mat} according to the permutation 
+    given by the array $\pi$.
+
+*******************************************************************************
+
+    Linear systems
+
+*******************************************************************************
+
+void _mat_lup_solve(char *x, char ** const rows, long m, long n, 
+                          const char *pi, const char *b, const mat_ctx_t ctx)
+
+    Solves the linear system $A x = b$, where the data relevant to the 
+    $m \times n$ matrix $A$ is given in the form $P A = L U$ with \code{rows} 
+    the $L U$ part and \code{pi} the $P$ part.
+
+    In the current implementation, asserts that \code{m == n}, 
+    and \code{x != b}.
+
+void mat_lup_solve(char *x, const mat_t mat, const long *pi, 
+                         const char *b, const mat_ctx_t ctx)
+
+    Solves the linear system $A x = b$, where $A$ is an $m \times n$ matrix, 
+    $x$ is a vector of length $n$ and $b$ is a vector of length $m$.
+
+    We assume that \code{mat} contains the information of the 
+    $LUP$ decomposition, that is, the lower unit-triangular matrix $L$ 
+    and the upper triangular matrix $U$.  The permutation matrix $P$ is 
+    given by the array $\pi$.  This function then solves the system 
+    $P A x = P b$, which is equivalent to the two systems $L y = P b$ 
+    and $U x = y$.
+
+    Assumes that the underlying functions \code{ctx->sub()} and 
+    \code{ctx->div()} support aliasing of the first and second arguments.
+
+    N.B.  In the current version, assumes that $m = n$.
+
+int _mat_lup_decompose(long *pi, char **rows, long m, 
+                             const mat_ctx_t ctx)
+
+int mat_lup_decompose(mat_t out, long *pi, 
+                            const mat_t mat, const mat_ctx_t ctx)
+
+    Sets \code{out} to the $LUP$ decomposition of \code{mat}.  Here the 
+    matrix $L$ is lower unit-triangular and matrix $U$ is upper triangular. 
+    The matrix $P$ determined by $\pi$ is a permutation matrix such that 
+    $P A = L U$.
+
+    The relation between the array $\pi$ and the implicit permutation 
+    matrix $P$ is as follows:
+    \begin{equation*}
+    P_{ij} = \begin{cases} 1 & \text{if $j = \pi_i$} \\
+                           0 & \text{otherwise} \end{cases}
+    \end{equation*}
+    This means that the $i$th row of the matrix $P A$ is the same as the 
+    $\pi_i$th row of the matrix $A$.
+
+    Returns $0$ if the matrix is non-singular and hence the computation 
+    was completed successfully.  Otherwise, returns a positive integer. 
+    This convention is chosen now so that perhaps at a later point it 
+    could be improved to return the rank deficiency.
+
+    Asserts that \code{mat} and \code{out} are square matrices of the 
+    same dimensions.
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+int mat_debug(const mat_t mat, const mat_ctx_t ctx)
+
+    Prints some debugging information about the matrix \code{mat} 
+    to \code{stdout}.
+
+int mat_print(const mat_t mat, const mat_ctx_t ctx)
+
+    Prints the matrix \code{mat} to \code{stdout}, row by row.
+

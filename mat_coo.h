@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "mat.h"
+#include "generics.h"
+#include "perm.h"
 
 typedef struct
 {
