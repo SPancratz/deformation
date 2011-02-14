@@ -1,5 +1,9 @@
 #include "mat_csr.h"
 
+#include "flint.h"
+#include "fmpz.h"
+#include "ulong_extras.h"
+
 static int 
 _is_block_triangular(const mat_csr_t A, const long * B, long b)
 {

@@ -5,35 +5,59 @@
 #include <stdio.h>
 
 #include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
 
-/* Randomisation *************************************************************/
+/* Memory management *********************************************************/
 
-/*
-    Generates a random permutation vector of length $n$.
-
-    This function uses the Knuth shuffle to generate a uniformly 
-    random permutation without retries.
- */
-
-static void _long_vec_randperm(long *vec, long n, flint_rand_t state)
+static long * _perm_init(long n)
 {
-    long i, j, t;
+    long i, *vec;
+
+    vec = malloc(n * sizeof(long));
+
+    if (!vec)
+    {
+        printf("ERROR (_perm_init).\n\n");
+        abort();
+    }
 
     for (i = 0; i < n; i++)
         vec[i] = i;
 
-    for (i = n - 1; i > 0; i--)
-    {
-        j = n_randint(state, i + 1);
-        t = vec[i];
-        vec[i] = vec[j];
-        vec[j] = t;
-    }
+    return vec;
 }
 
-static int _long_vec_print(const long *vec, long len)
+static void _perm_clear(long * vec)
+{
+    free(vec);
+}
+
+/* Assignment ****************************************************************/
+
+static void _perm_set_one(long * vec, long n)
+{
+    long i;
+
+    for (i = 0; i < n; i++)
+        vec[i] = i;
+}
+
+/* Composition ***************************************************************/
+
+static void _perm_compose(long *res, const long *vec1, const long *vec2, long n)
+{
+    long i;
+
+    for (i = 0; i < n; i++)
+        res[i] = vec1[vec2[i]];
+}
+
+/* Randomisation *************************************************************/
+
+void _perm_randtest(long * vec, long n, flint_rand_t state);
+
+/* Input and output **********************************************************/
+
+static int _long_vec_print(const long * vec, long len)
 {
     long i;
 
@@ -42,6 +66,21 @@ static int _long_vec_print(const long *vec, long len)
     {
         printf(" ");
         for (i = 0; i < len; i++)
+            printf(" %ld", vec[i]);
+    }
+
+    return 1;
+}
+
+static int _perm_print(const long * vec, long n)
+{
+    long i;
+
+    printf("%ld", n);
+    if (n > 0)
+    {
+        printf(" ");
+        for (i = 0; i < n; i++)
             printf(" %ld", vec[i]);
     }
 

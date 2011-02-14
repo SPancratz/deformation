@@ -1,5 +1,9 @@
 #include "mat_coo.h"
 
+#include "flint.h"
+#include "fmpz.h"
+#include "ulong_extras.h"
+
 int
 main(void)
 {

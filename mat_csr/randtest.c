@@ -1,5 +1,8 @@
 #include "mat_csr.h"
 
+#include "flint.h"
+#include "ulong_extras.h"
+
 void 
 mat_csr_randtest(mat_csr_t A, 
                  flint_rand_t state, double d, const mat_ctx_t ctx)

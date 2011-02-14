@@ -90,5 +90,5 @@ install: library
 %.o: %.c
 	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
 
-BUILD_DIRS = vec mat mat_coo mat_csr
+BUILD_DIRS = perm vec mat mat_coo mat_csr
 

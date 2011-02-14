@@ -1,5 +1,9 @@
 #include "mat_csr.h"
 
+#include "flint.h"
+#include "fmpz.h"
+#include "ulong_extras.h"
+
 int
 main(void)
 {
@@ -76,7 +80,7 @@ main(void)
         numnz = mat_csr_zfdiagonal(pi, A);
 
         printf("pi = {");
-        _long_vec_print(pi, m);
+        _perm_print(pi, m);
         printf("}\n");
         printf("numnz = %ld\n", numnz);
 
@@ -121,7 +125,7 @@ main(void)
 
         pi = malloc(m * sizeof(long));
 
-        _long_vec_randperm(pi, m, state);
+        _perm_randtest(pi, m, state);
 
         mat_csr_init(A, m, m, ctx);
         mat_csr_set_array3(A, mem, len, 0, ctx);
@@ -180,7 +184,7 @@ main(void)
 
         pi = malloc(m * sizeof(long));
 
-        _long_vec_randperm(pi, m, state);
+        _perm_randtest(pi, m, state);
 
         mat_csr_init(A, m, m, ctx);
         mat_csr_set_array3(A, mem, len, 0, ctx);
