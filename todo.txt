@@ -9,15 +9,25 @@ generics.h
 
 * Rename "mat_ctx_t" throughout the whole project
 
-perm.h
-======
+perm
+====
 
 * This is only a temporary place for the permutation generation 
-  function.  Eventually, it needs to be moved somewhere more sensible.
+  function.  Eventually, it needs to be moved somewhere more sensible
+
+* There's now a module "perm".  These functions still need to be 
+  used in the various places, though
+
+* There is also one function remaining in "perm.h", namely for the 
+  printing of long vectors, that needs to be moved or removed
 
 mat_csr
 =======
 
 * Implement sparse system solving using block triangularisation and 
   LUP decomposition on the (dense) kernels
+
+* Change mat_csr_block_triangularise to include a value at 
+  B[nb] == m
+
 
