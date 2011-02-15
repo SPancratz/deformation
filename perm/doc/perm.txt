@@ -24,6 +24,10 @@ void _perm_clear(long * vec)
 
 *******************************************************************************
 
+void _perm_set(long *res, const long *vec, long n)
+
+    Sets the permutation \code{res} to the same as the permutation \code{vec}.
+
 void _perm_set_one(long * vec, long n)
 
     Sets the permutation to the identity permutation.

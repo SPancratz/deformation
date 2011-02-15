@@ -33,6 +33,14 @@ static void _perm_clear(long * vec)
 
 /* Assignment ****************************************************************/
 
+static void _perm_set(long *res, const long *vec, long n)
+{
+    long i;
+
+    for (i = 0; i < n; i++)
+        res[i] = vec[i];
+}
+
 static void _perm_set_one(long * vec, long n)
 {
     long i;
