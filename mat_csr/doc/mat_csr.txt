@@ -150,6 +150,22 @@ void mat_csr_permute_rows(mat_csr_t A, const long *pi, const mat_ctx_t ctx)
 
 *******************************************************************************
 
+    Multiplication
+
+*******************************************************************************
+
+
+void mat_csr_mul_vec(char *y, const mat_csr_t A, const char *x, 
+                     const mat_ctx_t ctx)
+
+    Sets $y$ to $A x$.  In terms of the entries this means that, for all 
+    $0 \leq i < m$, 
+    \begin{equation*}
+    y_i = \sum_{0 \leq j < n} A_{ij} x_j.
+    \end{equation*}
+
+*******************************************************************************
+
     Linear systems
 
     This group contains functions that help solving linear systems 

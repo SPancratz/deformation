@@ -75,6 +75,10 @@ void _mat_csr_permute_cols(long m, long n, long *j, long *p, long *lenr, const l
 
 void mat_csr_permute_cols(mat_csr_t A, const long *pi, const mat_ctx_t ctx);
 
+/* Multiplication ************************************************************/
+
+void mat_csr_mul_vec(char *res, const mat_csr_t mat, const char *vec, const mat_ctx_t ctx);
+
 /* Linear systems ************************************************************/
 
 long _mat_csr_zfdiagonal(long *pi, long n, const long *j, const long *p, 
