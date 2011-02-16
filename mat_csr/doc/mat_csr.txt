@@ -115,7 +115,7 @@ int mat_csr_is_zero(const mat_csr_t A, const mat_ctx_t ctx)
 
 *******************************************************************************
 
-    Higher level algorithms
+    Permutations
 
 *******************************************************************************
 
@@ -144,6 +144,27 @@ void mat_csr_permute_rows(mat_csr_t A, const long *pi, const mat_ctx_t ctx)
     \end{equation*}
     then this function sets $A$ to $P A$.
 
+*******************************************************************************
+
+    Linear systems
+
+    This group contains functions that help solving linear systems 
+    $A x = b$ with an emphasis on repeated solving systems with 
+    constant matrix $A$ and varying constraints $b$.
+
+    There is a structure \code{__mat_csr_solve_struct} that encapsulates 
+    the information obtained in the preprocessing stage:
+
+    Suppose we are given a non-singular matrix $A$.  First find a permutation 
+    $P$ such that $P A$ has only non-zero entries on the diagonal, which is 
+    facilitated by \code{zfdiagonal()}.  Next, find a permutation $Q$ such 
+    that $Q P A Q^t$ is block triangular.  We set \code{nb} to the number 
+    of blocks, and the array \code{B} is such that \code{B[k]} gives the 
+    index of the first row belonging to the $k$th block.  We also arrange 
+    for \code{B[nb] == m}.
+
+*******************************************************************************
+
 long _mat_csr_block_triangularise(long *arp, long *b, long n, const long *j, 
                                   const long *p, const long *lenr, long *w)
 
@@ -162,12 +183,12 @@ long mat_csr_block_triangularise(long *pi, long *b, const mat_csr_t A,
 
     All the above mentioned \emph{blocks} are square.
 
-long _zfdiagonal(long *pi, long n, const long *j, const long *p, 
-                           const long *lenr, long *w)
+long _mat_csr_zfdiagonal(long *pi, long n, const long *j, const long *p, 
+                         const long *lenr, long *w)
 
     Expects a temporary array $w$ of length $5 n$.
 
-long zfdiagonal(long *pi, const mat_csr_t A)
+long _mat_csr_zfdiagonal(long *pi, const mat_csr_t A)
 
     Computes a permutation $\pi$ of rows, which we denote by $P$, such that 
     the matrix $P A$ has the greatest possible number of non-zero elements on 
@@ -194,6 +215,23 @@ void mat_csr_lupdecompose(mat_csr_t L, mat_csr_t U, long *pi,
     Asserts that the dimensions of the matrices $L$ and $U$ are the same 
     of that of the square $n \times n$ matrix $A$.  Assumes that the array 
     $\pi$ is an array of length $n$.  Assumes that $A$ is non-singular.
+
+void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat, 
+                        const mat_ctx_t ctx)
+
+    Initialises the solve structure for the matrix \code{mat}.
+
+void mat_csr_solve_clear(mat_csr_solve_t s, const mat_ctx_t ctx)
+
+    Clears the memory occupied internally by the solve structure.
+
+void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b, 
+                   const mat_ctx_t ctx)
+
+    Suppose the solve structure \code{s} was created for an 
+    $m \times n$ $A$.  Given a vector $b$ of length $m$, this 
+    functions solves the system of linear equations $A x = b$ 
+    for a vector $x$ of length $n$.
 
 *******************************************************************************
 

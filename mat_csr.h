@@ -21,6 +21,21 @@ typedef struct
 
 typedef __mat_csr_struct mat_csr_t[1];
 
+typedef struct
+{
+    __mat_csr_struct *mat;
+    long *pi;
+    long *qi;
+    long *B;
+    long nb;
+    char *entries;
+    char **LU;
+    long *P;
+    long alloc;
+} __mat_csr_solve_struct;
+
+typedef __mat_csr_solve_struct mat_csr_solve_t[1];
+
 /* Memory management *********************************************************/
 
 void mat_csr_init(mat_csr_t A, long m, long n, const mat_ctx_t ctx);
@@ -47,7 +62,7 @@ void mat_csr_randtest(mat_csr_t A, flint_rand_t state, double d, const mat_ctx_t
 
 int mat_csr_is_zero(const mat_csr_t A, const mat_ctx_t ctx);
 
-/* Higher level algorithms ***************************************************/
+/* Permutations **************************************************************/
 
 void _mat_csr_permute_rows(long m, long *p, long *lenr, const long *pi);
 
@@ -56,6 +71,8 @@ void mat_csr_permute_rows(mat_csr_t A, const long *pi, const mat_ctx_t ctx);
 void _mat_csr_permute_cols(long m, long n, long *j, long *p, long *lenr, const long *pi);
 
 void mat_csr_permute_cols(mat_csr_t A, const long *pi, const mat_ctx_t ctx);
+
+/* Linear systems ************************************************************/
 
 long _mat_csr_zfdiagonal(long *pi, long n, const long *j, const long *p, 
                            const long *lenr, long *w);
@@ -67,6 +84,14 @@ long _mat_csr_block_triangularise(long *arp, long *b, long n, const long *j,
 
 long mat_csr_block_triangularise(long *pi, long *b, const mat_csr_t A, 
                                                     const mat_ctx_t ctx);
+
+void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat, 
+                        const mat_ctx_t ctx);
+
+void mat_csr_solve_clear(mat_csr_solve_t s, const mat_ctx_t ctx);
+
+void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b, 
+                   const mat_ctx_t ctx);
 
 /* Input and output **********************************************************/
 
