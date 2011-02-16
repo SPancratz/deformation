@@ -48,6 +48,10 @@ int _vec_equal(const char *vec1, const char *vec2, long n,
 
 int _vec_is_zero(const char *vec, long n, const mat_ctx_t ctx);
 
+/* Permutation ***************************************************************/
+
+void _vec_permute(char *res, const char *vec, long n, long *pi, const mat_ctx_t ctx);
+
 /* Input and output **********************************************************/
 
 int _vec_print(const char *vec, long n, const mat_ctx_t ctx);
