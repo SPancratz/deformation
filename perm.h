@@ -41,12 +41,40 @@ static void _perm_set(long *res, const long *vec, long n)
         res[i] = vec[i];
 }
 
-static void _perm_set_one(long * vec, long n)
+static void _perm_set_one(long *vec, long n)
 {
     long i;
 
     for (i = 0; i < n; i++)
         vec[i] = i;
+}
+
+static void _perm_inv(long *res, const long *vec, long n)
+{
+    long i;
+
+    if (res == vec)
+    {
+        long *t = malloc(n * sizeof(long));
+
+        if (!t)
+        {
+            printf("ERROR (_perm_inv).\n\n");
+            abort();
+        }
+
+        for (i = 0; i < n; i++)
+            t[i] = vec[i];
+        for (i = 0; i < n; i++)
+            res[t[i]] = i;
+
+        free(t);
+    }
+    else
+    {
+        for (i = 0; i < n; i++)
+            res[vec[i]] = i;
+    }
 }
 
 /* Composition ***************************************************************/
