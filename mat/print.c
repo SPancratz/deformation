@@ -3,23 +3,28 @@
 
 #include "mat.h"
 
-int mat_print(const mat_t mat, const mat_ctx_t ctx)
+int _mat_print(char ** const rows, long m, long n, const mat_ctx_t ctx)
 {
     long i, j;
 
-    for (i = 0; i < mat->m; i++)
+    for (i = 0; i < m; i++)
     {
         printf("[ ");
-        for (j = 0; j < mat->n; j++)
+        for (j = 0; j < n; j++)
         {
-            ctx->print(mat_entry(mat, i, j, ctx));
+            ctx->print(rows[i] + j * ctx->size);
             printf(" ");
         }
         printf("]");
-        if (i != mat->m - 1)
+        if (i != m - 1)
             printf("\n");
     }
 
     return 1;
+}
+
+int mat_print(const mat_t mat, const mat_ctx_t ctx)
+{
+    return _mat_print(mat->rows, mat->m, mat->n, ctx);
 }
 

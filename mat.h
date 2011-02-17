@@ -99,6 +99,8 @@ int mat_lup_decompose(mat_t out, long *pi, const mat_t mat,
 
 int mat_debug(const mat_t mat, const mat_ctx_t ctx);
 
+int _mat_print(char ** const rows, long m, long n, const mat_ctx_t ctx);
+
 int mat_print(const mat_t mat, const mat_ctx_t ctx);
 
 #endif
