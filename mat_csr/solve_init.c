@@ -18,6 +18,14 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
     m = mat->m;
     s->mat = mat;
 
+#if !defined(NDEBUG)
+    printf("mat_csr_solve_init(...)\n");
+    printf("Matrix A:\n");
+    mat_csr_print_dense(mat, ctx);
+    printf("\n");
+    fflush(stdout);
+#endif
+
     s->pi = malloc((4 * m + 1) * sizeof(long));
     s->LU = malloc(m * sizeof(char *));
     w     = malloc((2 * m + mat->alloc + 3 * m) * sizeof(long));
@@ -33,6 +41,12 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
     s->B  = s->pi + 3 * m;
 
     nz = mat_csr_zfdiagonal(s->pi, mat);
+
+#if !defined(NDEBUG)
+    printf("nz = %ld\n", nz);
+    printf("pi = {"); _perm_print(s->pi, m); printf("}\n");
+    fflush(stdout);
+#endif
 
     if (nz != m)
     {
@@ -66,13 +80,20 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
     _mat_csr_permute_rows(m, p, lenr, s->qi);
     _mat_csr_permute_cols(m, m, j, p, lenr, s->qi);
 
+#if !defined(NDEBUG)
+    printf("nb = %ld\n", s->nb);
+    printf("B  = {"); _perm_print(s->B, s->nb); printf("}\n");
+    printf("qi = {"); _perm_print(s->qi, m); printf("}\n");
+    printf("Matrix Q P A Q^t:\n");
+    _mat_csr_print_dense(m, m, s->mat->x, j, p, lenr, ctx);
+    printf("\n");
+    fflush(stdout);
+#endif
+
+    /* Allocate dense data blocks */
     {
-        char *off, **rows;
-        long len, sum;
+        long len, sum = 0;
 
-        /* Allocate dense data blocks */
-
-        sum = 0;
         for (k = 0; k < s->nb; k++)
         {
             len  = s->B[k + 1] - s->B[k];
@@ -81,42 +102,55 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
 
         s->entries = _vec_init(sum, ctx);
         s->alloc   = sum;
+    }
 
-        off = s->entries;
+    /* Copy data of the square blocks */
+    {
+        char *off = s->entries;
+
         for (k = 0; k < s->nb; k++)
         {
-            long q, r, c;
-
-            rows = s->LU + s->B[k];
-            len  = s->B[k + 1] - s->B[k];
+            char **rows = s->LU + s->B[k];
+            long len = s->B[k + 1] - s->B[k];
+            long q, r;
 
             for (r = 0; r < len; r++)
                 rows[r] = off + r * len * ctx->size;
 
-            for (r = 0; r < len; r++)
-            {
-                i = s->B[k] + r;
-
+            for (r = 0, i = s->B[k]; r < len; r++, i++)
                 for (q = p[i]; q < p[i] + lenr[i]; q++)
                 {
-                    c = j[q] - s->B[k];
-                    ctx->set(rows[r] + c * ctx->size, mat->x + q * ctx->size);
+                    long c = j[q] - s->B[k];
+
+                    if (0 <= c && c < len)
+                        ctx->set(rows[r] + c * ctx->size, mat->x + q * ctx->size);
                 }
-            }
 
             off += len * len * ctx->size;
         }
-
-        /* Dense LUP decomposition */
-
-        for (k = 0; k < s->nb; k++)
-        {
-            rows = s->LU + s->B[k];
-            len  = s->B[k + 1] - s->B[k];
-
-            _mat_lup_decompose(s->P + s->B[k], rows, len, ctx);
-        }
     }
+
+    /* Dense LUP decomposition */
+
+    for (k = 0; k < s->nb; k++)
+    {
+        char **rows = s->LU + s->B[k];
+        long len = s->B[k + 1] - s->B[k];
+
+        _mat_lup_decompose(s->P + s->B[k], rows, len, ctx);
+    }
+
+#if !defined(NDEBUG)
+    for (k = 0; k < s->nb; k++)
+    {
+        long len = s->B[k + 1] - s->B[k];
+
+        printf("Block %ld (of length %ld):\n", k, len);
+        _mat_print(s->LU + s->B[k], len, len, ctx);
+        printf("\n");
+        fflush(stdout);
+    }
+#endif
 
     /* Compose Q P, invert Q */
 

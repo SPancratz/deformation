@@ -104,6 +104,10 @@ void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b,
 
 int mat_csr_debug(const mat_csr_t A, const mat_ctx_t ctx);
 
+int _mat_csr_print_dense(long m, long n, const char *x, const long *j, 
+                                         const long *p, const long *lenr, 
+                                         const mat_ctx_t ctx);
+
 int mat_csr_print_dense(const mat_csr_t A, const mat_ctx_t ctx);
 
 #endif
