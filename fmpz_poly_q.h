@@ -33,5 +33,10 @@ int fmpz_poly_is_unit(const fmpz_poly_t op)
     return op->length == 1 && (*(op->coeffs) == 1L || *(op->coeffs) == -1L);
 }
 
+/* Accessing numerator and denominator ***************************************/
+
+#define fmpz_poly_q_numref(op)  ((op)->num)
+#define fmpz_poly_q_denref(op)  ((op)->den)
+
 #endif
 
