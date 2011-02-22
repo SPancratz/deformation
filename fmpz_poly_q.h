@@ -19,5 +19,19 @@ typedef struct
 
 typedef fmpz_poly_q_struct fmpz_poly_q_t[1];
 
+/* Temporary functions *******************************************************/
+
+static __inline__
+int fmpz_poly_is_one(const fmpz_poly_t op)
+{
+    return op->length == 1 && *(op->coeffs) == 1L;
+}
+
+static __inline__
+int fmpz_poly_is_unit(const fmpz_poly_t op)
+{
+    return op->length == 1 && (*(op->coeffs) == 1L || *(op->coeffs) == -1L);
+}
+
 #endif
 
