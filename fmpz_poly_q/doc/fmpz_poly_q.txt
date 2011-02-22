@@ -1,0 +1,16 @@
+/******************************************************************************
+
+    Copyright (C) 2009, 2010, 2011 Sebastian Pancratz
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Memory management
+
+    We represent a rational function over $\mathbf{Q}$ as the quotient 
+    of two coprime integer polynomials of type \code{fmpz_poly_t}, 
+    enforcing that the leading coefficient of the denominator is 
+    positive.  The zero function is represented as $0/1$.
+
+*******************************************************************************
