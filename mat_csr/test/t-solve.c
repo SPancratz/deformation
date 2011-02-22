@@ -29,7 +29,7 @@ main(void)
         mat_t B;
         char *x, *b, *c;
 
-        m = n_randint(state, 2) + 1;
+        m = n_randint(state, 100) + 1;
 
         mat_ctx_init_mpq(ctx);
         mat_init(B, m, m, ctx);

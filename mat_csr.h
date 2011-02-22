@@ -24,15 +24,24 @@ typedef __mat_csr_struct mat_csr_t[1];
 
 typedef struct
 {
-    __mat_csr_struct *mat;
+    /* Sparse matrix data;  x is only a reference */
+    long m;
+    long n;
+    char *x;
+    long *j;
+    long *p;
+    long *lenr;
+
+    /* Permutations, blocks */
     long *pi;
     long *qi;
     long *B;
     long nb;
+
+    /* Dense data, LUP decomposition */
     char *entries;
     char **LU;
     long *P;
-    long alloc;
 } __mat_csr_solve_struct;
 
 typedef __mat_csr_solve_struct mat_csr_solve_t[1];

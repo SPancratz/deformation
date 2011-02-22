@@ -6,17 +6,18 @@
 
 #include "mat_csr.h"
 
+#define NDEBUG
+
 void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat, 
                         const mat_ctx_t ctx)
 {
-    long *w, *t;
-    long *j, *p, *lenr;
+    long *w;
+    long *mem;
     long i, k, m, nz;
 
     assert(mat->m == mat->n);
 
     m = mat->m;
-    s->mat = mat;
 
 #if !defined(NDEBUG)
     printf("mat_csr_solve_init(...)\n");
@@ -26,19 +27,23 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
     fflush(stdout);
 #endif
 
-    s->pi = malloc((4 * m + 1) * sizeof(long));
+    mem   = malloc((mat->alloc + 6 * m + 1) * sizeof(long));
     s->LU = malloc(m * sizeof(char *));
-    w     = malloc((2 * m + mat->alloc + 3 * m) * sizeof(long));
+    w     = malloc((3 * m) * sizeof(long));
 
-    if (!(s->pi) || !(s->LU) || !w)
+    if (!mem || !(s->LU) || !w)
     {
         printf("ERROR (mat_csr_solve_init).  Memory allocation.\n\n");
         abort();
     }
 
-    s->qi = s->pi + 1 * m;
-    s->P  = s->pi + 2 * m;
-    s->B  = s->pi + 3 * m;
+    s->j    = mem;
+    s->p    = mem + mat->alloc;
+    s->lenr = mem + mat->alloc + m;
+    s->pi   = mem + mat->alloc + 2 * m;
+    s->qi   = mem + mat->alloc + 3 * m;
+    s->P    = mem + mat->alloc + 4 * m;
+    s->B    = mem + mat->alloc + 5 * m;
 
     nz = mat_csr_zfdiagonal(s->pi, mat);
 
@@ -56,36 +61,35 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
 
     /* Copy the sparse structure of mat into {j, p, lenr} */
 
-    lenr = w;
-    p    = w + 1 * m;
-    j    = w + 2 * m;
-    t    = w + 2 * m + mat->alloc;
+    s->m = mat->m;
+    s->n = mat->n;
+    s->x = mat->x;
 
     for (i = 0; i < m; i++)
-        lenr[i] = mat->lenr[i];
+        s->lenr[i] = mat->lenr[i];
     for (i = 0; i < m; i++)
-        p[i] = mat->p[i];
+        s->p[i] = mat->p[i];
     for (i = 0; i < mat->alloc; i++)
-        j[i] = mat->j[i];
+        s->j[i] = mat->j[i];
 
     /* Set A := P A */
 
-    _mat_csr_permute_rows(m, p, lenr, s->pi);
+    _mat_csr_permute_rows(m, s->p, s->lenr, s->pi);
 
     /* Find Q s.t. Q P A Q^t is block triangular */
 
-    s->nb = _mat_csr_block_triangularise(s->qi, s->B, m, j, p, lenr, t);
+    s->nb = _mat_csr_block_triangularise(s->qi, s->B, m, s->j, s->p, s->lenr, w);
     s->B[s->nb] = m;
 
-    _mat_csr_permute_rows(m, p, lenr, s->qi);
-    _mat_csr_permute_cols(m, m, j, p, lenr, s->qi);
+    _mat_csr_permute_rows(m, s->p, s->lenr, s->qi);
+    _mat_csr_permute_cols(m, m, s->j, s->p, s->lenr, s->qi);
 
 #if !defined(NDEBUG)
     printf("nb = %ld\n", s->nb);
     printf("B  = {"); _perm_print(s->B, s->nb); printf("}\n");
     printf("qi = {"); _perm_print(s->qi, m); printf("}\n");
     printf("Matrix Q P A Q^t:\n");
-    _mat_csr_print_dense(m, m, s->mat->x, j, p, lenr, ctx);
+    _mat_csr_print_dense(m, m, s->x, s->j, s->p, s->lenr, ctx);
     printf("\n");
     fflush(stdout);
 #endif
@@ -101,7 +105,6 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
         }
 
         s->entries = _vec_init(sum, ctx);
-        s->alloc   = sum;
     }
 
     /* Copy data of the square blocks */
@@ -118,12 +121,12 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
                 rows[r] = off + r * len * ctx->size;
 
             for (r = 0, i = s->B[k]; r < len; r++, i++)
-                for (q = p[i]; q < p[i] + lenr[i]; q++)
+                for (q = s->p[i]; q < s->p[i] + s->lenr[i]; q++)
                 {
-                    long c = j[q] - s->B[k];
+                    long c = s->j[q] - s->B[k];
 
                     if (0 <= c && c < len)
-                        ctx->set(rows[r] + c * ctx->size, mat->x + q * ctx->size);
+                        ctx->set(rows[r] + c * ctx->size, s->x + q * ctx->size);
                 }
 
             off += len * len * ctx->size;

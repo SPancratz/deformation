@@ -11,9 +11,9 @@ void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b,
     char *c, *t;
     long i, k, m;
 
-    assert(s->mat->m == s->mat->n);
+    assert(s->m == s->n);
 
-    m = s->mat->m;
+    m = s->m;
 
     c = _vec_init(m, ctx);
     t = _vec_init(1, ctx);
@@ -33,16 +33,16 @@ void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b,
         for (i = i2; i < m; i++)
         {
             long q;
-            const long p1 = s->mat->p[i];
-            const long p2 = s->mat->p[i] + s->mat->lenr[i];
+            const long p1 = s->p[i];
+            const long p2 = s->p[i] + s->lenr[i];
 
             for (q = p1; q < p2; q++)
             {
-                const long j = s->mat->j[q];
+                const long j = s->j[q];
 
                 if (i1 <= j && j < i2)
                 {
-                    ctx->mul(t, s->mat->x + q * ctx->size, x + j * ctx->size);
+                    ctx->mul(t, s->x + q * ctx->size, x + j * ctx->size);
                     ctx->sub(c + i * ctx->size, c + i * ctx->size, t);
                 }
             }
