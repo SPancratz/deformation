@@ -14,3 +14,208 @@
     positive.  The zero function is represented as $0/1$.
 
 *******************************************************************************
+
+void fmpz_poly_q_init(fmpz_poly_q_t rop)
+
+    Initialises \code{rop}.
+
+void fmpz_poly_q_clear(fmpz_poly_q_t rop)
+
+    Clears the object \code{rop}.
+
+fmpz_poly_struct * fmpz_poly_q_numref(const fmpz_poly_q_t op)
+
+    Returns a reference to the numerator of \code{op}.
+
+fmpz_poly_struct * fmpz_poly_q_denref(const fmpz_poly_q_t op)
+
+    Returns a reference to the denominator of \code{op}.
+
+void fmpz_poly_q_canonicalise(fmpz_poly_q_t rop)
+
+    Brings \code{rop} into canonical form, only assuming that 
+    the denominator is non-zero.
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state,
+                          long len1, mp_bitcnt_t bits1, 
+                          long len2, mp_bitcnt_t bits2)
+
+    Sets \code{poly} to a random rational function.
+
+void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_t state, 
+                                   long len1, mp_bitcnt_t bits1, 
+                                   long len2, mp_bitcnt_t bits2)
+
+    Sets \code{poly} to a random non-zero rational function.
+
+*******************************************************************************
+
+    Assignment
+
+*******************************************************************************
+
+void fmpz_poly_q_set(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
+
+    Sets the element \code{rop} to the same value as the element \code{op}.
+
+void fmpz_poly_q_set_si(fmpz_poly_q_t rop, long op)
+
+    Sets the element \code{rop} to the value given by the \code{long} 
+    \code{op}.
+
+void fmpz_poly_q_swap(fmpz_poly_q_t op1, fmpz_poly_q_t op2)
+
+    Swaps the elements \code{op1} and \code{op2}.
+
+    This is done efficiently by swapping pointers.
+
+void fmpz_poly_q_zero(fmpz_poly_q_t rop)
+
+    Sets \code{rop} to zero.
+
+void fmpz_poly_q_one(fmpz_poly_q_t rop)
+
+    Sets \code{rop} to one.
+
+void fmpz_poly_q_neg(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
+
+    Sets the element \code{rop} to the additive inverse of \code{op}.
+
+void fmpz_poly_q_inv(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
+
+    Sets the element \code{rop} to the multiplicative inverse of \code{op}.
+
+    Assumes that the element \code{op} is non-zero.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int fmpz_poly_q_is_zero(const fmpz_poly_q_t op)
+
+    Returns whether the element \code{op} is zero.
+
+int fmpz_poly_q_is_one(const fmpz_poly_q_t op)
+
+    Returns whether the element \code{rop} is equal to the constant 
+    polynomial $1$.
+
+int fmpz_poly_q_equal(const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
+
+    Returns whether the two elements \code{op1} and \code{op2} are equal.
+
+*******************************************************************************
+
+    Addition and subtraction
+
+*******************************************************************************
+
+void fmpz_poly_q_add(fmpz_poly_q_t rop, 
+                     const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
+
+void fmpz_poly_q_sub(fmpz_poly_q_t rop, 
+                     const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
+
+void fmpz_poly_q_addmul(fmpz_poly_q_t rop, 
+                        const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
+
+void fmpz_poly_q_submul(fmpz_poly_q_t rop, 
+                        const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
+
+*******************************************************************************
+
+    Scalar multiplication and division
+
+*******************************************************************************
+
+void fmpz_poly_q_scalar_mul_si(fmpz_poly_q_t rop, 
+                               const fmpz_poly_q_t op, long x)
+
+void fmpz_poly_q_scalar_mul_mpz(fmpz_poly_q_t rop, 
+                                const fmpz_poly_q_t op, const mpz_t x)
+
+void fmpz_poly_q_scalar_mul_mpq(fmpz_poly_q_t rop, 
+                                const fmpz_poly_q_t op, const mpq_t x)
+
+void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, 
+                               const fmpz_poly_q_t op, long x)
+
+void fmpz_poly_q_scalar_div_mpz(fmpz_poly_q_t rop, 
+                                const fmpz_poly_q_t op, const mpz_t x)
+
+void fmpz_poly_q_scalar_div_mpq(fmpz_poly_q_t rop, 
+                                const fmpz_poly_q_t op, const mpq_t x)
+
+*******************************************************************************
+
+    Multiplication and division
+
+*******************************************************************************
+
+void fmpz_poly_q_mul(fmpz_poly_q_t rop, 
+                     const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
+
+    Sets \code{rop} to the product of \code{op1} and \code{op2}.
+
+void fmpz_poly_q_div(fmpz_poly_q_t rop, 
+                     const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
+
+    Sets \code{rop} to the quotient of \code{op1} and \code{op2}.
+
+*******************************************************************************
+
+    Powering
+
+*******************************************************************************
+
+void fmpz_poly_q_pow(fmpz_poly_q_t rop, const fmpz_poly_q_t op, ulong exp)
+
+    Sets \code{rop} to the \code{exp}th power of \code{op}.
+
+    The corner case of \code{exp == 0} is handled by setting \code{rop} to 
+    the constant function $1$.  Note that this includes the case $0^0 = 1$.
+
+*******************************************************************************
+
+    Derivative
+
+*******************************************************************************
+
+void fmpz_poly_q_derivative(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
+
+    Sets \code{rop} to the derivative of \code{op}.
+
+*******************************************************************************
+
+    Evaluation
+
+*******************************************************************************
+
+int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
+
+    Sets \code{rop} to $f$ evaluated at the rational $a$.
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+int fmpz_poly_q_set_str(fmpz_poly_q_t rop, const char *s)
+
+char * fmpz_poly_q_get_str(const fmpz_poly_q_t op)
+
+char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x)
+
+int fmpz_poly_q_print(const fmpz_poly_q_t op)
+
+int fmpz_poly_q_print_pretty(const fmpz_poly_q_t op, const char *x)
+
