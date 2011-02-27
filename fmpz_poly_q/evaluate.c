@@ -26,30 +26,30 @@ int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
     }
     else  /* a is an integer */
     {
-        fmpz_t num, den, _a;
+        fmpz_t num, den, a2;
 
         fmpz_init(num);
         fmpz_init(den);
-        fmpz_init(_a);
+        fmpz_init(a2);
 
-        fmpz_set_mpz(_a, mpq_numref(a));
+        fmpz_set_mpz(a2, mpq_numref(a));
 
-        fmpz_poly_evaluate_fmpz(den, f->den, _a);
+        fmpz_poly_evaluate_fmpz(den, f->den, a2);
         if (fmpz_is_zero(den))
         {
-            fmpz_clear(_a);
+            fmpz_clear(a2);
             fmpz_clear(num);
             fmpz_clear(den);
             return 0;
         }
 
-        fmpz_poly_evaluate_fmpz(num, f->num, _a);
+        fmpz_poly_evaluate_fmpz(num, f->num, a2);
 
         fmpz_get_mpz(mpq_numref(rop), num);
         fmpz_get_mpz(mpq_denref(rop), den);
         mpq_canonicalize(rop);
 
-        fmpz_clear(_a);
+        fmpz_clear(a2);
         fmpz_clear(num);
         fmpz_clear(den);
         return 1;

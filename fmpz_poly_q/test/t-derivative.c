@@ -78,8 +78,8 @@ main(void)
         fmpz_poly_q_init(d);
         fmpz_poly_q_init(lhs);
         fmpz_poly_q_init(rhs);
-        fmpz_poly_q_randtest(a, state, n_randint(state, 50), 50, n_randint(state, 50), 50);
-        fmpz_poly_q_randtest(b, state, n_randint(state, 50), 50, n_randint(state, 50), 50);
+        fmpz_poly_q_randtest(a, state, n_randint(state, 30), 50, n_randint(state, 30), 50);
+        fmpz_poly_q_randtest(b, state, n_randint(state, 30), 50, n_randint(state, 30), 50);
 
         fmpz_poly_q_mul(lhs, a, b);
         fmpz_poly_q_derivative(lhs, lhs);

@@ -29,7 +29,7 @@ main(void)
         fmpz_init(num);
         fmpz_init(den);
         fmpz_poly_q_init(f);
-        fmpz_poly_q_randtest(f, state, n_randint(state, 50), 50, n_randint(state, 50), 50);
+        fmpz_poly_q_randtest(f, state, n_randint(state, 10), 10, n_randint(state, 10), 10);
 
         fmpz_randtest(num, state, 50);
         fmpz_randtest_not_zero(den, state, 50);
@@ -44,8 +44,13 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpz_print(num), printf("\n\n");
-            fmpz_print(den), printf("\n\n");
+            printf("f = "), fmpz_poly_q_print(f), printf("\n");
+            printf("num = "), fmpz_print(num), printf("\n");
+            printf("den = "), fmpz_print(den), printf("\n");
+            gmp_printf("a = %Qd\n", a);
+            gmp_printf("b = %Qd\n", b);
+            printf("ans1 = %d\n", ans1);
+            printf("ans2 = %d\n", ans2);
             abort();
         }
 
