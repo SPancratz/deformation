@@ -26,6 +26,7 @@ main(void)
         fmpz_poly_q_init(c);
         fmpz_poly_q_randtest(a, state, n_randint(state, 50), 50, n_randint(state, 50), 50);
         fmpz_poly_q_randtest(b, state, n_randint(state, 50), 50, n_randint(state, 50), 50);
+        fmpz_poly_q_set(c, a);
 
         fmpz_poly_q_submul(c, a, b);
         fmpz_poly_q_submul(a, a, b);
@@ -55,6 +56,7 @@ main(void)
         fmpz_poly_q_init(c);
         fmpz_poly_q_randtest(a, state, n_randint(state, 50), 50, n_randint(state, 50), 50);
         fmpz_poly_q_randtest(b, state, n_randint(state, 50), 50, n_randint(state, 50), 50);
+        fmpz_poly_q_set(c, b);
 
         fmpz_poly_q_submul(c, a, b);
         fmpz_poly_q_submul(b, a, b);
