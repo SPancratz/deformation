@@ -78,8 +78,8 @@ main(void)
         fmpz_poly_q_init(d);
         fmpz_poly_q_init(lhs);
         fmpz_poly_q_init(rhs);
-        fmpz_poly_q_randtest(a, state, n_randint(state, 30), 50, n_randint(state, 30), 50);
-        fmpz_poly_q_randtest(b, state, n_randint(state, 30), 50, n_randint(state, 30), 50);
+        fmpz_poly_q_randtest(a, state, n_randint(state, 20), 20, n_randint(state, 20), 20);
+        fmpz_poly_q_randtest(b, state, n_randint(state, 20), 20, n_randint(state, 20), 20);
 
         fmpz_poly_q_mul(lhs, a, b);
         fmpz_poly_q_derivative(lhs, lhs);
@@ -89,12 +89,15 @@ main(void)
         fmpz_poly_q_mul(d, a, d);
         fmpz_poly_q_add(rhs, c, d);
 
-        result = fmpz_poly_q_equal(lhs, rhs);
+        result = fmpz_poly_q_equal(lhs, rhs) && fmpz_poly_q_is_canonical(lhs) 
+                                             && fmpz_poly_q_is_canonical(rhs);
         if (!result)
         {
             printf("FAIL:\n");
             fmpz_poly_q_print(a), printf("\n\n");
             fmpz_poly_q_print(b), printf("\n\n");
+            fmpz_poly_q_print(lhs), printf("\n\n");
+            fmpz_poly_q_print(rhs), printf("\n\n");
             abort();
         }
 

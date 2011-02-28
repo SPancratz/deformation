@@ -53,7 +53,7 @@ main(void)
         fmpz_poly_q_inv(b, a);
         fmpz_poly_q_mul(b, a, b);
 
-        result = fmpz_poly_q_is_one(b);
+        result = fmpz_poly_q_is_one(b) && fmpz_poly_q_is_canonical(b);
         if (!result)
         {
             printf("FAIL:\n");

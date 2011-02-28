@@ -24,7 +24,7 @@ main(void)
         fmpz_poly_q_randtest(a, state, n_randint(state, 50), 50, n_randint(state, 50), 50);
         fmpz_poly_q_zero(a);
 
-        result = fmpz_poly_q_is_zero(a);
+        result = fmpz_poly_q_is_zero(a) && fmpz_poly_q_is_canonical(a);
         if (!result)
         {
             printf("FAIL:\n");

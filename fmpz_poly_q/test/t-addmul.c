@@ -31,7 +31,7 @@ main(void)
         fmpz_poly_q_addmul(c, a, b);
         fmpz_poly_q_addmul(a, a, b);
 
-        result = fmpz_poly_q_equal(a, c);
+        result = fmpz_poly_q_equal(a, c) && fmpz_poly_q_is_canonical(a);
         if (!result)
         {
             printf("FAIL:\n");

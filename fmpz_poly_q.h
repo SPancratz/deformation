@@ -43,6 +43,8 @@ int fmpz_poly_is_unit(const fmpz_poly_t op)
 
 void fmpz_poly_q_canonicalise(fmpz_poly_q_t rop);
 
+int fmpz_poly_q_is_canonical(const fmpz_poly_q_t op);
+
 /* Memory management *********************************************************/
 
 void fmpz_poly_q_init(fmpz_poly_q_t rop);

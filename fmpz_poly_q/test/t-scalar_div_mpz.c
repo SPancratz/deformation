@@ -77,7 +77,7 @@ main(void)
         fmpz_poly_q_add(c, a, b);
         fmpz_poly_q_scalar_div_mpz(c, c, y);
 
-        result = fmpz_poly_q_equal(c, d);
+        result = fmpz_poly_q_equal(c, d) && fmpz_poly_q_is_canonical(c);
         if (!result)
         {
             printf("FAIL:\n");

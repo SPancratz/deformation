@@ -93,7 +93,7 @@ main(void)
         fmpz_poly_q_add(c, c, d);
         fmpz_poly_q_div(a2, c, b);
 
-        result = fmpz_poly_q_equal(a1, a2);
+        result = fmpz_poly_q_equal(a1, a2) && fmpz_poly_q_is_canonical(a1);
         if (!result)
         {
             printf("FAIL:\n");

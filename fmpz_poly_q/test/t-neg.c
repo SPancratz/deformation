@@ -53,7 +53,7 @@ main(void)
         fmpz_poly_q_neg(b, a);
         fmpz_poly_q_add(b, a, b);
 
-        result = fmpz_poly_q_is_zero(b);
+        result = fmpz_poly_q_is_zero(b) && fmpz_poly_q_is_canonical(b);
         if (!result)
         {
             printf("FAIL:\n");

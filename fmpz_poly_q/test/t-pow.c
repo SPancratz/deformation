@@ -30,7 +30,7 @@ main(void)
         fmpz_poly_q_pow(a, b, e);
         fmpz_poly_q_pow(b, b, e);
 
-        result = fmpz_poly_q_equal(a, b);
+        result = fmpz_poly_q_equal(a, b) && fmpz_poly_q_is_canonical(a);
         if (!result)
         {
             printf("FAIL:\n");
