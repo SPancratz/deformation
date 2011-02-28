@@ -9,10 +9,14 @@ void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, long x
         printf("ERROR (fmpz_poly_q_scalar_div_si).  Division by zero.\n");
         abort();
     }
-    
     if (x == 1)
     {
         fmpz_poly_q_set(rop, op);
+        return;
+    }
+    if (fmpz_poly_q_is_zero(op))
+    {
+        fmpz_poly_q_zero(rop);
         return;
     }
 

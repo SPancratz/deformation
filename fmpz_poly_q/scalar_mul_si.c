@@ -4,6 +4,12 @@ void fmpz_poly_q_scalar_mul_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, long x
 {
     fmpz_t cont, fx, gcd;
 
+    if (fmpz_poly_q_is_zero(op) || (x == 0))
+    {
+        fmpz_poly_q_zero(rop);
+        return;
+    }
+
     if (x == 1)
     {
         fmpz_poly_q_set(rop, op);
