@@ -1,0 +1,281 @@
+/******************************************************************************
+
+    Copyright (C) 2009, 2010, 2011 Sebastian Pancratz
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Data types
+
+    The monomial type is a \emph{primitive} type.
+
+    We represent a monomial as a 64-bit word.  More precisely, we store 
+    the monomial $(i_0, \dotsc, i_n)$ using \code{MON_BITS_PER_EXP} bits 
+    per exponent, where the least significant block is used for $i_0$.  If 
+    $n + 1$ does not divide 64 exactly then the $64 \bmod (n+1)$ most 
+    significant bits are always $0$.
+
+    The type of the exponent of a single variable is \code{exponent_t}, 
+    which is guaranteed to be an unsigned type of width at least~$8$.
+
+    \section Acknowledgements:
+
+    I would like to thank Andrew Lewis from the Computer Laboratory at the 
+    University of Cambridge for helpful discussions.
+    
+    \section Overview
+    
+    The aim of this work is to provide a basic but very thin and fast 
+    implementation of monomials with only minimal overhead.  The main step 
+    in order to achieve this is encoding a given monomial in one machine 
+    word, or possibly two, although this case is handled transparently. As 
+    a consequence of this design decision, this implementation can only be 
+    used for monomials in a fixed small number of variables and with small 
+    non-negative exponents.
+    
+    \section Introduction  Detailed introduction
+    
+    We assume that a number \f$n+1\f$ of variables is fixed from the beginning, 
+    where \f$1 \leq n \leq 7\f$, and that we only consider monomials with 
+    non-negative partial degrees of at most \f$2^8 - 1\f$.  Using 8 bits per 
+    exponent, we can encode the monomial \f$i = (i_0, \dotsc, i_n)\f$ as 
+    \f[
+    \sigma(i) = \sum_{j=0}^n i_j 2^{j 8}
+    \f]
+    in a 64-bit word.
+    
+    It turns out that, for many operations on monomials, this form is very 
+    convenient in the sense that the operation can be performed on 
+    \f$\sigma(i)\f$ as one word instead of \f$i_0, \dotsc, i_n\f$ involving 
+    \f$n+1\f$ words.  Examples of this are multiplication and division, 
+    which correspond to addition and subtraction, and the inverse 
+    lexicographical order, which corresponds to the operator \c <.  As an 
+    aside, the problem of possible overflow is burried in the our assumption 
+    that no monomial operation will involve partial exponents exceeding 
+    \f$2^8 - 1\f$.  Other operations, for example, checking whether one 
+    monomial is divisible by another, involve explicitly considering partial 
+    exponents using bitmasks.
+    
+    \section Orderings  Monomial orderings
+    
+    The following (global) monomial orderings are typically considered:
+    
+    - Lexicographic ordering (\em lex).
+      \f[i < i' \iff \exists j \quad i_0 = i_0', \dotsc, i_{j-1} = i_{j-1}', i_j < i_j'\f]
+    
+    - Inverse lexicographic ordering (\em invlex).
+      \f[i < i' \iff \exists j \quad i_n = i_n', \dotsc, i_{j+1} = i_{j+1}', i_j < i_j'\f]
+    
+    - Degree lexicographic (\em deglex).
+      \f[i < i' \iff \deg(i) < \deg(i') \text{ or } \bigl(\deg(i) < \deg(i') \text{ and } \exists j \quad i_0 = i_0', \dotsc, i_{j-1} = i_{j-1}, i_j < i_j'\bigr)\f]
+    
+    - Degree reverse lexicographic (\em degrevlex).
+      \f[i < i' \iff \deg(i) < \deg(i') \text{ or } \bigl(\deg(i) < \deg(i') \text{ and } \exists j \quad i_n = i_n', \dotsc, i_{j+1} = i_{j+1}, i_j > i_j'\bigr)\f]
+    
+    In this context, it is very useful to note that, in the inverse 
+    lexicographic ordering, we have \f$i < i'\f$ if and only 
+    \f$\sigma(i) < \sigma(i')\f$.  While the first test could involve \f$n+1\f$ 
+    word comparisons plus the overhead of a loop, the second test only involves 
+    one word comparison.
+
+*******************************************************************************
+
+*******************************************************************************
+
+    Memory management and basic assignment
+
+*******************************************************************************
+
+void mon_init(mon_t x)
+
+    Initialises $x$ to the monomial $1$.
+
+    This function is implemented as a macro.
+
+void mon_clear(mon_t x)
+
+    Clears the memory used by $x$.
+
+    This function is implemented as a macro.
+
+void mon_set(mon_t x, mon_t y)
+
+    Sets $x$ to the monomial $y$.
+
+    This function is implemented as a macro.
+
+void mon_swap(mon_t x, mon_t y)
+
+    Swaps the two monomials $x$ and $y$.
+
+    This function is implemented as a macro, that possibly evaluates 
+    its arguments multiple times.  It is required that $x$ and $y$ 
+    can be used as lvalues.
+
+void mon_one(mon_t x)
+
+    Sets $x$ to the monomial $1$.
+
+    This function is implemented as a macro.
+
+*******************************************************************************
+
+    Access
+
+*******************************************************************************
+
+exp_t mon_get_exp(mon_t x, int i)
+
+    Returns the $i$th exponent of the monomial $x$.
+
+    This function is implemented as a macro.
+
+void mon_set_exp(mon_t x, int i, exp_t e)
+
+    Sets the $i$th exponent of the monomial $x$ to the value $e$.
+
+    Assumes that $e$ fits into eight bits, i.e.\ lies in the 
+    range $[0, 255)$.
+
+    This function is implemented as a macro, which might evaluate its 
+    arguments multiple times.
+
+void mon_inc_exp(mon_t x, int i, exp_t e)
+
+    Increments the current value of the $i$th exponent of the 
+    monomial $x$ by $e$.
+
+    Assumes that the new value of the exponent still fits into 
+    eight bits.
+
+    This function is implemented as a macro, which possibly 
+    evaluates ots arguments multiple times.
+
+void mon_dec_exp(mon_t x, int i, exp_t e)
+
+    Decrements the current value of the $i$th exponent of the 
+    monomial $x$ by $e$.
+
+    Assumes that the new exponent lies in the range $[0, 255)$.
+
+    This function is implemented as a macro, which possibly 
+    evaluates ots arguments multiple times.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int mon_cmp_invlex(mon_t x, mon_t y)
+
+    Compares the two monomials $x$ and $y$ inverse-lexicographically.
+
+    This function is implemented as a macro, possibly evaluating its 
+    arguments multiple times.
+
+int mon_is_one(mon_t x)
+
+    Returns whether the monomial $x$ is equal to $1$.
+
+*******************************************************************************
+
+    Multiplication and division
+
+*******************************************************************************
+
+void mon_mul(mon_t x, mon_t y, mon_t z)
+
+    Sets $x = y z$.
+
+void mon_div(mon_t x, mon_t y, mon_t z)
+
+    Sets $x = y z^{-1}$, assuming that $z$ divides $y$.
+
+int mon_divides(mon_t x, mon_t y)
+
+    Returns whether $x$ divides $y$.
+
+    The return value will be either $1$ or $0$, depending on whether or not 
+    $x$ divides $y$.
+
+*******************************************************************************
+
+    Monomial parameters
+
+*******************************************************************************
+
+int mon_degree(mon_t x)
+
+    Returns the total degree of the monomial $x$.
+
+    Note that, since we assume the individual degrees to be less than 256 and 
+    support at most eight variables, the result fits into eleven bits.
+
+*******************************************************************************
+
+    Input and output
+
+    The format used for a monomial $x$ in $n$ variables is 
+    \code{"n  x[0] ... x[n-1]"}, where there are two spaces 
+    after the first integer and single spaces only otherwise.
+
+*******************************************************************************
+
+char * mon_get_str(mon_t x, int n)
+
+    Returns a string representation of the monomial $x$ in $n$ variables.
+
+char * mon_get_str_pretty(mon_t x, int n, const char * vars)
+
+    Returns a pretty string representation of the monomial $x$ in 
+    $n$ variables.
+
+    Since $x$ is a monomial in $n$ variables, the array of 
+    \code{char}s \code{vars} should have length at least that, 
+    so that the $i$th entry can be used as a symbol for the 
+    $i$th variable in $x$.
+
+    Alternatively, if \code{vars == NULL}, an array of default variable 
+    names is used.
+
+mon_t mon_set_str(char * str)
+
+    Returns the monomial given by the string representation \code{str}.
+
+*******************************************************************************
+
+    Enumeration
+
+*******************************************************************************
+
+mon_t * mon_generate_by_degree(long * len, int n, int d)
+
+    Generates all monomials in $n$ variables of total degree $d$.
+
+    This method returns an array of length $\binom{n-1+d}{d}$, which is 
+    also the value of \code{*len} on exit.  The monomials are arrange in 
+    descending lexicographical order.
+
+mon_t * mon_generate_by_degree_invlex(long * len, int n, int d)
+
+    Generates all monomials in $n$ variables of total degree $d$.
+
+    This method returns an array of length $\binom{n-1+d}{d}$, which is also 
+    the value of \code{*len} on exit.  The monomials are arrange in ascending 
+    inverse lexicographical order.
+
+*******************************************************************************
+
+    Auxiliary functions
+
+*******************************************************************************
+
+unsigned long mon_binom(unsigned long n, unsigned long k)
+
+    Returns the binomial coefficient $\binom{n}{k}$.
+
+    Special cases are handled as follows.  If $n < k$, returns $0$. 
+    If $k = 0$ or $k = n$, returns $1$.
+
