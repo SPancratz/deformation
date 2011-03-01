@@ -71,7 +71,9 @@ char * mon_get_str(mon_t x, int n);
 
 char * mon_get_str_pretty(mon_t x, int n, const char * vars);
 
-mon_t mon_set_str(char * str);
+mon_t _mon_set_str(char * str);
+
+#define mon_set_str(x, str)  ((x) = _mon_set_str(str))
 
 /* Enumeration  **************************************************************/
 

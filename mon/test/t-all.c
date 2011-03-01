@@ -13,11 +13,15 @@ int main(int argc, char *argv[])
     mon_t m, m1, m2, *list;
     long i, len;
     char *out, *out1, *out2;
-    
+
+    printf("t-all\n");
+    printf("=====\n");
+    fflush(stdout);
+
     /* INIT, FROM_STRING, CLEAR */
     
     mon_init(m);
-    m = mon_set_str("3  1 1 1");
+    mon_set_str(m, "3  1 1 1");
     
     out = mon_get_str(m, 3);
     printf("m = {%s}\n", out);
@@ -54,7 +58,7 @@ int main(int argc, char *argv[])
     /* IS_ONE, DEGREE */
 
     mon_init(m);
-    m = mon_set_str("3  2 0 1");
+    mon_set_str(m, "3  2 0 1");
     out = mon_get_str_pretty(m, 3, "XYZ");
     printf("Is %s equal to one?  %d\n", out, mon_is_one(m));
     printf("Degree: %d\n", mon_degree(m));
@@ -62,7 +66,7 @@ int main(int argc, char *argv[])
     mon_clear(m);
     
     mon_init(m);
-    m = mon_set_str("3  0 0 0");
+    mon_set_str(m, "3  0 0 0");
     out = mon_get_str_pretty(m, 3, "XYZ");
     printf("Is %s equal to one?  %d\n", out, mon_is_one(m));
     printf("Degree: %d\n", mon_degree(m));
@@ -74,8 +78,8 @@ int main(int argc, char *argv[])
     mon_init(m);
     mon_init(m1);
     mon_init(m2);
-    m1 = mon_set_str("3  2 0 1");
-    m2 = mon_set_str("3  0 1 0");
+    mon_set_str(m1, "3  2 0 1");
+    mon_set_str(m2, "3  0 1 0");
     mon_mul(m, m1, m2);
     out = mon_get_str_pretty(m, 3, "XYZ");
     printf("Product is [2 0 1] [0 1 0] = %s\n", out);
@@ -91,8 +95,8 @@ int main(int argc, char *argv[])
     mon_init(m);
     mon_init(m1);
     mon_init(m2);
-    m1 = mon_set_str("3  1 0 1");
-    m2 = mon_set_str("3  1 1 3");
+    mon_set_str(m1, "3  1 0 1");
+    mon_set_str(m2, "3  1 1 3");
     mon_mul(m, m1, m2);
     out = mon_get_str_pretty(m, 3, "XYZ");
     printf("Product is [1 0 1] [1 1 3] = %s\n", out);
@@ -109,14 +113,17 @@ int main(int argc, char *argv[])
     
     /* INVLEX */
     
-    m1 = mon_set_str("3  6 0 0");
-    m2 = mon_set_str("3  0 0 6");
+    mon_set_str(m1, "3  6 0 0");
+    mon_set_str(m2, "3  0 0 6");
     out1 = mon_get_str_pretty(m1, 3, NULL);
     out2 = mon_get_str_pretty(m2, 3, NULL);
     printf("CMP_INVLEX(%s, %s) = %d\n", out1, out2, mon_cmp_invlex(m1, m2));
     free(out1);
     free(out2);
 
+    printf("PASS\n");
+    printf("=====\n");
+    fflush(stdout);
     return EXIT_SUCCESS;
 }
 

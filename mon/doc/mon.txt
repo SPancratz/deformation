@@ -240,9 +240,13 @@ char * mon_get_str_pretty(mon_t x, int n, const char * vars)
     Alternatively, if \code{vars == NULL}, an array of default variable 
     names is used.
 
-mon_t mon_set_str(char * str)
+mon_t _mon_set_str(char * str)
 
-    Returns the monomial given by the string representation \code{str}.
+    Returns the monomial given by the string \code{str}.
+
+void mon_set_str(mon_t x, char * str)
+
+    Sets $x$ to the monomial given by the string \code{str}.
 
 *******************************************************************************
 

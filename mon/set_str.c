@@ -4,7 +4,7 @@
 
 #include "mon.h"
 
-mon_t mon_set_str(char * str)
+mon_t _mon_set_str(char * str)
 {
     int i, n;   /* Number of variables */
     mon_t rop;  /* Output */
