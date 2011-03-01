@@ -41,6 +41,8 @@ typedef unsigned long exp_t;
 
 /* Randomisation *************************************************************/
 
+mon_t _mon_randtest(flint_rand_t state, int n, exp_t k);
+
 #define mon_randtest(x, state, n, k) \
     ((x) = _mon_randtest((state), (n), (k)))
 
@@ -49,6 +51,8 @@ typedef unsigned long exp_t;
 #define mon_cmp_invlex(x, y)  (((x) < (y)) ? -1 : ((x) > (y) ? 1 : 0))
 
 #define mon_is_one(x)  ((x) == 0)
+
+#define mon_equal(x, y)  ((x) == (y))
 
 /* Multiplication and division ***********************************************/
 
@@ -81,6 +85,26 @@ char * mon_get_str_pretty(mon_t x, int n, const char * vars);
 mon_t _mon_set_str(char * str);
 
 #define mon_set_str(x, str)  ((x) = _mon_set_str(str))
+
+static int mon_print(mon_t x, int n)
+{
+    char *str;
+
+    str = mon_get_str(x, n);
+    printf("%s", str);
+    free(str);
+    return 1;
+}
+
+static int mon_print_pretty(mon_t x, int n, const char * vars)
+{
+    char *str;
+
+    str = mon_get_str_pretty(x, n, vars);
+    printf("%s", str);
+    free(str);
+    return 1;
+}
 
 /* Enumeration  **************************************************************/
 

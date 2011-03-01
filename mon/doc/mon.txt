@@ -195,6 +195,10 @@ int mon_is_one(mon_t x)
 
     Returns whether the monomial $x$ is equal to $1$.
 
+int mon_equal(mon_t x, mon_t y)
+
+    Returns whether the monomials $x$ and $y$ are equal.
+
 *******************************************************************************
 
     Multiplication and division
@@ -263,6 +267,15 @@ mon_t _mon_set_str(char * str)
 void mon_set_str(mon_t x, char * str)
 
     Sets $x$ to the monomial given by the string \code{str}.
+
+int mon_print(mon_t x, int n)
+
+    Prints the monomial $x$ in $n$ variables to \code{stdout}.
+
+int mon_print_pretty(mon_t x, int n, const char * vars)
+
+    Prints the monomial $x$ in $n$ variables to \code{stdout}, 
+    using the array \code{vars} for variable names.
 
 *******************************************************************************
 
