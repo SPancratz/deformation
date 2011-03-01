@@ -35,3 +35,5 @@ mon
 
 * Change the syntax of all the calls so that the objects look like 
   they are of a managed type.
+* Add randtest functions
+
