@@ -7,6 +7,8 @@
 #ifndef MON_H
 #define MON_H
 
+#include "flint.h"
+
 typedef unsigned long mon_t;
 typedef unsigned long exp_t;
 
@@ -36,6 +38,11 @@ typedef unsigned long exp_t;
 
 #define mon_dec_exp(x, i, e)  \
     ((x) = ((x) - (((mon_t)(e)) << ((i) * MON_BITS_PER_EXP))))
+
+/* Randomisation *************************************************************/
+
+#define mon_randtest(x, state, n, k) \
+    ((x) = _mon_randtest((state), (n), (k)))
 
 /* Comparison ****************************************************************/
 

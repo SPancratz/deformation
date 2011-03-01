@@ -164,6 +164,22 @@ void mon_dec_exp(mon_t x, int i, exp_t e)
 
 *******************************************************************************
 
+    Randomisation
+
+*******************************************************************************
+
+mon_t _mon_randtest(flint_rand_t state, int n, exp_t k)
+
+    Returns a random monomial in $n$ variables with individual exponents 
+    in the range $[0, k)$.
+
+void mon_randtest(mon_t x, flint_rand_t state, int n, exp_t k)
+
+    Sets $x$ to a random monomial in $n$ variables with individual 
+    exponents in the range $[0, k)$.
+
+*******************************************************************************
+
     Comparison
 
 *******************************************************************************

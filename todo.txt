@@ -33,5 +33,5 @@ mat_csr
 mon
 ===
 
-* Add randtest functions
+* Add randomised testing
 
