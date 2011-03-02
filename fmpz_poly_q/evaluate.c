@@ -11,18 +11,17 @@ int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
         if (mpq_sgn(mpqden) == 0)
         {
             mpq_clear(mpqden);
-            return 0;
+            return 1;
         }
 
         mpq_init(mpqnum);
 
         fmpz_poly_evaluate_mpq(mpqnum, f->num, a);
         mpq_div(rop, mpqnum, mpqden);
-        mpq_canonicalize(rop);
 
         mpq_clear(mpqnum);
         mpq_clear(mpqden);
-        return 1;
+        return 0;
     }
     else  /* a is an integer */
     {
@@ -40,7 +39,7 @@ int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
             fmpz_clear(a2);
             fmpz_clear(num);
             fmpz_clear(den);
-            return 0;
+            return 1;
         }
 
         fmpz_poly_evaluate_fmpz(num, f->num, a2);
@@ -52,6 +51,6 @@ int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
         fmpz_clear(a2);
         fmpz_clear(num);
         fmpz_clear(den);
-        return 1;
+        return 0;
     }
 }

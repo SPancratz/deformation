@@ -19,8 +19,8 @@
  * The rational function is brought into canonical form by calling 
  * #fmpz_poly_q_canonicalize() in this function.
  * 
- * Returns \c 1 if the string represents a valid rational function and 
- * \c 0 otherwise.
+ * Returns \c 0 if the string represents a valid rational function and 
+ * \c non-zero otherwise.
  */
 int fmpz_poly_q_set_str(fmpz_poly_q_t rop, const char *s)
 {
@@ -44,10 +44,10 @@ int fmpz_poly_q_set_str(fmpz_poly_q_t rop, const char *s)
     }
     else
     {
-        numstr = malloc((m+1) * sizeof(char));
+        numstr = malloc(m + 1);
         if (!numstr)
         {
-            printf("ERROR (fmpz_poly_q_from_string).  Memory allocation failed.\n");
+            printf("ERROR (fmpz_poly_q_set_str).  Memory allocation failed.\n");
             abort();
         }
         
@@ -55,9 +55,9 @@ int fmpz_poly_q_set_str(fmpz_poly_q_t rop, const char *s)
             numstr[i] = s[i];
         numstr[i] = '\0';
         
-        ans = fmpz_poly_set_str(rop->num, numstr);
-        ans = fmpz_poly_set_str(rop->den, (char *) (s + (m+1))) & ans;
-        if (ans)
+        ans  = fmpz_poly_set_str(rop->num, numstr);
+        ans |= fmpz_poly_set_str(rop->den, s + (m + 1));
+        if (ans == 0)
             fmpz_poly_q_canonicalise(rop);
         else
             fmpz_poly_q_zero(rop);

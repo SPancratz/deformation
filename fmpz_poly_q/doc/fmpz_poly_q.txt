@@ -357,9 +357,9 @@ int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
 
     Sets \code{rop} to $f$ evaluated at the rational $a$.
 
-    If the denominator evaluates to zero at $a$, returns $0$ and does not 
-    modify any of the variables.  Otherwise, returns $1$ and sets \code{rop} 
-    to the rational $f(a)$.
+    If the denominator evaluates to zero at $a$, returns non-zero and 
+    does not modify any of the variables.  Otherwise, returns $0$ and 
+    sets \code{rop} to the rational $f(a)$.
 
 *******************************************************************************
 
