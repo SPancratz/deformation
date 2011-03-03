@@ -21,7 +21,7 @@ typedef struct                                                                \
                                                                               \
 typedef NAME ## _queue_struct NAME ## _queue_t[1];                            \
                                                                               \
-ATTR void NAME ## _queue_init(NAME ## _queue_struct * Q)                      \
+ATTR void NAME ## _queue_init(NAME ## _queue_t Q)                             \
 {                                                                             \
     Q->a = NULL;                                                              \
     Q->h = 0;                                                                 \
@@ -29,7 +29,7 @@ ATTR void NAME ## _queue_init(NAME ## _queue_struct * Q)                      \
     Q->N = 0;                                                                 \
 }                                                                             \
                                                                               \
-ATTR void NAME ## _queue_init2(NAME ## _queue_struct * S, long N)             \
+ATTR void NAME ## _queue_init2(NAME ## _queue_t S, long N)                    \
 {                                                                             \
     S->a = (TYPE *) malloc(N * sizeof(TYPE));                                 \
     S->h = 0;                                                                 \
@@ -37,7 +37,7 @@ ATTR void NAME ## _queue_init2(NAME ## _queue_struct * S, long N)             \
     S->N = N;                                                                 \
 }                                                                             \
                                                                               \
-ATTR void NAME ## _queue_fit_size(NAME ## _queue_struct * S, long N)          \
+ATTR void NAME ## _queue_fit_size(NAME ## _queue_t S, long N)                 \
 {                                                                             \
     if (S->N == 0)                                                            \
     {                                                                         \
@@ -53,17 +53,17 @@ ATTR void NAME ## _queue_fit_size(NAME ## _queue_struct * S, long N)          \
     }                                                                         \
 }                                                                             \
                                                                               \
-ATTR void NAME ## _queue_clear(NAME ## _queue_struct * S)                     \
+ATTR void NAME ## _queue_clear(NAME ## _queue_t S)                            \
 {                                                                             \
     free(S->a);                                                               \
 }                                                                             \
                                                                               \
-ATTR int NAME ## _queue_is_empty(NAME ## _queue_struct * S)                   \
+ATTR int NAME ## _queue_is_empty(NAME ## _queue_t S)                          \
 {                                                                             \
     return S->n == 0;                                                         \
 }                                                                             \
                                                                               \
-ATTR void NAME ## _queue_enqueue(NAME ## _queue_struct * S, TYPE o)           \
+ATTR void NAME ## _queue_enqueue(NAME ## _queue_t S, TYPE o)                  \
 {                                                                             \
     if (S->N == S->n)                                                         \
     {                                                                         \
@@ -72,7 +72,7 @@ ATTR void NAME ## _queue_enqueue(NAME ## _queue_struct * S, TYPE o)           \
     (S->a)[(S->h + (S->n)++) % S->N] = o;                                     \
 }                                                                             \
                                                                               \
-ATTR TYPE NAME ## _queue_dequeue(NAME ## _queue_struct * S)                   \
+ATTR TYPE NAME ## _queue_dequeue(NAME ## _queue_t S)                          \
 {                                                                             \
     long h = S->h;                                                            \
     (S->h) = (S->h + 1) % S->N;                                               \
