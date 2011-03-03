@@ -90,5 +90,5 @@ install: library
 %.o: %.c
 	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
 
-BUILD_DIRS = perm vec mat mat_coo mat_csr fmpz_poly_q mon queue
+BUILD_DIRS = perm vec mat mat_coo mat_csr fmpz_poly_q mon queue stack
 
