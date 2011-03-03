@@ -7,6 +7,9 @@
 #ifndef MON_H
 #define MON_H
 
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "flint.h"
 
 typedef unsigned long mon_t;

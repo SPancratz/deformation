@@ -1,5 +1,8 @@
 #include "mon.h"
 
+#include "flint.h"
+#include "ulong_extras.h"
+
 /**
  * Generates a random monomial with all individual exponents less than k.
  */
@@ -18,4 +21,6 @@ mon_t _mon_randtest(flint_rand_t state, int n, exp_t k)
 
         mon_set_exp(x, i, e);
     }
+
+    return x;
 }
