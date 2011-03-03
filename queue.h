@@ -58,7 +58,7 @@ ATTR void NAME ## _queue_clear(NAME ## _queue_t S)                            \
     free(S->a);                                                               \
 }                                                                             \
                                                                               \
-ATTR int NAME ## _queue_is_empty(NAME ## _queue_t S)                          \
+ATTR int NAME ## _queue_is_empty(const NAME ## _queue_t S)                    \
 {                                                                             \
     return S->n == 0;                                                         \
 }                                                                             \

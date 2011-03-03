@@ -55,7 +55,7 @@ ATTR void NAME ## _stack_clear(NAME ## _stack_t S)                            \
     free(S->a);                                                               \
 }                                                                             \
                                                                               \
-ATTR int NAME ## _stack_is_empty(NAME ## _stack_t S)                          \
+ATTR int NAME ## _stack_is_empty(const NAME ## _stack_t S)                    \
 {                                                                             \
     return S->n == 0;                                                         \
 }                                                                             \
