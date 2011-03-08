@@ -1,0 +1,156 @@
+*******************************************************************************
+
+    Copyright (C) 2011 Sebastian Pancratz
+
+*******************************************************************************
+
+*******************************************************************************
+
+    Module documentation
+
+    This module provides a generic, macro-based implementation 
+    of red-black trees
+
+    A red-black tree is a binary search tree in which additionally 
+    every node is assigned a colour, either red or black, and which 
+    satisfies the following properties:
+    \begin{enumerate}
+    \item A node is either red or black.
+    \item The root is black.
+    \item All leaves are black.
+    \item Both children of every red node are black.
+    \item Every path from a given node to any of its descendant 
+          leaves contains the same number of black nodes.
+    \end{enumerate}
+
+    The basic type of a node in the tree is \code{rbtree_node_struct}, which 
+    contains a pair \code{(key, val)} of type \code{(KTYPE, VTYPE)}, where 
+    the types are provided at compile-time via macros.
+
+    Furthermore, it contains three pointers to other nodes of type 
+    \code{rbtree_node_struct}, namely the left and right children and 
+    the parent node.  Note that these can be \code{NULL} if they do not 
+    exist.
+
+*******************************************************************************
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void rbtree_init(rbtree_t T)
+
+    Initialises the tree $T$.
+
+void rbtree_clear(rbtree_t T)
+
+    Frees all memory allocated by the tree $T$.
+
+void rbtree_swap(rbtree_t T1, rbtree_t T2)
+
+    Swaps the two trees $T_1$ and $T_2$.  This is done efficiently by 
+    swapping pointers.
+
+long rbtree_size(const rbtree_t T)
+
+    Returns the number of elements in the tree $T$.
+
+rbtree_node_struct * rbtree_find_node(const rbtree_t T, const KTYPE key)
+
+    Returns a pointer to the node structure with the given key, or 
+    \code{NULL} if no such node exists.
+
+void rbtree_replace_node(rbtree_t T, rbtree_node_struct * o, 
+                                     rbtree_node_struct * n)
+
+    Replaces the old node $o$ in the tree $T$ with the new node $n$.  
+    Assumes that the old node is actually a node in the tree.
+
+void rbtree_rotate_left(rbtree_t T, rbtree_node_struct * n)
+
+void rbtree_rotate_right(rbtree_t T, rbtree_node_struct * n)
+
+int rbtree_is_empty(const rbtree_t T)
+
+    Returns whether the tree $T$ is empty.
+
+rbtree_node_struct * rbtree_min(const rbtree_node_struct * n)
+
+    Returns a pointer to the node structure with the minimum key.
+
+rbtree_node_struct * rbtree_max(const rbtree_node_struct * n)
+
+    Returns a pointer to the node structure with the maximum key.
+
+rbtree_node_struct * rbtree_prev(const rbtree_node_struct * n)
+
+    Returns a pointer to the predecessor of $n$, or \code{NULL} if 
+    $n$ is the node with minimum key.
+
+rbtree_node_struct * rbtree_next(const rbtree_node_struct * n)
+
+    Returns a pointer to the successor of $n$, or \code{NULL} if 
+    $n$ is the node with maximum key.
+
+int rbtree_find(KTYPE * key, VTYPE * val, const rbtree_t T, const KTYPE k)
+
+    Sets the values of \code{*key} and \code{*val} to the entries in the 
+    node with key $k$ and returns $1$ if such a node exists in the tree $T$;
+    otherwise returns $0$.
+
+int rbtree_insert(KTYPE * okey, VTYPE * oval, rbtree_t T, 
+                  const KTYPE key, const VTYPE val)
+
+    Inserts the new node with data \code{(key, val)} into the tree $T$. 
+    If there previously was a node with the same key in the tree, 
+    the pair \code{(okey, oval)} is set to the previous data.  Returns 
+    non-zero in case of replacement.
+
+int rbtree_delete(KTYPE * okey, VTYPE * oval, rbtree_t T, const KTYPE key)
+
+    Removes the node with key \code{key} from the tree $T$ and 
+    returns non-zero.  In this case, the node's data is written to 
+    \code{(okey, oval)}.  If there is no such node, returns zero.
+
+*******************************************************************************
+
+    Iterator
+
+*******************************************************************************
+
+void rbtree_iter_init(rbtree_iter_t iter, const rbtree_t T)
+
+    Initialises an iterator \code{iter} for use with the tree $T$.
+
+void rbtree_iter_clear(rbtree_iter_t iter)
+
+    Clears all memory associated to the iterator \code{iter}.
+
+rbtree_node_struct * rbtree_iter_next(rbtree_iter_t iter)
+
+    Returns a pointer to the structure of the next node, or \code{NULL} 
+    if there is no such node.
+
+*******************************************************************************
+
+    Debugging
+
+*******************************************************************************
+
+int rbtree_verify2(const rbtree_node_struct * n)
+
+    Verifies that the tree rooted at the node $n$ is either empty or 
+    has a black root.
+
+int rbtree_verify4(const rbtree_node_struct * n)
+
+    Verifies that in the tree rooted at the node $n$ every red node 
+    has two black children.
+
+int rbtree_verify5(const rbtree_node_struct * n)
+
+    Verifies that in the tree rooted at the node $n$ all paths from 
+    any given node to its leaf nodes contain the same number of 
+    black nodes.
