@@ -56,7 +56,7 @@ int main(void)
         }
 
         {
-            int_rbtree_node_struct * n;
+            int_rbtree_node * n;
             int_rbtree_iter_t iter;
 
             int_rbtree_iter_init(iter, T);
