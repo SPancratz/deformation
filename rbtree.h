@@ -30,6 +30,8 @@
 
 #define RBTREE_T(NAME)  NAME ## _rbtree_t
 
+#define RBTREE_NODE(NAME)  NAME ## _rbtree_node
+
 #define RBTREE_ITER_T(NAME)  NAME ## _rbtree_iter_t
 
 #define RBTREE_ITER_INIT(NAME, iter, dict)                                    \
@@ -64,6 +66,15 @@
 
 #define RBTREE_IS_EMPTY(NAME, t)                                              \
     NAME ## _rbtree_is_empty(t)
+
+#define RBTREE_VERIFY2(NAME, n)                                               \
+    NAME ## _rbtree_verify2(n);
+
+#define RBTREE_VERIFY4(NAME, n)                                               \
+    NAME ## _rbtree_verify4(n);
+
+#define RBTREE_VERIFY5(NAME, n)                                               \
+    NAME ## _rbtree_verify5(n);
 
 #define RBTREE_PROTOTYPE_H(NAME, KTYPE, VTYPE, ATTR)                          \
                                                                               \
