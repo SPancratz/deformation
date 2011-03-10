@@ -8,10 +8,13 @@
 #include "long_extras.h"
 #include "ulong_extras.h"
 
-#define int_cmp(x, y)  ((x) - (y))
+static int int_cmp(int x, int y)
+{
+    return x - y;
+}
 
-RBTREE_PROTOTYPE_H(int, int, int, int_cmp, static)
-RBTREE_PROTOTYPE_C(int, int, int, int_cmp, static)
+RBTREE_PROTOTYPE_H(int, int, int, static)
+RBTREE_PROTOTYPE_C(int, int, int, static)
 
 RBTREE_PROTOTYPE_DEBUG_H(int, static)
 RBTREE_PROTOTYPE_DEBUG_C(int, static)
@@ -40,7 +43,7 @@ int main(void)
             int x = z_randtest(state);
             int y = z_randtest(state);
 
-            ins = int_rbtree_insert(&a, &b, T, x, y);
+            ins = int_rbtree_insert(&a, &b, T, x, y, &int_cmp);
 
             c2 = int_rbtree_verify2(RBTREE_ROOT(T));
             c4 = int_rbtree_verify4(RBTREE_ROOT(T));
@@ -69,7 +72,7 @@ int main(void)
             int a, b, c2, c4, c5;
             int x = z_randtest(state);
 
-            del = int_rbtree_delete(&a, &b, T, x);
+            del = int_rbtree_delete(&a, &b, T, x, &int_cmp);
 
             c2 = int_rbtree_verify2(RBTREE_ROOT(T));
             c4 = int_rbtree_verify4(RBTREE_ROOT(T));
@@ -104,7 +107,7 @@ int main(void)
             int x = i;
             int y = z_randtest(state);
 
-            ins = int_rbtree_insert(&a, &b, T, x, y);
+            ins = int_rbtree_insert(&a, &b, T, x, y, &int_cmp);
 
             c2 = int_rbtree_verify2(RBTREE_ROOT(T));
             c4 = int_rbtree_verify4(RBTREE_ROOT(T));
@@ -124,7 +127,7 @@ int main(void)
             int a, b, c2, c4, c5;
             int x = i;
 
-            del = int_rbtree_delete(&a, &b, T, x);
+            del = int_rbtree_delete(&a, &b, T, x, &int_cmp);
 
             result = (del == 1);
             if (!result)

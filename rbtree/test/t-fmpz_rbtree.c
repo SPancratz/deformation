@@ -18,8 +18,8 @@ static void fmpz_delete(fmpz x)
     fmpz_clear(&x);
 }
 
-RBTREE_PROTOTYPE_H(fmpz, fmpz, fmpz, fmpz_compare, static)
-RBTREE_PROTOTYPE_C(fmpz, fmpz, fmpz, fmpz_compare, static)
+RBTREE_PROTOTYPE_H(fmpz, fmpz, fmpz, static)
+RBTREE_PROTOTYPE_C(fmpz, fmpz, fmpz, static)
 
 RBTREE_PROTOTYPE_DEBUG_H(fmpz, static)
 RBTREE_PROTOTYPE_DEBUG_C(fmpz, static)
@@ -51,7 +51,7 @@ int main(void)
             fmpz_randtest(&x, state, 100);
             fmpz_randtest(&y, state, 100);
 
-            ins = fmpz_rbtree_insert(&a, &b, T, x, y);
+            ins = fmpz_rbtree_insert(&a, &b, T, x, y, &fmpz_compare);
 
             if (ins)
             {
@@ -88,7 +88,7 @@ int main(void)
             fmpz_init(&x);
             fmpz_randtest(&x, state, 100);
 
-            del = fmpz_rbtree_delete(&a, &b, T, x);
+            del = fmpz_rbtree_delete(&a, &b, T, x, &fmpz_compare);
 
             if (del)
             {
@@ -134,7 +134,7 @@ int main(void)
             fmpz_set_si(&x, i);
             fmpz_randtest(&y, state, 100);
 
-            ins = fmpz_rbtree_insert(&a, &b, T, x, y);
+            ins = fmpz_rbtree_insert(&a, &b, T, x, y, &fmpz_compare);
 
             if (ins)
             {
@@ -162,7 +162,7 @@ int main(void)
             fmpz_init(&x);
             fmpz_set_si(&x, i);
 
-            del = fmpz_rbtree_delete(&a, &b, T, x);
+            del = fmpz_rbtree_delete(&a, &b, T, x, &fmpz_compare);
 
             if (del)
             {

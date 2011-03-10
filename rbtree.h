@@ -53,19 +53,19 @@
 #define RBTREE_SIZE(NAME, t)                                                  \
     NAME ## _rbtree_size(t)
 
-#define RBTREE_FIND(NAME, k2, v2, t, k)                                       \
-    NAME ## _rbtree_find(k2, v2, t, k)
+#define RBTREE_FIND(NAME, k2, v2, t, k, cmp)                                  \
+    NAME ## _rbtree_find(k2, v2, t, k, cmp)
 
-#define RBTREE_INSERT(NAME, k2, v2, t, k, v)                                  \
-    NAME ## _rbtree_insert(k2, v2, t, k, v)
+#define RBTREE_INSERT(NAME, k2, v2, t, k, v, cmp)                             \
+    NAME ## _rbtree_insert(k2, v2, t, k, v, cmp)
 
-#define RBTREE_DELETE(NAME, k2, v2, t, k)                                     \
-    NAME ## _rbtree_delete(k2, v2, t, k)
+#define RBTREE_DELETE(NAME, k2, v2, t, k, cmp)                                \
+    NAME ## _rbtree_delete(k2, v2, t, k, cmp)
 
 #define RBTREE_IS_EMPTY(NAME, t)                                              \
     NAME ## _rbtree_is_empty(t)
 
-#define RBTREE_PROTOTYPE_H(NAME, KTYPE, VTYPE, CMP, ATTR)                     \
+#define RBTREE_PROTOTYPE_H(NAME, KTYPE, VTYPE, ATTR)                          \
                                                                               \
 typedef struct NAME ## _rbtree_node                                           \
 {                                                                             \
@@ -93,7 +93,8 @@ NAME ## _rbtree_swap(NAME ## _rbtree_t t1, NAME ## _rbtree_t t2);             \
 long NAME ## _rbtree_size(const NAME ## _rbtree_t t);                         \
                                                                               \
 ATTR NAME ## _rbtree_node *                                                   \
-NAME ## _rbtree_find_node(const NAME ## _rbtree_t t, const KTYPE key);        \
+NAME ## _rbtree_find_node(const NAME ## _rbtree_t t, const KTYPE key,         \
+                          int (*cmp)(const KTYPE k1, const KTYPE k2));        \
                                                                               \
 ATTR void                                                                     \
 NAME ## _rbtree_replace_node(NAME ## _rbtree_t t,                             \
@@ -125,15 +126,18 @@ NAME ## _rbtree_next(const NAME ## _rbtree_node * n);                         \
                                                                               \
 ATTR int                                                                      \
 NAME ## _rbtree_find(KTYPE * key, VTYPE * val,                                \
-                     const NAME ## _rbtree_t t, const KTYPE k);               \
+                     const NAME ## _rbtree_t t, const KTYPE k,                \
+                     int (*cmp)(const KTYPE k1, const KTYPE k2));             \
                                                                               \
 ATTR int                                                                      \
 NAME ## _rbtree_insert(KTYPE * okey, VTYPE * oval,                            \
-                       NAME ## _rbtree_t t, const KTYPE key, const VTYPE val);\
+                       NAME ## _rbtree_t t, const KTYPE key, const VTYPE val, \
+                       int (*cmp)(const KTYPE k1, const KTYPE k2));           \
                                                                               \
 ATTR int                                                                      \
 NAME ## _rbtree_delete(KTYPE * okey, VTYPE * oval,                            \
-                       NAME ## _rbtree_t t, const KTYPE key);                 \
+                       NAME ## _rbtree_t t, const KTYPE key,                  \
+                       int (*cmp)(const KTYPE k1, const KTYPE k2));           \
                                                                               \
 typedef struct NAME ## _rbtree_iter_struct                                    \
 {                                                                             \
@@ -154,7 +158,7 @@ ATTR NAME ## _rbtree_node *                                                   \
 NAME ## _rbtree_iter_next(NAME ## _rbtree_iter_t iter);                       \
 
 
-#define RBTREE_PROTOTYPE_C(NAME, KTYPE, VTYPE, CMP, ATTR)                     \
+#define RBTREE_PROTOTYPE_C(NAME, KTYPE, VTYPE, ATTR)                          \
                                                                               \
 ATTR void                                                                     \
 NAME ## _rbtree_init(NAME ## _rbtree_t t)                                     \
@@ -211,15 +215,16 @@ long NAME ## _rbtree_size(const NAME ## _rbtree_t t)                          \
 }                                                                             \
                                                                               \
 ATTR NAME ## _rbtree_node *                                                   \
-NAME ## _rbtree_find_node(const NAME ## _rbtree_t t, const KTYPE key)         \
+NAME ## _rbtree_find_node(const NAME ## _rbtree_t t, const KTYPE key,         \
+                          int (*cmp)(const KTYPE k1, const KTYPE k2))         \
 {                                                                             \
     NAME ## _rbtree_node * n = RBTREE_ROOT(t);                                \
     while (n)                                                                 \
     {                                                                         \
-        int cmp = CMP(key, n->key);                                           \
-        if (cmp == 0)                                                         \
+        int res = cmp(key, n->key);                                           \
+        if (res == 0)                                                         \
             return n;                                                         \
-        n = (cmp < 0) ? n->left : n->right;                                   \
+        n = (res < 0) ? n->left : n->right;                                   \
     }                                                                         \
     return NULL;                                                              \
 }                                                                             \
@@ -475,9 +480,10 @@ NAME ## _rbtree_next(const NAME ## _rbtree_node * n)                          \
                                                                               \
 ATTR int                                                                      \
 NAME ## _rbtree_find(KTYPE * key, VTYPE * val,                                \
-                     const NAME ## _rbtree_t t, const KTYPE k)                \
+                     const NAME ## _rbtree_t t, const KTYPE k,                \
+                     int (*cmp)(const KTYPE k1, const KTYPE k2))              \
 {                                                                             \
-    NAME ## _rbtree_node * n = NAME ## _rbtree_find_node(t, k);               \
+    NAME ## _rbtree_node * n = NAME ## _rbtree_find_node(t, k, cmp);          \
                                                                               \
     if (n)                                                                    \
     {                                                                         \
@@ -490,7 +496,8 @@ NAME ## _rbtree_find(KTYPE * key, VTYPE * val,                                \
                                                                               \
 ATTR int                                                                      \
 NAME ## _rbtree_insert(KTYPE * okey, VTYPE * oval,                            \
-                       NAME ## _rbtree_t t, const KTYPE key, const VTYPE val) \
+                       NAME ## _rbtree_t t, const KTYPE key, const VTYPE val, \
+                       int (*cmp)(const KTYPE k1, const KTYPE k2))            \
 {                                                                             \
     if (RBTREE_ROOT(t) == NULL)                                               \
     {                                                                         \
@@ -501,11 +508,11 @@ NAME ## _rbtree_insert(KTYPE * okey, VTYPE * oval,                            \
     else                                                                      \
     {                                                                         \
         NAME ## _rbtree_node * n = RBTREE_ROOT(t);                            \
-        int cmp = CMP(key, n->key);                                           \
+        int res = cmp(key, n->key);                                           \
                                                                               \
-        while (cmp)                                                           \
+        while (res)                                                           \
         {                                                                     \
-            if (cmp < 0)                                                      \
+            if (res < 0)                                                      \
             {                                                                 \
                 if (n->left)                                                  \
                     n = n->left;                                              \
@@ -529,7 +536,7 @@ NAME ## _rbtree_insert(KTYPE * okey, VTYPE * oval,                            \
                     return 0;                                                 \
                 }                                                             \
             }                                                                 \
-            cmp = CMP(key, n->key);                                           \
+            res = cmp(key, n->key);                                           \
         }                                                                     \
                                                                               \
         *okey = n->key;                                                       \
@@ -542,9 +549,10 @@ NAME ## _rbtree_insert(KTYPE * okey, VTYPE * oval,                            \
                                                                               \
 ATTR int                                                                      \
 NAME ## _rbtree_delete(KTYPE * okey, VTYPE * oval,                            \
-                       NAME ## _rbtree_t t, const KTYPE key)                  \
+                       NAME ## _rbtree_t t, const KTYPE key,                  \
+                       int (*cmp)(const KTYPE k1, const KTYPE k2))            \
 {                                                                             \
-    NAME ## _rbtree_node *c, *n = NAME ## _rbtree_find_node(t, key);          \
+    NAME ## _rbtree_node *c, *n = NAME ## _rbtree_find_node(t, key, cmp);     \
                                                                               \
     if (n == NULL)                                                            \
         return 0;                                                             \
