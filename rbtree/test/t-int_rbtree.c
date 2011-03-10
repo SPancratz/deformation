@@ -9,10 +9,9 @@
 #include "ulong_extras.h"
 
 #define int_cmp(x, y)  ((x) - (y))
-#define int_clear(x) 
 
-RBTREE_PROTOTYPE_H(int, int, int, int_cmp, int_clear, int_clear, static)
-RBTREE_PROTOTYPE_C(int, int, int, int_cmp, int_clear, int_clear, static)
+RBTREE_PROTOTYPE_H(int, int, int, int_cmp, static)
+RBTREE_PROTOTYPE_C(int, int, int, int_cmp, static)
 
 RBTREE_PROTOTYPE_DEBUG_H(int, static)
 RBTREE_PROTOTYPE_DEBUG_C(int, static)
@@ -84,7 +83,7 @@ int main(void)
             }
         }
 
-        int_rbtree_clear(T);
+        int_rbtree_clear(T, NULL, NULL);
     }
 
     /*
@@ -155,7 +154,7 @@ int main(void)
             abort();
         }
 
-        int_rbtree_clear(T);
+        int_rbtree_clear(T, NULL, NULL);
     }
 
 

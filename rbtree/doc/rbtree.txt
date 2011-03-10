@@ -44,7 +44,8 @@ void rbtree_init(rbtree_t T)
 
     Initialises the tree $T$.
 
-void rbtree_clear(rbtree_t T)
+void rbtree_clear(rbtree_t T, 
+                  void (*kclear)(KTYPE key), void (*vclear)(VTYPE val))
 
     Frees all memory allocated by the tree $T$.
 

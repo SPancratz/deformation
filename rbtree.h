@@ -44,8 +44,8 @@
 #define RBTREE_INIT(NAME, t)                                                  \
     NAME ## _rbtree_init(t)
 
-#define RBTREE_CLEAR(NAME, t)                                                 \
-    NAME ## _rbtree_clear(t)
+#define RBTREE_CLEAR(NAME, t, kclear, vclear)                                 \
+    NAME ## _rbtree_clear(t, kclear, vclear)
 
 #define RBTREE_SWAP(NAME, t1, t2)                                             \
     NAME ## _rbtree_swap(t1, t2)
@@ -65,7 +65,7 @@
 #define RBTREE_IS_EMPTY(NAME, t)                                              \
     NAME ## _rbtree_is_empty(t)
 
-#define RBTREE_PROTOTYPE_H(NAME, KTYPE, VTYPE, CMP, KCLEAR, VCLEAR, ATTR)     \
+#define RBTREE_PROTOTYPE_H(NAME, KTYPE, VTYPE, CMP, ATTR)                     \
                                                                               \
 typedef struct NAME ## _rbtree_node                                           \
 {                                                                             \
@@ -83,7 +83,9 @@ ATTR void                                                                     \
 NAME ## _rbtree_init(NAME ## _rbtree_t t);                                    \
                                                                               \
 ATTR void                                                                     \
-NAME ## _rbtree_clear(NAME ## _rbtree_t t);                                   \
+NAME ## _rbtree_clear(NAME ## _rbtree_t t,                                    \
+                      void (*kclear)(KTYPE key),                              \
+                      void (*vclear)(VTYPE val));                             \
                                                                               \
 ATTR void                                                                     \
 NAME ## _rbtree_swap(NAME ## _rbtree_t t1, NAME ## _rbtree_t t2);             \
@@ -152,7 +154,7 @@ ATTR NAME ## _rbtree_node *                                                   \
 NAME ## _rbtree_iter_next(NAME ## _rbtree_iter_t iter);                       \
 
 
-#define RBTREE_PROTOTYPE_C(NAME, KTYPE, VTYPE, CMP, KCLEAR, VCLEAR, ATTR)     \
+#define RBTREE_PROTOTYPE_C(NAME, KTYPE, VTYPE, CMP, ATTR)                     \
                                                                               \
 ATTR void                                                                     \
 NAME ## _rbtree_init(NAME ## _rbtree_t t)                                     \
@@ -161,22 +163,29 @@ NAME ## _rbtree_init(NAME ## _rbtree_t t)                                     \
 }                                                                             \
                                                                               \
 ATTR void                                                                     \
-_ ## NAME ## _rbtree_clear(NAME ## _rbtree_node * n)                          \
+_ ## NAME ## _rbtree_clear(NAME ## _rbtree_node * n,                          \
+                           void (*kclear)(KTYPE key),                         \
+                           void (*vclear)(VTYPE val))                         \
 {                                                                             \
     if (n->left)                                                              \
-        _ ## NAME ## _rbtree_clear(n->left);                                  \
+        _ ## NAME ## _rbtree_clear(n->left, kclear, vclear);                  \
     if (n->right)                                                             \
-        _ ## NAME ## _rbtree_clear(n->right);                                 \
-    KCLEAR(n->key);                                                           \
-    VCLEAR(n->val);                                                           \
+        _ ## NAME ## _rbtree_clear(n->right, kclear, vclear);                 \
+                                                                              \
+    if (kclear != NULL)                                                       \
+        kclear(n->key);                                                       \
+    if (vclear != NULL)                                                       \
+        vclear(n->val);                                                       \
     free(n);                                                                  \
 }                                                                             \
                                                                               \
 ATTR void                                                                     \
-NAME ## _rbtree_clear(NAME ## _rbtree_t t)                                    \
+NAME ## _rbtree_clear(NAME ## _rbtree_t t,                                    \
+                      void (*kclear)(KTYPE key),                              \
+                      void (*vclear)(VTYPE val))                              \
 {                                                                             \
     if (RBTREE_ROOT(t))                                                       \
-        _ ## NAME ## _rbtree_clear(RBTREE_ROOT(t));                           \
+        _ ## NAME ## _rbtree_clear(RBTREE_ROOT(t), kclear, vclear);           \
     RBTREE_ROOT(t) = NULL;                                                    \
 }                                                                             \
                                                                               \
