@@ -58,7 +58,8 @@ long rbtree_size(const rbtree_t T)
 
     Returns the number of elements in the tree $T$.
 
-rbtree_node_struct * rbtree_find_node(const rbtree_t T, const KTYPE key)
+rbtree_node_struct * rbtree_find_node(const rbtree_t T, const KTYPE key, 
+                                    int (*cmp)(const KTYPE k1, const KTYPE k2))
 
     Returns a pointer to the node structure with the given key, or 
     \code{NULL} if no such node exists.
@@ -95,21 +96,24 @@ rbtree_node_struct * rbtree_next(const rbtree_node_struct * n)
     Returns a pointer to the successor of $n$, or \code{NULL} if 
     $n$ is the node with maximum key.
 
-int rbtree_find(KTYPE * key, VTYPE * val, const rbtree_t T, const KTYPE k)
+int rbtree_find(KTYPE * key, VTYPE * val, const rbtree_t T, const KTYPE k, 
+                int (*cmp)(const KTYPE k1, const KTYPE k2))
 
     Sets the values of \code{*key} and \code{*val} to the entries in the 
     node with key $k$ and returns $1$ if such a node exists in the tree $T$;
     otherwise returns $0$.
 
 int rbtree_insert(KTYPE * okey, VTYPE * oval, rbtree_t T, 
-                  const KTYPE key, const VTYPE val)
+                  const KTYPE key, const VTYPE val, 
+                  int (*cmp)(const KTYPE k1, const KTYPE k2))
 
     Inserts the new node with data \code{(key, val)} into the tree $T$. 
     If there previously was a node with the same key in the tree, 
     the pair \code{(okey, oval)} is set to the previous data.  Returns 
     non-zero in case of replacement.
 
-int rbtree_delete(KTYPE * okey, VTYPE * oval, rbtree_t T, const KTYPE key)
+int rbtree_delete(KTYPE * okey, VTYPE * oval, rbtree_t T, const KTYPE key, 
+                  int (*cmp)(const KTYPE k1, const KTYPE k2))
 
     Removes the node with key \code{key} from the tree $T$ and 
     returns non-zero.  In this case, the node's data is written to 
