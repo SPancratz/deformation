@@ -16,7 +16,7 @@ typedef __mat_struct mat_t[1];
 
 /* Memory management *********************************************************/
 
-void mat_init(mat_t mat, long m, long n, const mat_ctx_t);
+void mat_init(mat_t mat, long m, long n, const mat_ctx_t ctx);
 
 void mat_set(mat_t mat1, const mat_t mat2, 
                    const mat_ctx_t ctx);
