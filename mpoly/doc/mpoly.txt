@@ -1,0 +1,292 @@
+*******************************************************************************
+
+    Copyright (C) 2011 Sebastian Pancratz
+
+*******************************************************************************
+
+*******************************************************************************
+
+    Memory management
+
+    The structure for a multivariate polynomial of type \code{__mpoly_struct} 
+    contains two elements:  an associative array \code{dict}, which maps 
+    monomials to coefficients, and an integer \code{n}, which denotes the 
+    number of variables $x_0, \dotsc, x_{n-1}$.
+
+*******************************************************************************
+
+void mpoly_init(mpoly_t rop, long n, const mat_ctx_t ctx)
+
+    Initialises the polynomial \code{rop}.
+
+void mpoly_clear(mpoly_t rop, const mat_ctx_t ctx)
+
+    Clears all memory allocated by the polynomial \code{rop}.
+
+*******************************************************************************
+
+    Iterator
+
+*******************************************************************************
+
+void mpoly_iter_init(mpoly_iter_t iter, const mpoly_t op)
+
+    Initialises the iterator \code{iter} for use with the 
+    polynomial \code{op}.
+
+void mpoly_iter_clear(mpoly_iter_t iter)
+
+    Clears all memory used by the iterator \code{iter}.  
+    Note that this does not affect the polynomials that 
+    this iterator was used with.
+
+mpoly_term mpoly_iter_next(mpoly_iter_t iter)
+
+    Returns the next monomial term from the iterator \code{iter}, 
+    or \code{NULL} if there is no such term.
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void mpoly_randtest(mpoly_t rop, flint_rand_t state, long d, long N, 
+                    const mat_ctx_t ctx)
+
+    Sets \code{rop} to a random polynomial in \code{rop->n} variables 
+    with partial degrees stricly less than $d$ and at most $N$ terms.
+
+void mpoly_randtest_not_zero(mpoly_t rop, flint_rand_t state, long d, long N, 
+                             const mat_ctx_t ctx)
+
+    Sets \code{rop} to a non-zero random polynomial in 
+    \code{rop->n} variables with partial degrees stricly 
+    less than $d$ and at most $N$ terms.
+
+*******************************************************************************
+
+    Assignment and basic manipulation
+
+*******************************************************************************
+
+void mpoly_set(mpoly_t rop, const mpoly_t op, const mat_ctx_t ctx)
+
+    Sets \code{rop} to the same multi-variate polynomial as \code{op}, 
+    including the number of variables.
+
+void mpoly_swap(mpoly_t op1, const mpoly_t op2, const mat_ctx_t ctx)
+
+    Swaps the polynomials \code{op1} and \code{op2}.  This is done 
+    efficiently by swapping pointers.
+
+void mpoly_zero(mpoly_t rop, const mat_ctx_t ctx)
+
+    Sets the polynomial \code{rop} to zero.
+
+void mpoly_neg(mpoly_t rop, const mpoly_t op, const mat_ctx_t ctx)
+
+    Sets \code{rop} to the additive inverse of \code{op}.
+
+*******************************************************************************
+
+    Setting and retrieving coefficients
+
+*******************************************************************************
+
+void mpoly_set_coeff(mpoly_t rop, const mon_t m, const void *c, 
+                     const mat_ctx_t ctx)
+
+    Sets the coefficient of the monomial $m$ to $c$.
+
+    Creates copies the monomial $m$ and the coefficient $c$ using the 
+    functions \code{mon_set()} and \code{ctx->set()}, respectively. 
+    Assumes that the monomial $m$ and the polynomial \code{rop} use 
+    the same number of variables.
+
+void mpoly_get_coeff(void *rop, const mpoly_t op, const mon_t m, 
+                     const mat_ctx_t ctx)
+
+    Sets \code{rop} to the value of the coefficient of the monomial $m$ 
+    in the polynomial \code{op}.
+
+*******************************************************************************
+
+    Properties
+
+*******************************************************************************
+
+long mpoly_degree(const mpoly_t op, long var, const mat_ctx_t ctx)
+
+    Returns the degree of the polynomial \code{op} with respect to the 
+    variable \code{var}.  If \code{var == -1}, returns the total degree.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int mpoly_is_zero(const mpoly_t op, const mat_ctx_t ctx)
+
+    Returns whether the polynomial \code{op} is zero.
+
+int mpoly_is_one(const mpoly_t op, const mat_ctx_t ctx)
+
+    Returns whether the polynomial \code{op} is the constant polynomial $1$.
+
+int mpoly_equal(const mpoly_t op1, const mpoly_t op2, const mat_ctx_t ctx)
+
+    Returns whether the two polynomials \code{op1} and \code{op2} are 
+    equal.
+
+    Note that, even in the case that the two polynomials are mathematically 
+    equal, we may not assume that the dictionary trees were constructured 
+    in the same manner.
+
+    Thus, after checking that the two polynomials have the same number of 
+    terms, we iterate over all terms of one polynomial and then look for 
+    that term in the other.
+
+    Assumes that the two polynomials have the same number of variables.
+
+*******************************************************************************
+
+    Addition and subtraction
+
+*******************************************************************************
+
+void _mpoly_add_in_place(mpoly_t rop, const mpoly_t op, const mat_ctx_t ctx)
+
+    Adds the polynomial \code{op} to the polynomial \code{rop}.
+
+void mpoly_add(mpoly_t rop, const mpoly_t op1, const mpoly_t op2, 
+               const mat_ctx_t ctx)
+
+    Sets \code{rop} to the sum of \code{op1} and \code{op2}.
+
+    Assumes that all olynomials have the same number of variables.
+
+void _mpoly_sub_in_place(mpoly_t rop, const mpoly_t op, const mat_ctx_t ctx)
+
+    Subtracts the polynomial \code{op} to the polynomial \code{rop}.
+
+void mpoly_sub(mpoly_t rop, const mpoly_t op1, const mpoly_t op2, 
+               const mat_ctx_t ctx)
+
+    Sets \code{rop} to the difference of \code{op1} and \code{op2}.
+
+    Assumes that all olynomials have the same number of variables.
+
+void mpoly_add_coeff(mpoly_t rop, const mon_t m, const void *x, 
+                     const mat_ctx_t ctx)
+
+    Adds the term $x m$ to the polynomial \code{rop}.
+
+    Assumes that polynomial \code{rop} and the monomial $m$ have the 
+    same number of variables.
+
+void mpoly_sub_coeff(mpoly_t rop, const mon_t m, const void *x, 
+                     const mat_ctx_t ctx)
+
+    Subtracts the term $x m$ from the polynomial \code{rop}.
+
+    Assumes that polynomial \code{rop} and the monomial $m$ have the 
+    same number of variables.
+
+*******************************************************************************
+
+    Scalar multiplication
+
+*******************************************************************************
+
+void mpoly_scalar_mul(mpoly_t rop, const mpoly_t op, const void *x, 
+                      const mat_ctx_t ctx)
+
+    Sets the polynomial \code{rop} to the polynomial \code{op} multiplied 
+    by the scalar \code{x}.
+
+void mpoly_scalar_mul_si(mpoly_t rop, const mpoly_t op, long x, 
+                         const mat_ctx_t ctx)
+
+    Sets the polynomial \code{rop} to the polynomial \code{op} multiplied 
+    by the scalar \code{x}.
+
+void mpoly_scalar_div(mpoly_t rop, const mpoly_t op, const void *x, 
+                      const mat_ctx_t ctx)
+
+    Sets the polynomial \code{rop} to the polynomial \code{op} divided 
+    by the scalar \code{x}.
+
+void mpoly_scalar_div_si(mpoly_t rop, const mpoly_t op, long x, 
+                         const mat_ctx_t ctx)
+
+    Sets the polynomial \code{rop} to the polynomial \code{op} divided 
+    by the scalar \code{x}.
+
+*******************************************************************************
+
+    Multiplication
+
+*******************************************************************************
+
+void mpoly_mul_mon(mpoly_t rop, const mpoly_t op, const mon_t m, 
+                   const mat_ctx_t ctx)
+
+    Sets \code{rop} to the product of the polynomial \code{op} and 
+    the monomial \code{m}.
+
+void mpoly_mul(mpoly_t rop, const mpoly_t op1, const mpoly_t op2, 
+               const mat_ctx_t ctx)
+
+    Sets \code{rop} to the product of the two polynomials 
+    \code{op1} and \code{op2}.
+
+void mpoly_addmul(mpoly_t rop, const mpoly_t op1, const mpoly_t op2, 
+                  const mat_ctx_t ctx)
+
+    Adds the product of \code{op1} and \code{op2} to the polynomial 
+    \code{rop}.
+
+void mpoly_submul(mpoly_t rop, const mpoly_t op1, const mpoly_t op2, 
+                  const mat_ctx_t ctx)
+
+    Subtracts the product of \code{op1} and \code{op2} from the 
+    polynomial \code{rop}.
+
+*******************************************************************************
+
+    Derivative
+
+*******************************************************************************
+
+void mpoly_derivative(mpoly_t rop, const mpoly_t op, int var, 
+                      const mat_ctx_t ctx)
+
+    Sets the polynomial \code{rop} to the derivative of \code{op} with 
+    repect to the variable \code{var}, where the variables are numbered 
+    $0, \dotsc, n - 1$.
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+int mpoly_set_str(mpoly_t rop, const char *str, const mat_ctx_t ctx)
+
+    Sets the polynomial \code{rop} to the polynomial given by the 
+    string \code{str}.
+
+    Returns a positive value if this is successful, and a non-positive 
+    value otherwise.
+
+char * mpoly_get_str(const mpoly_t op, const mat_ctx_t ctx)
+
+    Returns the string representation of the polynomial \code{op}.
+
+void mpoly_print(const mpoly_t op, const mat_ctx_t ctx)
+
+    Prints the string representation of the polynomial \code{op} 
+    to \code{stdout}.
+
