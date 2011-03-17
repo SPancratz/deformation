@@ -85,6 +85,9 @@
 
     Memory management and basic assignment
 
+    Defines a macro \code{MON_MAX_VARS} that returns the maximum number 
+    of variables supported on this architecture.
+
 *******************************************************************************
 
 void mon_init(mon_t x)

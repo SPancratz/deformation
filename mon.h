@@ -19,6 +19,9 @@ typedef unsigned long exp_t;
 #define MON_BITMASK_BLOCK  (0xFFul)
 #define MON_BITMASK_ALL  (~ (0ul))
 
+#define MON_MIN_VARS  1
+#define MON_MAX_VARS  (FLINT_BITS / MON_BITS_PER_EXP)
+
 /* Initialization ************************************************************/
 
 #define mon_init(x)  ((x) = 0)
@@ -52,6 +55,12 @@ mon_t _mon_randtest(flint_rand_t state, int n, exp_t k);
 /* Comparison ****************************************************************/
 
 #define mon_cmp_invlex(x, y)  (((x) < (y)) ? -1 : ((x) > (y) ? 1 : 0))
+
+static __inline__
+int mon_cmp(const mon_t x, const mon_t y)
+{
+    return mon_cmp_invlex(x, y);
+}
 
 #define mon_is_one(x)  ((x) == 0)
 
