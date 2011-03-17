@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <mpir.h>
 #include "flint.h"
@@ -16,6 +17,7 @@ typedef struct
     void (*clear)(void *op);
 
     void (*set)(void *rop, const void *op);
+    void (*set_si)(void *rop, long op);
     void (*swap)(void *op1, void *op2);
     void (*zero)(void *rop);
     void (*one)(void *rop);
@@ -35,6 +37,8 @@ typedef struct
     void (*div)(void *rop, const void *op1, const void *op2);
 
     int (*print)(const void *op);
+    char * (*get_str)(const void *op);
+    int (*set_str)(void *rop, const char * str);
 
 } __mat_ctx_struct;
 
@@ -49,6 +53,8 @@ static void ld_init(void *op)
 static void ld_clear(void *op) { }
 static void ld_set(void *rop, const void *op)
     { *(long *) rop = *(const long *) op; }
+static void ld_set_si(void *rop, long op)
+    { *(long *) rop = op; }
 static void ld_swap(void *op1, void *op2)
 {
     long t;
@@ -83,6 +89,24 @@ static void ld_div(void *rop, const void *op1, const void *op2)
     { *(long *) rop = *(long *) op1 / *(long *) op2; }
 static int ld_print(const void *op)
     { return printf("%ld", *(long *) op); }
+static char * ld_get_str(const void *op)
+{
+    char *s;
+
+    s = malloc(21);
+    if (!s)
+    {
+        printf("ERROR (ld_get_str).\n");
+        abort();
+    }
+    sprintf(s, "%ld", *(long *) op);
+    return s;
+}
+static int ld_set_str(void *rop, const char *str)
+{
+    *(long *) rop = atoi(str);
+    return 1;  /* TODO */
+}
 
 static void mat_ctx_init_long(mat_ctx_t ctx)
 {
@@ -91,6 +115,7 @@ static void mat_ctx_init_long(mat_ctx_t ctx)
     ctx->init              = &ld_init;
     ctx->clear             = &ld_clear;
     ctx->set               = &ld_set;
+    ctx->set_si            = &ld_set_si;
     ctx->swap              = &ld_swap;
     ctx->zero              = &ld_zero;
     ctx->one               = &ld_one;
@@ -105,6 +130,8 @@ static void mat_ctx_init_long(mat_ctx_t ctx)
     ctx->mul               = &ld_mul;
     ctx->div               = &ld_div;
     ctx->print             = &ld_print;
+    ctx->get_str           = &ld_get_str;
+    ctx->set_str           = &ld_set_str;
 }
 
 /* mpq_t **********************************************************************/
@@ -115,6 +142,8 @@ static void _mpq_clear(void *op)
     { mpq_clear(op); }
 static void _mpq_set(void *rop, const void *op)
     { mpq_set(rop, op); }
+static void _mpq_set_si(void *rop, long op)
+    { mpq_set_si(rop, op, 1); }
 static void _mpq_swap(void *op1, void *op2)
     { mpq_swap(op1, op2); }
 static void _mpq_zero(void *rop)
@@ -154,6 +183,10 @@ static void _mpq_div(void *rop, const void *op1, const void *op2)
     { mpq_div(rop, op1, op2); }
 static int _mpq_print(const void *op)
     { return gmp_printf("%Qd", op); }
+static char * _mpq_get_str(const void *op)
+    { return mpq_get_str(NULL, 10, op); }
+static int _mpq_set_str(void *rop, const char *str)
+    { return (mpq_set_str(rop, str, 10) == 0) ? 1 : 0; }
 
 static void mat_ctx_init_mpq(mat_ctx_t ctx)
 {
@@ -162,6 +195,7 @@ static void mat_ctx_init_mpq(mat_ctx_t ctx)
     ctx->init              = &_mpq_init;
     ctx->clear             = &_mpq_clear;
     ctx->set               = &_mpq_set;
+    ctx->set_si            = &_mpq_set_si;
     ctx->swap              = &_mpq_swap;
     ctx->zero              = &_mpq_zero;
     ctx->one               = &_mpq_one;
@@ -176,6 +210,8 @@ static void mat_ctx_init_mpq(mat_ctx_t ctx)
     ctx->mul               = &_mpq_mul;
     ctx->div               = &_mpq_div;
     ctx->print             = &_mpq_print;
+    ctx->get_str           = &_mpq_get_str;
+    ctx->set_str           = &_mpq_set_str;
 }
 
 static void mat_ctx_clear(mat_ctx_t ctx)
