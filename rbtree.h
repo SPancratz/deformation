@@ -101,7 +101,8 @@ NAME ## _rbtree_clear(NAME ## _rbtree_t t,                                    \
 ATTR void                                                                     \
 NAME ## _rbtree_swap(NAME ## _rbtree_t t1, NAME ## _rbtree_t t2);             \
                                                                               \
-long NAME ## _rbtree_size(const NAME ## _rbtree_t t);                         \
+ATTR long                                                                     \
+NAME ## _rbtree_size(const NAME ## _rbtree_t t);                              \
                                                                               \
 ATTR NAME ## _rbtree_node *                                                   \
 NAME ## _rbtree_find_node(const NAME ## _rbtree_t t, const KTYPE key,         \
@@ -399,7 +400,7 @@ NAME ## _rbtree_delete_rearrange(NAME ## _rbtree_t t,                         \
 }                                                                             \
                                                                               \
 ATTR NAME ## _rbtree_node *                                                   \
-NAME ## _rbtree_new_node(KTYPE key, VTYPE val,                                \
+NAME ## _rbtree_new_node(const KTYPE key, const VTYPE val,                    \
                          int color,                                           \
                          NAME ## _rbtree_node * parent,                       \
                          NAME ## _rbtree_node * left,                         \
@@ -408,8 +409,8 @@ NAME ## _rbtree_new_node(KTYPE key, VTYPE val,                                \
     NAME ## _rbtree_node * n;                                                 \
                                                                               \
     n = malloc(sizeof(struct NAME ## _rbtree_node));                          \
-    n->key = key;                                                             \
-    n->val = val;                                                             \
+    n->key = (KTYPE) key;                                                     \
+    n->val = (VTYPE) val;                                                     \
     n->color = color;                                                         \
     n->parent = parent;                                                       \
     n->left = left;                                                           \
@@ -552,8 +553,8 @@ NAME ## _rbtree_insert(KTYPE * okey, VTYPE * oval,                            \
                                                                               \
         *okey = n->key;                                                       \
         *oval = n->val;                                                       \
-        n->key = key;                                                         \
-        n->val = val;                                                         \
+        n->key = (KTYPE) key;                                                 \
+        n->val = (VTYPE) val;                                                 \
         return 1;                                                             \
     }                                                                         \
 }                                                                             \
