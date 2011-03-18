@@ -32,7 +32,7 @@ mat_csr_mul_vec(char *res, const mat_csr_t mat, const char *vec,
 {
     char *in;
 
-    in = (res == vec) ? _vec_init(mat->n, ctx) : vec;
+    in = (res == vec) ? _vec_init(mat->n, ctx) : (char *) vec;
 
     _mat_csr_mul_vec(res, mat->m, mat->n, mat->x, mat->j, mat->p, mat->lenr, 
                      vec, ctx);
