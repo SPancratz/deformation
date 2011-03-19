@@ -8,6 +8,8 @@ generics.h
 ==========
 
 * Rename "mat_ctx_t" throughout the whole project
+* Add test code for all the functionality that the generic 
+  rings/ fields provide
 
 perm
 ====
@@ -35,3 +37,7 @@ mon
 
 * Add more randomised testing
 
+gmconnection
+============
+
+* Port the old cover over into a new module
