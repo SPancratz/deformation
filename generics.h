@@ -8,6 +8,9 @@
 #include <mpir.h>
 #include "flint.h"
 #include "long_extras.h"
+#include "ulong_extras.h"
+
+#include "fmpz_poly_q.h"
 
 typedef struct
 {
@@ -212,6 +215,87 @@ static void mat_ctx_init_mpq(mat_ctx_t ctx)
     ctx->print             = &_mpq_print;
     ctx->get_str           = &_mpq_get_str;
     ctx->set_str           = &_mpq_set_str;
+}
+
+/* Rational functions ********************************************************/
+
+static void _fmpz_poly_q_init(void *rop)
+    { fmpz_poly_q_init(rop); }
+static void _fmpz_poly_q_clear(void *rop)
+    { fmpz_poly_q_clear(rop); }
+
+static void _fmpz_poly_q_set(void *rop, const void *op)
+    { fmpz_poly_q_set(rop, op); }
+static void _fmpz_poly_q_set_si(void *rop, long op)
+    { fmpz_poly_q_set_si(rop, op); }
+static void _fmpz_poly_q_swap(void *op1, void *op2)
+    { fmpz_poly_q_swap(op1, op2); }
+static void _fmpz_poly_q_zero(void *rop)
+    { fmpz_poly_q_zero(rop); }
+static void _fmpz_poly_q_one(void *rop)
+    { fmpz_poly_q_one(rop); }
+
+static void _fmpz_poly_q_randtest(void *rop, flint_rand_t state)
+{
+    fmpz_poly_q_randtest(rop, state, n_randint(state, 50), 80, 
+                                     n_randint(state, 49) + 1, 80);
+}
+static void _fmpz_poly_q_randtest_not_zero(void *rop, flint_rand_t state)
+{
+    fmpz_poly_q_randtest_not_zero(rop, state, n_randint(state, 49) + 1, 80, 
+                                              n_randint(state, 49) + 1, 80);
+}
+
+static int _fmpz_poly_q_equal(const void *op1, const void *op2)
+    { return fmpz_poly_q_equal(op1, op2); }
+static int _fmpz_poly_q_is_zero(const void *op)
+    { return fmpz_poly_q_is_zero(op); }
+static int _fmpz_poly_q_is_one(const void *op)
+    { return fmpz_poly_q_is_one(op); }
+
+static void _fmpz_poly_q_neg(void *rop, const void *op)
+    { fmpz_poly_q_neg(rop, op); }
+
+static void _fmpz_poly_q_add(void *rop, const void *op1, const void *op2)
+    { fmpz_poly_q_add(rop, op1, op2); }
+static void _fmpz_poly_q_sub(void *rop, const void *op1, const void *op2)
+    { fmpz_poly_q_sub(rop, op1, op2); }
+static void _fmpz_poly_q_mul(void *rop, const void *op1, const void *op2)
+    { fmpz_poly_q_mul(rop, op1, op2); }
+static void _fmpz_poly_q_div(void *rop, const void *op1, const void *op2)
+    { fmpz_poly_q_div(rop, op1, op2); }
+
+static int _fmpz_poly_q_print(const void *op)
+    { return fmpz_poly_q_print(op); }
+static char * _fmpz_poly_q_get_str(const void *op)
+    { return fmpz_poly_q_get_str(op); }
+static int _fmpz_poly_q_set_str(void *rop, const char *str)
+    { return fmpz_poly_q_set_str(rop, str); }
+
+static void mat_ctx_init_fmpz_poly_q(mat_ctx_t ctx)
+{
+    ctx->size              = sizeof(fmpz_poly_q_struct);
+
+    ctx->init              = &_fmpz_poly_q_init;
+    ctx->clear             = &_fmpz_poly_q_clear;
+    ctx->set               = &_fmpz_poly_q_set;
+    ctx->set_si            = &_fmpz_poly_q_set_si;
+    ctx->swap              = &_fmpz_poly_q_swap;
+    ctx->zero              = &_fmpz_poly_q_zero;
+    ctx->one               = &_fmpz_poly_q_one;
+    ctx->randtest          = &_fmpz_poly_q_randtest;
+    ctx->randtest_not_zero = &_fmpz_poly_q_randtest_not_zero;
+    ctx->equal             = &_fmpz_poly_q_equal;
+    ctx->is_zero           = &_fmpz_poly_q_is_zero;
+    ctx->is_one            = &_fmpz_poly_q_is_one;
+    ctx->neg               = &_fmpz_poly_q_neg;
+    ctx->add               = &_fmpz_poly_q_add;
+    ctx->sub               = &_fmpz_poly_q_sub;
+    ctx->mul               = &_fmpz_poly_q_mul;
+    ctx->div               = &_fmpz_poly_q_div;
+    ctx->print             = &_fmpz_poly_q_print;
+    ctx->get_str           = &_fmpz_poly_q_get_str;
+    ctx->set_str           = &_fmpz_poly_q_set_str;
 }
 
 static void mat_ctx_clear(mat_ctx_t ctx)
