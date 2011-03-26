@@ -39,6 +39,8 @@ typedef struct
     void (*mul)(void *rop, const void *op1, const void *op2);
     void (*div)(void *rop, const void *op1, const void *op2);
 
+    void (*derivative)(void *rop, const void *op);
+
     int (*print)(const void *op);
     char * (*get_str)(const void *op);
     int (*set_str)(void *rop, const char * str);
@@ -132,6 +134,7 @@ static void mat_ctx_init_long(mat_ctx_t ctx)
     ctx->sub               = &ld_sub;
     ctx->mul               = &ld_mul;
     ctx->div               = &ld_div;
+    ctx->derivative        = NULL;
     ctx->print             = &ld_print;
     ctx->get_str           = &ld_get_str;
     ctx->set_str           = &ld_set_str;
@@ -212,6 +215,7 @@ static void mat_ctx_init_mpq(mat_ctx_t ctx)
     ctx->sub               = &_mpq_sub;
     ctx->mul               = &_mpq_mul;
     ctx->div               = &_mpq_div;
+    ctx->derivative        = NULL;
     ctx->print             = &_mpq_print;
     ctx->get_str           = &_mpq_get_str;
     ctx->set_str           = &_mpq_set_str;
@@ -265,6 +269,9 @@ static void _fmpz_poly_q_mul(void *rop, const void *op1, const void *op2)
 static void _fmpz_poly_q_div(void *rop, const void *op1, const void *op2)
     { fmpz_poly_q_div(rop, op1, op2); }
 
+static void _fmpz_poly_q_derivative(void *rop, const void *op)
+    { fmpz_poly_q_derivative(rop, op); }
+
 static int _fmpz_poly_q_print(const void *op)
     { return fmpz_poly_q_print(op); }
 static char * _fmpz_poly_q_get_str(const void *op)
@@ -293,6 +300,7 @@ static void mat_ctx_init_fmpz_poly_q(mat_ctx_t ctx)
     ctx->sub               = &_fmpz_poly_q_sub;
     ctx->mul               = &_fmpz_poly_q_mul;
     ctx->div               = &_fmpz_poly_q_div;
+    ctx->derivative        = &_fmpz_poly_q_derivative;
     ctx->print             = &_fmpz_poly_q_print;
     ctx->get_str           = &_fmpz_poly_q_get_str;
     ctx->set_str           = &_fmpz_poly_q_set_str;
