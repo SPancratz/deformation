@@ -1,5 +1,5 @@
-#ifndef MAT_DENSE_H
-#define MAT_DENSE_H
+#ifndef MAT_H
+#define MAT_H
 
 #include "generics.h"
 #include "perm.h"
