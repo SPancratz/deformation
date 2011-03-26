@@ -61,6 +61,9 @@ void mpoly_randtest(mpoly_t rop, flint_rand_t state, long d, long N,
 void mpoly_randtest_not_zero(mpoly_t rop, flint_rand_t state, long d, long N, 
                              const mat_ctx_t ctx);
 
+void mpoly_randhom(mpoly_t rop, flint_rand_t state, long d, long N, 
+                   const mat_ctx_t ctx);
+
 /* Assignment and basic manipulation *****************************************/
 
 void mpoly_set(mpoly_t rop, const mpoly_t op, const mat_ctx_t ctx);

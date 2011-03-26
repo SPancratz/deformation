@@ -64,6 +64,13 @@ void mpoly_randtest_not_zero(mpoly_t rop, flint_rand_t state, long d, long N,
     \code{rop->n} variables with partial degrees stricly 
     less than $d$ and at most $N$ terms.
 
+void mpoly_randhom(mpoly_t rop, flint_rand_t state, long d, long N, 
+                   const mat_ctx_t ctx)
+
+    Sets \code{rop} to a random homogeneous polynomial with total degree 
+    equal to $d$ and at most $N$ terms.  If $N = 0$ then the polynomial 
+    is forced to be the zero polynomial.
+
 *******************************************************************************
 
     Assignment and basic manipulation
