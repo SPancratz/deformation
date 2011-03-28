@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <mpir.h>
+
+#include "flint.h"
+#include "fmpz.h"
+#include "ulong_extras.h"
+
+#include "mpoly.h"
+#include "mat_csr.h"
+#include "gmconnection.h"
+
+int 
+main(int argc, const char* argv[])
+{
+    mat_ctx_t ctx;
+
+    mpoly_t P;
+    mat_t M;
+    mon_t *rows, *cols;
+
+    if (argc != 2)
+    {
+        printf("Syntax: gmconnection <polynomial>\n");
+        fflush(stdout);
+        return EXIT_FAILURE;
+    }
+
+    mat_ctx_init_fmpz_poly_q(ctx);
+
+    mpoly_init(P, 1, ctx);
+    mpoly_set_str(P, argv[1], ctx);
+
+    gmc_compute(M, &rows, &cols, P, ctx);
+
+    printf("M = \n"), mat_print(M, ctx), printf("\n");
+
+    mpoly_clear(P, ctx);
+    mat_clear(M, ctx);
+    free(rows);
+    free(cols);
+
+    mat_ctx_clear(ctx);
+
+    _fmpz_cleanup();
+    return EXIT_SUCCESS;
+}
+
