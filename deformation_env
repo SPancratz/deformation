@@ -1,0 +1,2 @@
+export LD_LIBRARY_PATH=/home/suser/MPFR/mpfr-3.0.0/.libs:/home/suser/MPIR/mpir-2.1.1/.libs:/home/suser/FLINT/flint2-seb:/home/suser/deformation:$LD_LIBRARY_PATH
+
