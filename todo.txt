@@ -37,6 +37,11 @@ mon
 
 * Add more randomised testing
 
+mpoly
+=====
+
+* Add "init_set_str"
+
 gmconnection
 ============
 
