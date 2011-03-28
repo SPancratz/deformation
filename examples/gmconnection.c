@@ -10,6 +10,36 @@
 #include "mat_csr.h"
 #include "gmconnection.h"
 
+static 
+int _gmc_mat_print(char ** const rows, long m, long n, const mat_ctx_t ctx)
+{
+    long i, j;
+
+    for (i = 0; i < m; i++)
+    {
+        printf("[");
+        for (j = 0; j < n; j++)
+        {
+            ctx->print(rows[i] + j * ctx->size);
+            if (j != n - 1)
+                printf(" ");
+        }
+        if (i != m - 1)
+            printf("],\n");
+        else
+            printf("]");
+    }
+
+    return 1;
+}
+
+static 
+int gmc_mat_print(const mat_t mat, const mat_ctx_t ctx)
+{
+    return _gmc_mat_print(mat->rows, mat->m, mat->n, ctx);
+}
+
+
 int 
 main(int argc, const char* argv[])
 {
@@ -33,7 +63,7 @@ main(int argc, const char* argv[])
 
     gmc_compute(M, &rows, &cols, P, ctx);
 
-    printf("M = \n"), mat_print(M, ctx), printf("\n");
+    gmc_mat_print(M, ctx), printf("\n");
 
     mpoly_clear(P, ctx);
     mat_clear(M, ctx);
