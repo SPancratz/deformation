@@ -54,7 +54,7 @@ void gmc_reduce(mpoly_t *R,
      */
     if (k == u + 1)
     {
-        gmc_decompose_poly(A, Q, s, rows, cols, p, ctx);
+        gmc_decompose_poly(A, Q, s[k], rows[k], cols[k], p[k], ctx);
         
         /* Set up the next polynomial to be decomposed */
         mpoly_zero(Q, ctx);
@@ -68,12 +68,12 @@ void gmc_reduce(mpoly_t *R,
     }
     
     /* Ensure that all higher parts of the reduction array are zero */
-    for (i = k+1; i <= u; i++)
+    for (i = k + 1; i <= u; i++)
         mpoly_zero(R[i], ctx);
     
     while (!gmc_basis_contains(Q, d))
     {
-        gmc_decompose_poly(A, Q, s, rows, cols, p, ctx);
+        gmc_decompose_poly(A, Q, s[k], rows[k], cols[k], p[k], ctx);
         
         for (i = 0; i < n; i++)
             mpoly_submul(Q, A[i], dP[i], ctx);

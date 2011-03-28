@@ -10,6 +10,8 @@
 #include "mat_csr.h"
 #include "gmconnection.h"
 
+#define RUNS 1000
+
 int
 main(void)
 {
@@ -73,7 +75,7 @@ main(void)
 
             printf("k = %ld\n", k);
             printf("[");
-            for (i = 0; i < 1000; i++)
+            for (i = 0; i < RUNS; i++)
             {
                 mpoly_t poly1, poly2, poly3;
                 char *zero;

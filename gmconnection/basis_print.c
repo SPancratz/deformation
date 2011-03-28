@@ -21,6 +21,6 @@ void gmc_basis_print(const mon_t *B, const long *iB, long lenB, long n, long d)
     }
     for ( ; k < n - 1; k++)
         printf(" |");
-    printf(" ]\n");
+    printf(" ]");
 }
 

@@ -10,6 +10,8 @@
 #include "mat_csr.h"
 #include "gmconnection.h"
 
+#define RUNS 100
+
 int
 main(void)
 {
@@ -25,7 +27,7 @@ main(void)
     mat_ctx_init_fmpz_poly_q(ctx);
 
     printf("[");
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < RUNS; i++)
     {
         mpoly_t a, b, c;
         long n, d, N;

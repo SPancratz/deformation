@@ -51,7 +51,7 @@ static void mpoly_tderivative(mpoly_t rop, const mpoly_t op, const mat_ctx_t ctx
     mpoly_clear(temp, ctx);
 }
 
-void gmc_compute(mat_t M, mon_t *rows, mon_t *cols, 
+void gmc_compute(mat_t M, mon_t **rows, mon_t **cols, 
                  const mpoly_t P, const mat_ctx_t ctx)
 {
     long i, j, k, colk, rowk;
@@ -72,9 +72,9 @@ void gmc_compute(mat_t M, mon_t *rows, mon_t *cols,
     long **aux_p;
     mat_csr_solve_t *aux_s;
     
-    #if DEBUG > 0
-        printf("Input:\n");
-        printf("  P = "), mpoly_print(P, ctx), printf("\n");
+    #if (DEBUG > 0)
+    printf("Input:\n");
+    printf("  P = "), mpoly_print(P, ctx), printf("\n");
     #endif
     
     /*
@@ -88,41 +88,25 @@ void gmc_compute(mat_t M, mon_t *rows, mon_t *cols,
     mpoly_init(dPdt, n, ctx);
     mpoly_tderivative(dPdt, P, ctx);
     
-    #if DEBUG > 0
-        printf("Derivatives:\n");
-        for (i = 0; i < n; i++)
-        {
-            printf("  dPdX %ld = ", i), mpoly_print(dP[i], ctx), printf("\n");
-        }
-        printf("  dPdt = "), mpoly_print(dPdt, ctx), printf("\n");
+    #if (DEBUG > 0)
+    printf("Derivatives:\n");
+    for (i = 0; i < n; i++)
+    {
+        printf("  dPdX %ld = ", i), mpoly_print(dP[i], ctx), printf("\n");
+    }
+    printf("  dPdt = "), mpoly_print(dPdt, ctx), printf("\n");
     #endif
     
     /* Construct the index set B */
     gmc_basis_sets(&B, &iB, &lenB, &l, &u, n, d);
     
-    #if DEBUG > 0
-        printf("Basis sets:\n");
-        printf("  [");
-        for (k = 1; k < l; k++)
-            printf(" |");
-        for ( ; k <= u; k++)
-        {
-            for (i = iB[k]; i < iB[k + 1]; i++)
-            {
-                printf(i == iB[k] ? " " : ", ");
-                mon_print(B[i], n);
-                printf("\n");
-            }
-            printf(" |");
-        }
-        for ( ; k < n - 1; k++)
-            printf(" |");
-        printf(" ]\n");
-        fflush(stdout);
+    #if (DEBUG > 0)
+    printf("Basis sets:\n  ");
+    gmc_basis_print(B, iB, lenB, n, d), printf("\n");
+    fflush(stdout);
     #endif
     
     /* Connection matrix init */
-    mat_clear(M, ctx);
     mat_init(M, lenB, lenB, ctx);
 
     /*
@@ -139,17 +123,15 @@ void gmc_compute(mat_t M, mon_t *rows, mon_t *cols,
     aux_p    = malloc((n + 1) * sizeof(long *));
     aux_s    = malloc((n + 1) * sizeof(mat_csr_solve_t));
 
-    /*
-        While (k-1)*d < n OR kd < n+1, which is equivalent to saying 
-        while (k-1)*d < n, since d > 1
-     */
-    for (k = 0; (k - 1) * d < (n - 1); k++) ;
-    
-    for ( ; k <= u + 1; k++)
+    #if (DEBUG > 0)
+    printf("Computing auxiliary matrices..\n");
+    #endif
+
+    for (k = ((n - 1) + (d - 1)) / d + 1; k <= u + 1; k++)
     {
         
         #if (DEBUG > 0)
-            printf("Computing auxiliary matrix for k = %ld.\n", k);
+        printf("  k = %ld\n", k);
         #endif
         
         aux_p[k] = malloc((n + 1) * sizeof(long));
@@ -159,7 +141,11 @@ void gmc_compute(mat_t M, mon_t *rows, mon_t *cols,
     }
     
     /* Construct the Gauss--Manin connection matrix */
-    
+
+    #if (DEBUG > 0)
+    printf("Computing columns..\n");
+    #endif
+
     for (colk = l; colk <= u; colk++)
     {
         for (j = iB[colk]; j < iB[colk + 1]; j++)
@@ -172,7 +158,7 @@ void gmc_compute(mat_t M, mon_t *rows, mon_t *cols,
                 mpoly_init(R[i], n, ctx);
 
             #if (DEBUG > 0)
-            printf("Computing column j = %ld.\n", j);
+            printf("  j = %ld\n", j);
             #endif
             
             /* Set Q to -colk B[j] dPdt, and then reduce */
@@ -201,26 +187,43 @@ void gmc_compute(mat_t M, mon_t *rows, mon_t *cols,
             free(R);
         }
     }
-    
+
+    /* Copy row and column index sets */
+
+    *rows = malloc(lenB * sizeof(mon_t));
+    *cols = malloc(lenB * sizeof(mon_t));
+
+    for (i = 0; i < lenB; i++)
+    {
+        (*rows)[i] = B[i];
+        (*cols)[i] = B[i];
+    }
+
     /* Clean up */
-    for (i = 0; i < n; i++)
-        mpoly_clear(dP[i], ctx);
-    free(dP);
-    mpoly_clear(dPdt, ctx);
-    
-    free(iB);
-    
+
     k = ((n - 1) + (d - 1)) / d + 1;  /* k = ceil(n / d) + 1 */
 
     for ( ; k <= u + 1; k++)
     {
-        #if (DEBUG > 0)
-            printf("Computing auxiliary matrix for k = %ld.\n", k);
-        #endif
-        
+        free(aux_rows[k]);
+        free(aux_cols[k]);
         free(aux_p[k]);
         mat_csr_clear(aux[k], ctx);
         mat_csr_solve_clear(aux_s[k], ctx);
     }
+
+    free(aux);
+    free(aux_rows);
+    free(aux_cols);
+    free(aux_p);
+    free(aux_s);
+
+    free(B);
+    free(iB);
+
+    for (i = 0; i < n; i++)
+        mpoly_clear(dP[i], ctx);
+    free(dP);
+    mpoly_clear(dPdt, ctx);
 }
 

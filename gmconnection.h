@@ -50,7 +50,7 @@ void gmc_reduce(mpoly_t *R,
 
 void gmc_derivatives(mpoly_t *D, const mpoly_t P, const mat_ctx_t ctx);
 
-void gmc_compute(mat_t M, mon_t *rows, mon_t *cols, 
+void gmc_compute(mat_t M, mon_t **rows, mon_t **cols, 
                  const mpoly_t P, const mat_ctx_t ctx);
 
 #endif

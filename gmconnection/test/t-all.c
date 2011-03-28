@@ -24,6 +24,11 @@ main(void)
 
     mat_ctx_init_fmpz_poly_q(ctx);
 
+    /*
+        Manually computing basis sets for 
+
+            X^3 + Y^3 + Z^3 + t X Y Z.
+     */
     {
         mpoly_t P;
 
@@ -69,6 +74,34 @@ main(void)
         mpoly_clear(P, ctx);
         free(B);
         free(iB);
+    }
+
+    /*
+        Computing Gauss--Manin connection for 
+
+            X^3 + Y^3 + Z^3 + t X Y Z.
+     */
+    {
+        mpoly_t P;
+
+        mat_t M;
+        mon_t *rows, *cols;
+
+        printf("\n");
+        fflush(stdout);
+
+        mpoly_init(P, 3, ctx);
+        mpoly_set_str(P, "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]", ctx);
+
+        gmc_compute(M, &rows, &cols, P, ctx);
+
+        printf("M = \n"), mat_print(M, ctx), printf("\n");
+
+        mat_clear(M, ctx);
+        free(rows);
+        free(cols);
+
+        mpoly_clear(P, ctx);
     }
 
     mat_ctx_clear(ctx);
