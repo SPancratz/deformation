@@ -4,7 +4,7 @@
 #include "vec.h"
 
 void _mat_lup_solve(char *x, char ** const rows, long m, long n, 
-                          const long *pi, const char *b, const mat_ctx_t ctx)
+                    const long *pi, const char *b, const mat_ctx_t ctx)
 {
     long i, j;
     char *t;
@@ -21,8 +21,11 @@ void _mat_lup_solve(char *x, char ** const rows, long m, long n,
         ctx->set(x + i * ctx->size, b + pi[i] * ctx->size);
         for (j = 0; j < i; j++)
         {
-            ctx->mul(t, rows[i] + j * ctx->size, x + j * ctx->size);
-            ctx->sub(x + i * ctx->size, x + i * ctx->size, t);
+            if (!ctx->is_zero(rows[i] + j * ctx->size))
+            {
+                ctx->mul(t, rows[i] + j * ctx->size, x + j * ctx->size);
+                ctx->sub(x + i * ctx->size, x + i * ctx->size, t);
+            }
         }
     }
 
@@ -32,8 +35,11 @@ void _mat_lup_solve(char *x, char ** const rows, long m, long n,
     {
         for (j = i + 1; j < m; j++)
         {
-            ctx->mul(t, rows[i] + j * ctx->size, x + j * ctx->size);
-            ctx->sub(x + i * ctx->size, x + i * ctx->size, t);
+            if (!ctx->is_zero(rows[i] + j * ctx->size))
+            {
+                ctx->mul(t, rows[i] + j * ctx->size, x + j * ctx->size);
+                ctx->sub(x + i * ctx->size, x + i * ctx->size, t);
+            }
         }
         ctx->div(x + i * ctx->size, x + i * ctx->size, rows[i] + i * ctx->size);
     }
@@ -44,6 +50,9 @@ void _mat_lup_solve(char *x, char ** const rows, long m, long n,
 void mat_lup_solve(char *x, const mat_t mat, const long *pi, 
                          const char *b, const mat_ctx_t ctx)
 {
-    _mat_lup_solve(x, mat->rows, mat->m, mat->n, pi, b, ctx);
+    if (mat->m == 1 && mat->n == 1)
+        ctx->div(x, b, (mat->rows)[0]);
+    else
+        _mat_lup_solve(x, mat->rows, mat->m, mat->n, pi, b, ctx);
 }
 
