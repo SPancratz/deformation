@@ -6,7 +6,7 @@
 
 #include "mat_csr.h"
 
-#define NDEBUG
+#define DEBUG  0
 
 void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat, 
                         const mat_ctx_t ctx)
@@ -19,13 +19,13 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
 
     m = mat->m;
 
-#if !defined(NDEBUG)
-    printf("mat_csr_solve_init(...)\n");
-    printf("Matrix A:\n");
+    #if (DEBUG > 0)
+    printf("mat_csr_solve_init()\n");
+    printf("Matrix A (%ld x %ld):\n", mat->m, mat->n);
     mat_csr_print_dense(mat, ctx);
     printf("\n");
     fflush(stdout);
-#endif
+    #endif
 
     mem   = malloc((mat->alloc + 6 * m + 1) * sizeof(long));
     s->LU = malloc(m * sizeof(char *));
@@ -45,13 +45,18 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
     s->P    = mem + mat->alloc + 4 * m;
     s->B    = mem + mat->alloc + 5 * m;
 
+    #if (DEBUG > 0)
+    printf("Calling mat_csr_zfdiagonal()\n");
+    fflush(stdout);
+    #endif
+
     nz = mat_csr_zfdiagonal(s->pi, mat);
 
-#if !defined(NDEBUG)
+    #if (DEBUG > 0)
     printf("nz = %ld\n", nz);
     printf("pi = {"); _perm_print(s->pi, m); printf("}\n");
     fflush(stdout);
-#endif
+    #endif
 
     if (nz != m)
     {
@@ -74,17 +79,38 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
 
     /* Set A := P A */
 
+    #if (DEBUG > 0)
+    printf("Calling _mat_csr_permute_rows()\n");
+    fflush(stdout);
+    #endif
+
     _mat_csr_permute_rows(m, s->p, s->lenr, s->pi);
 
     /* Find Q s.t. Q P A Q^t is block triangular */
 
+    #if (DEBUG > 0)
+    printf("Calling _mat_csr_block_triangularise()\n");
+    fflush(stdout);
+    #endif
+
     s->nb = _mat_csr_block_triangularise(s->qi, s->B, m, s->j, s->p, s->lenr, w);
     s->B[s->nb] = m;
 
+    #if (DEBUG > 0)
+    printf("Calling _mat_csr_permute_rows()\n");
+    fflush(stdout);
+    #endif
+
     _mat_csr_permute_rows(m, s->p, s->lenr, s->qi);
+
+    #if (DEBUG > 0)
+    printf("Calling _mat_csr_permute_cols()\n");
+    fflush(stdout);
+    #endif
+
     _mat_csr_permute_cols(m, m, s->j, s->p, s->lenr, s->qi);
 
-#if !defined(NDEBUG)
+    #if (DEBUG > 0)
     printf("nb = %ld\n", s->nb);
     printf("B  = {"); _perm_print(s->B, s->nb); printf("}\n");
     printf("qi = {"); _perm_print(s->qi, m); printf("}\n");
@@ -92,7 +118,7 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
     _mat_csr_print_dense(m, m, s->x, s->j, s->p, s->lenr, ctx);
     printf("\n");
     fflush(stdout);
-#endif
+    #endif
 
     /* Allocate dense data blocks */
     {
@@ -135,6 +161,11 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
 
     /* Dense LUP decomposition */
 
+    #if (DEBUG > 0)
+    printf("LUP decomposition for dense kernels..\n");
+    fflush(stdout);
+    #endif
+
     for (k = 0; k < s->nb; k++)
     {
         char **rows = s->LU + s->B[k];
@@ -143,7 +174,7 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
         _mat_lup_decompose(s->P + s->B[k], rows, len, ctx);
     }
 
-#if !defined(NDEBUG)
+    #if (DEBUG > 0)
     for (k = 0; k < s->nb; k++)
     {
         long len = s->B[k + 1] - s->B[k];
@@ -153,7 +184,7 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
         printf("\n");
         fflush(stdout);
     }
-#endif
+    #endif
 
     /* Compose Q P, invert Q */
 
