@@ -6,7 +6,7 @@
 
 #include "mat_csr.h"
 
-#define DEBUG  0
+#define DEBUG  1
 
 void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat, 
                         const mat_ctx_t ctx)
@@ -170,6 +170,11 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
     {
         char **rows = s->LU + s->B[k];
         long len = s->B[k + 1] - s->B[k];
+
+        #if (DEBUG > 0)
+        printf("  Block %ld out of %ld, of size %ld\n", k, s->nb, len);
+        fflush(stdout);
+        #endif
 
         _mat_lup_decompose(s->P + s->B[k], rows, len, ctx);
     }
