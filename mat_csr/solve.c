@@ -5,6 +5,8 @@
 
 #include "mat_csr.h"
 
+#define DEBUG  1
+
 void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b, 
                    const mat_ctx_t ctx)
 {
@@ -12,6 +14,10 @@ void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b,
     long i, k, m;
 
     assert(s->m == s->n);
+
+    #if (DEBUG > 0)
+    printf("mat_csr_solve()\n"), fflush(stdout);
+    #endif
 
     m = s->m;
 
@@ -25,6 +31,10 @@ void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b,
         const long i1  = s->B[k];
         const long i2  = s->B[k + 1];
         const long len = i2 - i1;
+
+        #if (DEBUG > 0)
+        printf("  Block %ld out of %ld\n", k, s->nb), fflush(stdout);
+        #endif
 
         _mat_lup_solve(x + i1 * ctx->size, s->LU + i1, len, len, 
                        s->P + i1, c + i1 * ctx->size, ctx);
