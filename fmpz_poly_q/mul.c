@@ -3,6 +3,12 @@
 void fmpz_poly_q_mul_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
 {
     fmpz_poly_t d, e;
+
+    if (fmpz_poly_q_is_zero(rop) || fmpz_poly_q_is_zero(op))
+    {
+        fmpz_poly_q_zero(rop);
+        return;
+    }
     
     if (rop == op)
     {
@@ -11,12 +17,6 @@ void fmpz_poly_q_mul_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
         return;
     }
 
-    if (fmpz_poly_is_zero(rop->num) || fmpz_poly_is_zero(op->num))
-    {
-        fmpz_poly_q_zero(rop);
-        return;
-    }
-    
     /*
         From here on, rop and op point to two different object in memory, 
         and these are both non-zero rational functions
