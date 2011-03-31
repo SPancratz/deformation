@@ -5,7 +5,7 @@
 
 #include "mat_csr.h"
 
-#define DEBUG  1
+#define DEBUG  0
 
 void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b, 
                    const mat_ctx_t ctx)
@@ -39,6 +39,10 @@ void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b,
         _mat_lup_solve(x + i1 * ctx->size, s->LU + i1, len, len, 
                        s->P + i1, c + i1 * ctx->size, ctx);
 
+        #if (DEBUG > 0)
+        printf("  Completed LUP solving.\n"), fflush(stdout);
+        #endif
+
         /* Update c.  Subtract A{bk} y{k} from c{b} for b > k */
         for (i = i2; i < m; i++)
         {
@@ -46,15 +50,18 @@ void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b,
             const long p1 = s->p[i];
             const long p2 = s->p[i] + s->lenr[i];
 
-            for (q = p1; q < p2; q++)
+            #if (DEBUG > 0)
+            printf("      i = %ld\n", i), fflush(stdout);
+            #endif
+
+            /* XXX.  Use that column indices appear in sorted order. */
+            for (q = p1; q < p2 && s->j[q] < i1; q++) ;
+            for ( ; q < p2 && s->j[q] < i2; q++)
             {
                 const long j = s->j[q];
 
-                if (i1 <= j && j < i2)
-                {
-                    ctx->mul(t, s->x + q * ctx->size, x + j * ctx->size);
-                    ctx->sub(c + i * ctx->size, c + i * ctx->size, t);
-                }
+                ctx->mul(t, s->x + q * ctx->size, x + j * ctx->size);
+                ctx->sub(c + i * ctx->size, c + i * ctx->size, t);
             }
         }
     }

@@ -259,6 +259,10 @@ void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b,
     functions solves the system of linear equations $A x = b$ 
     for a vector $x$ of length $n$.
 
+    Assumes that the elements of every row appear in sorted order 
+    (of increasing column indices) in the arrays \code{s->x} and 
+    \code{s->j}.
+
 *******************************************************************************
 
     Input and output
