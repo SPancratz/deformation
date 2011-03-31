@@ -131,12 +131,14 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
     {
         
         #if (DEBUG > 0)
-        printf("  k = %ld\n", k);
+        printf("  k = %ld\n", k), fflush(stdout);
         #endif
         
         aux_p[k] = malloc((n + 1) * sizeof(long));
+
         gmc_init_auxmatrix(aux[k], aux_rows + k, aux_cols + k, aux_p[k], 
                            P, k, ctx);
+
         mat_csr_solve_init(aux_s[k], aux[k], ctx);
     }
     
