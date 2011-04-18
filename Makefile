@@ -7,7 +7,7 @@ DEFORMATION_FLINT_INCLUDE_DIR=/home/suser/FLINT/flint2-seb
 
 DEFORMATION_LIB=libdeformation.so
 CC=gcc
-CFLAGS=-O2 -g -ansi -pedantic -Wall -funroll-loops -Wno-unused
+CFLAGS=-O2 -g -ansi -pedantic -Wall -funroll-loops -Wno-unused -DNDEBUG
 PREFIX=~/DEFORMATION/
 
 LIBS=-L$(CURDIR) -L$(DEFORMATION_MPIR_LIB_DIR) -L$(DEFORMATION_MPFR_LIB_DIR) -L$(DEFORMATION_FLINT_LIB_DIR) -ldeformation -lflint -lmpir -lmpfr -lm
