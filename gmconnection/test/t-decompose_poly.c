@@ -85,8 +85,8 @@ main(void)
                 mpoly_init(poly3, n, ctx);
 
                 zero = malloc(ctx->size);
-                ctx->init(zero);
-                ctx->zero(zero);
+                ctx->init(ctx, zero);
+                ctx->zero(ctx, zero);
 
                 mpoly_randhom(poly1, state, k * d - n, 20, ctx);
                 for (j = iB[k]; j < iB[k + 1]; j++)
@@ -118,7 +118,7 @@ main(void)
                 mpoly_clear(poly1, ctx);
                 mpoly_clear(poly2, ctx);
                 mpoly_clear(poly3, ctx);
-                ctx->clear(zero);
+                ctx->clear(ctx, zero);
                 free(zero);
             }
             printf("]\n");

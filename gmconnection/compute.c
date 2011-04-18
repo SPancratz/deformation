@@ -28,12 +28,12 @@ static void mpoly_tderivative(mpoly_t rop, const mpoly_t op, const mat_ctx_t ctx
         char *c;
 
         c = malloc(ctx->size);
-        ctx->init(c);
-        ctx->derivative(c, t->val);
+        ctx->init(ctx, c);
+        ctx->derivative(ctx, c, t->val);
 
-        if (ctx->is_zero(c))
+        if (ctx->is_zero(ctx, c))
         {
-            ctx->clear(c);
+            ctx->clear(ctx, c);
             free(c);
         }
         else

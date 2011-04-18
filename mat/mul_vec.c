@@ -14,19 +14,19 @@ void _mat_mul_vec(char *y, char ** const rows, long m, long n,
         abort();
     }
 
-    ctx->init(t);
+    ctx->init(ctx, t);
 
     for (i = 0; i < m; i++)
     {
-        ctx->zero(y + i * ctx->size);
+        ctx->zero(ctx, y + i * ctx->size);
         for (j = 0; j < n; j++)
         {
-            ctx->mul(t, rows[i] + j * ctx->size, x + j * ctx->size);
-            ctx->add(y + i * ctx->size, y + i * ctx->size, t);
+            ctx->mul(ctx, t, rows[i] + j * ctx->size, x + j * ctx->size);
+            ctx->add(ctx, y + i * ctx->size, y + i * ctx->size, t);
         }
     }
 
-    ctx->clear(t);
+    ctx->clear(ctx, t);
     free(t);
 }
 

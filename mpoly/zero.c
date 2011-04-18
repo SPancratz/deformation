@@ -9,7 +9,7 @@ void mpoly_zero(mpoly_t rop, const mat_ctx_t ctx)
 
     while ((t = mpoly_iter_next(iter)))
     {
-        ctx->clear(t->val);
+        ctx->clear(ctx, t->val);
         free(t->val);
     }
 

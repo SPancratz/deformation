@@ -5,5 +5,5 @@ void mat_zero(mat_t mat, const mat_ctx_t ctx)
     long i;
 
     for (i = 0; i < mat->m * mat->n; i++)
-        ctx->zero(mat->entries + i * ctx->size);
+        ctx->zero(ctx, mat->entries + i * ctx->size);
 }

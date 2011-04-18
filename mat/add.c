@@ -7,7 +7,7 @@ void _mat_add(char **rowsC, char ** const rowsA, char ** const rowsB,
 
     for (i = 0; i < m; i++)
         for (j = 0; j < n; j++)
-            ctx->add(rowsC[i] + j * ctx->size, 
+            ctx->add(ctx, rowsC[i] + j * ctx->size, 
                      rowsA[i] + j * ctx->size, 
                      rowsB[i] + j * ctx->size);
 }

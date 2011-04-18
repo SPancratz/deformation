@@ -12,7 +12,7 @@ void mat_set(mat_t mat1, const mat_t mat2, const mat_ctx_t ctx)
 
         for (i = 0; i < mat1->m; i++)
             for (j = 0; j < mat1->n; j++)
-                ctx->set(mat_entry(mat1, i, j, ctx), 
+                ctx->set(ctx, mat_entry(mat1, i, j, ctx), 
                          mat_entry(mat2, i, j, ctx));
     }
 }

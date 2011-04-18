@@ -7,18 +7,18 @@ void mpoly_sub_coeff(mpoly_t rop, const mon_t m, const void *x,
     mon_t m2;
     void *x2;
 
-    if (ctx->is_zero(x))
+    if (ctx->is_zero(ctx, x))
         return;
 
     find = RBTREE_FIND(mpoly, &m2, &x2, rop->dict, m, &mon_cmp);
 
     if (find)
     {
-        ctx->sub(x2, x2, x);
-        if (ctx->is_zero(x2))
+        ctx->sub(ctx, x2, x2, x);
+        if (ctx->is_zero(ctx, x2))
         {
             RBTREE_DELETE(mpoly, &m2, &x2, rop->dict, m, &mon_cmp);
-            ctx->clear(x2);
+            ctx->clear(ctx, x2);
             free(x2);
         }
     }
@@ -27,8 +27,8 @@ void mpoly_sub_coeff(mpoly_t rop, const mon_t m, const void *x,
         char *x1;
 
         x1 = malloc(ctx->size);
-        ctx->init(x1);
-        ctx->neg(x1, x);
+        ctx->init(ctx, x1);
+        ctx->neg(ctx, x1, x);
 
         RBTREE_INSERT(mpoly, &m2, &x2, rop->dict, m, x1, &mon_cmp);
     }

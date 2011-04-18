@@ -31,7 +31,7 @@ int mpoly_equal(const mpoly_t op1, const mpoly_t op2, const mat_ctx_t ctx)
 
         find = RBTREE_FIND(mpoly, &m, &c, op2->dict, t->key, &mon_cmp);
 
-        if (!find || !ctx->equal(t->val, c))
+        if (!find || !ctx->equal(ctx, t->val, c))
         {
             mpoly_iter_clear(iter);
             return 0;

@@ -21,7 +21,7 @@ _mat_coo_print_dense(long m, long n, const char *list, long len,
                 }
             printf(" ");
             if (x)
-                ctx->print(x);
+                ctx->print(ctx, x);
             else
                 printf("0");
         }

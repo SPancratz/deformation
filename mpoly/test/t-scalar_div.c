@@ -34,12 +34,12 @@ main(void)
         N = n_randint(state, 50) + 1;
 
         x = malloc(ctx->size);
-        ctx->init(x);
+        ctx->init(ctx, x);
 
         mpoly_init(a, n, ctx);
         mpoly_init(b, n, ctx);
         mpoly_randtest(b, state, d, N, ctx);
-        ctx->randtest_not_zero(x, state);
+        ctx->randtest_not_zero(ctx, x, state);
 
         mpoly_scalar_div(a, b, x, ctx);
         mpoly_scalar_div(b, b, x, ctx);
@@ -50,13 +50,13 @@ main(void)
             printf("FAIL:\n");
             mpoly_print(a, ctx); printf("\n");
             mpoly_print(b, ctx); printf("\n");
-            ctx->print(x); printf("\n");
+            ctx->print(ctx, x); printf("\n");
             abort();
         }
 
         mpoly_clear(a, ctx);
         mpoly_clear(b, ctx);
-        ctx->clear(x);
+        ctx->clear(ctx, x);
         free(x);
     }
 
@@ -72,7 +72,7 @@ main(void)
         N = n_randint(state, 50) + 1;
 
         x = malloc(ctx->size);
-        ctx->init(x);
+        ctx->init(ctx, x);
 
         mpoly_init(a, n, ctx);
         mpoly_init(b, n, ctx);
@@ -80,7 +80,7 @@ main(void)
         mpoly_init(c2, n, ctx);
         mpoly_randtest(a, state, d, N, ctx);
         mpoly_randtest(b, state, d, N, ctx);
-        ctx->randtest_not_zero(x, state);
+        ctx->randtest_not_zero(ctx, x, state);
 
         mpoly_scalar_div(c1, a, x, ctx);
         mpoly_scalar_div(c2, b, x, ctx);
@@ -97,7 +97,7 @@ main(void)
             mpoly_print(b, ctx); printf("\n");
             mpoly_print(c1, ctx); printf("\n");
             mpoly_print(c2, ctx); printf("\n");
-            ctx->print(x); printf("\n");
+            ctx->print(ctx, x); printf("\n");
             abort();
         }
 
@@ -105,7 +105,7 @@ main(void)
         mpoly_clear(b, ctx);
         mpoly_clear(c1, ctx);
         mpoly_clear(c2, ctx);
-        ctx->clear(x);
+        ctx->clear(ctx, x);
         free(x);
     }
 

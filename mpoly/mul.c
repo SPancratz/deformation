@@ -34,14 +34,14 @@ void mpoly_mul(mpoly_t rop, const mpoly_t op1, const mpoly_t op2,
 
             mon_init(m);
             c = malloc(ctx->size);
-            ctx->init(c);
+            ctx->init(ctx, c);
 
             mon_mul(m, t1->key, t2->key);
-            ctx->mul(c, t1->val, t2->val);
+            ctx->mul(ctx, c, t1->val, t2->val);
             mpoly_add_coeff(temp, m, c, ctx);
 
             mon_clear(m);
-            ctx->clear(c);
+            ctx->clear(ctx, c);
             free(c);
         }
         mpoly_iter_clear(iter2);

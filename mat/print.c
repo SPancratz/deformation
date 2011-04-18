@@ -12,7 +12,7 @@ int _mat_print(char ** const rows, long m, long n, const mat_ctx_t ctx)
         printf("[ ");
         for (j = 0; j < n; j++)
         {
-            ctx->print(rows[i] + j * ctx->size);
+            ctx->print(ctx, rows[i] + j * ctx->size);
             printf(" ");
         }
         printf("]");

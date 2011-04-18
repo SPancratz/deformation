@@ -13,7 +13,7 @@ int mat_coo_debug(const mat_coo_t A, const mat_ctx_t ctx)
     {
         printf("(%ld ", (long) *(A->list + k * u));
         printf( "%ld ", (long) *(A->list + k * u + sizeof(long)));
-        ctx->print(A->list + k * u + 2 * sizeof(long));
+        ctx->print(ctx, A->list + k * u + 2 * sizeof(long));
         printf(")");
     }
     printf("}");

@@ -19,7 +19,7 @@ char * _vec_init(long n, const mat_ctx_t ctx)
     }
 
     for (i = 0; i < n; i++)
-        ctx->init(vec + i * ctx->size);
+        ctx->init(ctx, vec + i * ctx->size);
 
     return vec;
 }

@@ -12,10 +12,10 @@ void mat_one(mat_t mat, const mat_ctx_t ctx)
     {
         for (j = 0; j < i; j++)
         {
-            ctx->zero(mat_entry(mat, i, j, ctx));
-            ctx->zero(mat_entry(mat, j, i, ctx));
+            ctx->zero(ctx, mat_entry(mat, i, j, ctx));
+            ctx->zero(ctx, mat_entry(mat, j, i, ctx));
         }
-        ctx->one(mat_entry(mat, i, i, ctx));
+        ctx->one(ctx, mat_entry(mat, i, i, ctx));
     }
 }
 

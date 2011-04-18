@@ -154,8 +154,8 @@ void gmc_init_auxmatrix(mat_csr_t M,
                         /* Add the entry mt->value in position (i, q) */
                         *(long *) (mem + c * u) = i;
                         *(long *) (mem + c * u + sizeof(long)) = q;
-                        ctx->init(mem + c * u + 2 * sizeof(long));
-                        ctx->set(mem + c * u + 2 * sizeof(long), mt->val);
+                        ctx->init(ctx, mem + c * u + 2 * sizeof(long));
+                        ctx->set(ctx, mem + c * u + 2 * sizeof(long), mt->val);
                         c++;
                     }
                 }

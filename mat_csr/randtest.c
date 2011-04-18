@@ -37,8 +37,8 @@ mat_csr_randtest(mat_csr_t A,
             {
                 *(long *) (mem + k * u) = i;
                 *(long *) (mem + k * u + sizeof(long)) = j;
-                ctx->init(mem + k * u + 2 * sizeof(long));
-                ctx->randtest_not_zero(mem + k * u + 2 * sizeof(long), state);
+                ctx->init(ctx, mem + k * u + 2 * sizeof(long));
+                ctx->randtest_not_zero(ctx, mem + k * u + 2 * sizeof(long), state);
                 k++;
             }
         }
