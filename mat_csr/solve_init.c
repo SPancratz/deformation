@@ -6,7 +6,7 @@
 
 #include "mat_csr.h"
 
-#define DEBUG  0
+#define DEBUG  1
 
 void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat, 
                         const mat_ctx_t ctx)
@@ -25,17 +25,6 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
     mat_csr_print_dense(mat, ctx);
     printf("\n");
     fflush(stdout);
-    #endif
-
-    #if (DEBUG == -1)
-    if (m == 164)
-    {
-        printf("------\n");
-        mat_csr_print_dense(mat, ctx);
-        printf("\n");
-        printf("------\n");
-        fflush(stdout);
-    }
     #endif
 
     mem   = malloc((mat->alloc + 6 * m + 1) * sizeof(long));
@@ -190,20 +179,15 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
         _mat_lup_decompose(s->P + s->B[k], rows, len, ctx);
     }
 
-    #if (DEBUG == -1)
-    if (m == 164)
+    #if (DEBUG > 0)
+    for (k = 0; k < s->nb; k++)
     {
-        printf("------\n");
-        for (k = 0; k < s->nb; k++)
-        {
-            long len = s->B[k + 1] - s->B[k];
+        long len = s->B[k + 1] - s->B[k];
 
-            printf("Block %ld (of length %ld):\n", k, len);
-            _mat_print(s->LU + s->B[k], len, len, ctx);
-            printf("\n");
-            fflush(stdout);
-        }
-        printf("------\n");
+        printf("Block %ld (of length %ld):\n", k, len);
+        _mat_print(s->LU + s->B[k], len, len, ctx);
+        printf("\n");
+        fflush(stdout);
     }
     #endif
 
