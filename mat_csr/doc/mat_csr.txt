@@ -65,12 +65,6 @@ void mat_csr_clear(mat_csr_t A, const mat_ctx_t ctx)
 
 void mat_csr_fit_length(mat_csr_t A, long len, const mat_ctx_t ctx)
 
-void mat_csr_sort_rows(mat_csr_t A, const mat_ctx_t ctx)
-
-    Ensures that the column indices in array \code{A->j} appear in sorted 
-    order, by re-ordering the two arrays \code{A->j} and \code{A->x} 
-    accordingly.
-
 *******************************************************************************
 
     Assignment
