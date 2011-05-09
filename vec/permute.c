@@ -21,7 +21,7 @@ _vec_permute(char *res, const char *vec, long n, long *pi, const mat_ctx_t ctx)
     else
     {
         for (i = 0; i < n; i++)
-            ctx->set(ctx, res + i * ctx->size, vec + pi[i] * ctx->size);
+            ctx->set(res + i * ctx->size, vec + pi[i] * ctx->size);
     }
 }
 

@@ -8,7 +8,7 @@ mat_coo_set_entry(mat_coo_t A, long i, long j, const void *x,
 {
     long k, u = 2 * sizeof(long) + ctx->size;
 
-    assert(!ctx->is_zero(ctx, x));
+    assert(!ctx->is_zero(x));
 
     for (k = 0; k < A->length; k++)
         if (   i == *(long *) (A->list + k * u) 
@@ -17,7 +17,7 @@ mat_coo_set_entry(mat_coo_t A, long i, long j, const void *x,
 
     if (k < A->length)
     {
-        ctx->set(ctx, A->list + k * u + 2 * sizeof(long), x);
+        ctx->set(A->list + k * u + 2 * sizeof(long), x);
     }
     else
     {
@@ -25,7 +25,7 @@ mat_coo_set_entry(mat_coo_t A, long i, long j, const void *x,
         A->length += 1;
         *(long *) (A->list + k * u) = i;
         *(long *) (A->list + k * u + sizeof(long)) = j;
-        ctx->init(ctx, A->list + k * u + 2 * sizeof(long));
-        ctx->set(ctx, A->list + k * u + 2 * sizeof(long), x);
+        ctx->init(A->list + k * u + 2 * sizeof(long));
+        ctx->set(A->list + k * u + 2 * sizeof(long), x);
     }
 }

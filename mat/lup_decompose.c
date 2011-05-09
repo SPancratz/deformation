@@ -7,7 +7,7 @@ _mat_lup_decompose(long *pi, char **rows, long m, const mat_ctx_t ctx)
     char *p, *x;
 
     x = malloc(ctx->size);
-    ctx->init(ctx, x);
+    ctx->init(x);
 
     for (i = 0; i < m; i++)
         pi[i] = i;
@@ -23,12 +23,12 @@ _mat_lup_decompose(long *pi, char **rows, long m, const mat_ctx_t ctx)
 
             for (i = k; i < m; i++)
             {
-                if (ctx->is_zero(ctx, rows[i] + k * ctx->size))
+                if (ctx->is_zero(rows[i] + k * ctx->size))
                     continue;
 
                 nz = 0;
                 for (j = k; j < m; j++)
-                    if (ctx->is_zero(ctx, rows[i] + j * ctx->size))
+                    if (ctx->is_zero(rows[i] + j * ctx->size))
                         nz++;
                 if (nz > nz_best)
                 {
@@ -51,26 +51,26 @@ _mat_lup_decompose(long *pi, char **rows, long m, const mat_ctx_t ctx)
 
         for (i = k + 1; i < m; i++)
         {
-            if (ctx->is_zero(ctx, rows[i] + k * ctx->size))
+            if (ctx->is_zero(rows[i] + k * ctx->size))
                 continue;
 
-            ctx->div(ctx, rows[i] + k * ctx->size, 
+            ctx->div(rows[i] + k * ctx->size, 
                      rows[i] + k * ctx->size, 
                      rows[k] + k * ctx->size);
             for (j = k + 1; j < m; j++)
             {
-                if (ctx->is_zero(ctx, rows[k] + j * ctx->size))
+                if (ctx->is_zero(rows[k] + j * ctx->size))
                     continue;
 
-                ctx->mul(ctx, x, rows[i] + k * ctx->size, 
+                ctx->mul(x, rows[i] + k * ctx->size, 
                             rows[k] + j * ctx->size);
-                ctx->sub(ctx, rows[i] + j * ctx->size, 
+                ctx->sub(rows[i] + j * ctx->size, 
                          rows[i] + j * ctx->size, x);
             }
         }
     }
 
-    ctx->clear(ctx, x);
+    ctx->clear(x);
     free(x);
 
     return 0;

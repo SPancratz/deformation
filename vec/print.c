@@ -18,7 +18,7 @@ int _vec_print(const char *vec, long n, const mat_ctx_t ctx)
         for (i = 0; i < n; i++)
         {
             printf(" ");
-            ctx->print(ctx, vec + i * ctx->size);
+            ctx->print(vec + i * ctx->size);
         }
     }
 

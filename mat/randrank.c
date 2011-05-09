@@ -8,5 +8,5 @@ void mat_randrank(mat_t mat, flint_rand_t state, long rank,
     mat_zero(mat, ctx);
 
     for (i = 0; i < rank; i++)
-        ctx->randtest_not_zero(ctx, mat_entry(mat, i, i, ctx), state);
+        ctx->randtest_not_zero(mat_entry(mat, i, i, ctx), state);
 }

@@ -14,7 +14,7 @@ void mat_csr_realloc(mat_csr_t A, long alloc, const mat_ctx_t ctx)
     if (A->alloc)
     {
         for (k = alloc; k < A->alloc; k++)
-            ctx->clear(ctx, A->x + k * (ctx->size));
+            ctx->clear(A->x + k * (ctx->size));
 
         A->x = realloc(A->x, alloc * (ctx->size));
         A->j = realloc(A->j, alloc * sizeof(long));
@@ -26,7 +26,7 @@ void mat_csr_realloc(mat_csr_t A, long alloc, const mat_ctx_t ctx)
         }
 
         for (k = A->alloc; k < alloc; k++)
-            ctx->init(ctx, A->x + k * (ctx->size));
+            ctx->init(A->x + k * (ctx->size));
         for (k = A->alloc; k < alloc; k++)
             A->j[k] = 0;
 
@@ -45,7 +45,7 @@ void mat_csr_realloc(mat_csr_t A, long alloc, const mat_ctx_t ctx)
         }
 
         for (k = 0; k < alloc; k++)
-            ctx->init(ctx, A->x + k * (ctx->size));
+            ctx->init(A->x + k * (ctx->size));
     }
 }
 

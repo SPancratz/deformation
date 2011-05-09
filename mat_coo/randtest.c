@@ -29,8 +29,8 @@ void mat_coo_randtest(mat_coo_t A, flint_rand_t state, double d, const mat_ctx_t
                 *(long *) (off) = i;
                 *(long *) (off + sizeof(long)) = j;
 
-                ctx->init(ctx, off + 2 * sizeof(long));
-                ctx->randtest_not_zero(ctx, off + 2 * sizeof(long), state);
+                ctx->init(off + 2 * sizeof(long));
+                ctx->randtest_not_zero(off + 2 * sizeof(long), state);
 
                 k++;
                 z--;

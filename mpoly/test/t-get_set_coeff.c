@@ -37,9 +37,9 @@ main(void)
         mon_randtest(m, state, n, d);
         x = malloc(ctx->size);
         y = malloc(ctx->size);
-        ctx->init(ctx, x);
-        ctx->init(ctx, y);
-        ctx->randtest(ctx, x, state);
+        ctx->init(x);
+        ctx->init(y);
+        ctx->randtest(x, state);
 
         mpoly_init(a, n, ctx);
         mpoly_randtest(a, state, d, N, ctx);
@@ -47,20 +47,20 @@ main(void)
         mpoly_set_coeff(a, m, x, ctx);
         mpoly_get_coeff(y, a, m, ctx);
 
-        result = (ctx->equal(ctx, x, y));
+        result = (ctx->equal(x, y));
         if (!result)
         {
             printf("FAIL:\n");
             mpoly_print(a, ctx); printf("\n");
-            ctx->print(ctx, x); printf("\n");
-            ctx->print(ctx, y); printf("\n");
+            ctx->print(x); printf("\n");
+            ctx->print(y); printf("\n");
             abort();
         }
 
         mpoly_clear(a, ctx);
         mon_clear(m);
-        ctx->clear(ctx, x);
-        ctx->clear(ctx, y);
+        ctx->clear(x);
+        ctx->clear(y);
         free(x);
         free(y);
     }

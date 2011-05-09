@@ -118,7 +118,7 @@ main(void)
             col = n_randint(state, n);
 
             mpq_init(x);
-            ctx->randtest_not_zero(ctx, x, state);
+            ctx->randtest_not_zero(x, state);
 
             mat_coo_set_entry(A, row, col, &x, ctx);
 

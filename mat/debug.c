@@ -12,7 +12,7 @@ int mat_debug(const mat_t mat, const mat_ctx_t ctx)
     printf("entries = { ");
     for (i = 0; i < mat->m * mat->n; i++)
     {
-        ctx->print(ctx, mat->entries + i * ctx->size);
+        ctx->print(mat->entries + i * ctx->size);
         printf(" ");
     }
     printf("}\n");

@@ -8,6 +8,6 @@ int mpoly_is_one(const mpoly_t op, const mat_ctx_t ctx)
     {
         mpoly_term t = RBTREE_ROOT(op->dict);
 
-        return mon_is_one(t->key) && ctx->is_one(ctx, t->val);
+        return mon_is_one(t->key) && ctx->is_one(t->val);
     }
 }

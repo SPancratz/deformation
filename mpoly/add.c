@@ -38,11 +38,11 @@ void _mpoly_add_in_place(mpoly_t rop, const mpoly_t op, const mat_ctx_t ctx)
 
         if (find)
         {
-            ctx->add(ctx, c, c, t->val);
-            if (ctx->is_zero(ctx, c))
+            ctx->add(c, c, t->val);
+            if (ctx->is_zero(c))
             {
                 RBTREE_DELETE(mpoly, &m, &c, rop->dict, t->key, &mon_cmp);
-                ctx->clear(ctx, c);
+                ctx->clear(c);
                 free(c);
             }
         }
@@ -51,8 +51,8 @@ void _mpoly_add_in_place(mpoly_t rop, const mpoly_t op, const mat_ctx_t ctx)
             char *c2;
 
             c2 = malloc(ctx->size);
-            ctx->init(ctx, c2);
-            ctx->set(ctx, c2, t->val);
+            ctx->init(c2);
+            ctx->set(c2, t->val);
 
             RBTREE_INSERT(mpoly, &m, &c, rop->dict, t->key, c2, &mon_cmp);
         }

@@ -27,7 +27,7 @@ void mat_csr_set_array3(mat_csr_t A, char *mem, long len, int copy, const mat_ct
 
     for (k = 0; k < len; k++)
     {
-        if (!ctx->is_zero(ctx, mem + k * u + 2 * sizeof(long)))
+        if (!ctx->is_zero(mem + k * u + 2 * sizeof(long)))
         {
             i = *(long *) (mem + k * u);
             lenr[i] ++;
@@ -42,7 +42,7 @@ void mat_csr_set_array3(mat_csr_t A, char *mem, long len, int copy, const mat_ct
     {
         char *x, *y = mem + k * u + 2 * sizeof(long);
 
-        if (!ctx->is_zero(ctx, y))
+        if (!ctx->is_zero(y))
         {
             i = *(long *) (mem + k * u);
             j = *(long *) (mem + k * u + sizeof(long));
@@ -50,11 +50,11 @@ void mat_csr_set_array3(mat_csr_t A, char *mem, long len, int copy, const mat_ct
 
             if (copy)
             {
-                ctx->set(ctx, x, y);
+                ctx->set(x, y);
             }
             else
             {
-                ctx->clear(ctx, x);
+                ctx->clear(x);
                 memcpy(x, y, ctx->size);
             }
             A->j[A->p[i] + A->lenr[i]] = j;
@@ -62,7 +62,7 @@ void mat_csr_set_array3(mat_csr_t A, char *mem, long len, int copy, const mat_ct
         }
         else
             if (!copy)
-                ctx->clear(ctx, y);
+                ctx->clear(y);
     }
 
     free(lenr);

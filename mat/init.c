@@ -12,7 +12,7 @@ void mat_init(mat_t mat, long m, long n, const mat_ctx_t ctx)
     mat->rows    = malloc(m * sizeof(char *));
 
     for (i = 0; i < m * n; i++)
-        ctx->init(ctx, mat->entries + i * ctx->size);
+        ctx->init(mat->entries + i * ctx->size);
 
     for (i = 0; i < m; i++)
         mat->rows[i] = mat->entries + i * n * ctx->size;

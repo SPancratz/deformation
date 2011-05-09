@@ -48,7 +48,7 @@ void mat_csr_init2(mat_csr_t A, long m, long n, long alloc, const mat_ctx_t ctx)
         }
 
         for (k = 0; k < alloc; k++)
-            ctx->init(ctx, A->x + k * (ctx->size));
+            ctx->init(A->x + k * (ctx->size));
     }
     else
     {

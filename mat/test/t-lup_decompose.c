@@ -47,9 +47,9 @@ main(void)
         for (i = 0; i < m; i++)
         {
             for (j = i; j < n; j++)
-                ctx->swap(ctx, mat_entry(L, i, j, ctx), 
-                               mat_entry(U, i, j, ctx));
-            ctx->one(ctx, mat_entry(L, i, i, ctx));
+                ctx->swap(mat_entry(L, i, j, ctx), 
+                          mat_entry(U, i, j, ctx));
+            ctx->one(mat_entry(L, i, i, ctx));
         }
 
         mat_mul_classical(T, L, U, ctx);
@@ -84,4 +84,3 @@ main(void)
     printf("PASS\n");
     return EXIT_SUCCESS;
 }
-

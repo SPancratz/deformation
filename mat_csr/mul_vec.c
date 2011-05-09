@@ -15,11 +15,11 @@ _mat_csr_mul_vec(char *res,
 
     for (r = 0; r < m; r++)
     {
-        ctx->zero(ctx, res + r * ctx->size);
+        ctx->zero(res + r * ctx->size);
         for (q = p[r]; q < p[r] + lenr[r]; q++)
         {
-            ctx->mul(ctx, t, x + q * ctx->size, vec + j[q] * ctx->size);
-            ctx->add(ctx, res + r * ctx->size, res + r * ctx->size, t);
+            ctx->mul(t, x + q * ctx->size, vec + j[q] * ctx->size);
+            ctx->add(res + r * ctx->size, res + r * ctx->size, t);
         }
     }
 

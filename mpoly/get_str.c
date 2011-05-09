@@ -61,10 +61,10 @@ char * mpoly_get_str(const mpoly_t op, const mat_ctx_t ctx)
     mpoly_iter_init(iter, op);
     while ((t = mpoly_iter_next(iter)))
     {
-        if (ctx->is_one(ctx, t->val))
+        if (ctx->is_one(t->val))
             coeffs[i] = NULL;
         else
-            coeffs[i] = ctx->get_str(ctx, t->val);
+            coeffs[i] = ctx->get_str(t->val);
         mons[i] = _mpoly_mon_get_str(t->key, op->n);
         i++;
     }

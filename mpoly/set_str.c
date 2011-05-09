@@ -141,7 +141,7 @@ int mpoly_set_str(mpoly_t rop, const char * str, const mat_ctx_t ctx)
 
         mon_init(m);
         c = malloc(ctx->size);
-        ctx->init(ctx, c);
+        ctx->init(c);
 
         while (str[j] != '(' && str[j] != '[')
             j++;
@@ -150,7 +150,7 @@ int mpoly_set_str(mpoly_t rop, const char * str, const mat_ctx_t ctx)
         {
             jclose = mpoly_str_find_close(str, j, '(', ')');
             s = mpoly_str_substr(str, j + 1, jclose);
-            ctx->set_str(ctx, c, s);
+            ctx->set_str(c, s);
             free(s);
 
             j = jclose + 1;
@@ -159,7 +159,7 @@ int mpoly_set_str(mpoly_t rop, const char * str, const mat_ctx_t ctx)
         }
         else
         {
-            ctx->one(ctx, c);
+            ctx->one(c);
         }
         
         jclose = mpoly_str_find_close(str, j, '[', ']');

@@ -8,18 +8,18 @@ void mpoly_add_coeff(mpoly_t rop, const mon_t m, const void *x,
     mon_t m2;
     void *x2;
 
-    if (ctx->is_zero(ctx, x))
+    if (ctx->is_zero(x))
         return;
 
     find = RBTREE_FIND(mpoly, &m2, &x2, rop->dict, m, &mon_cmp);
 
     if (find)
     {
-        ctx->add(ctx, x2, x2, x);
-        if (ctx->is_zero(ctx, x2))
+        ctx->add(x2, x2, x);
+        if (ctx->is_zero(x2))
         {
             RBTREE_DELETE(mpoly, &m2, &x2, rop->dict, m, &mon_cmp);
-            ctx->clear(ctx, x2);
+            ctx->clear(x2);
             free(x2);
         }
     }
@@ -28,8 +28,8 @@ void mpoly_add_coeff(mpoly_t rop, const mon_t m, const void *x,
         char *x1;
 
         x1 = malloc(ctx->size);
-        ctx->init(ctx, x1);
-        ctx->set(ctx, x1, x);
+        ctx->init(x1);
+        ctx->set(x1, x);
 
         RBTREE_INSERT(mpoly, &m2, &x2, rop->dict, m, x1, &mon_cmp);
     }

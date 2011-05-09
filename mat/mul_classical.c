@@ -8,22 +8,22 @@ void _mat_mul_classical(char **rowsC,
     char *x, *y;
 
     x = malloc(ctx->size);
-    ctx->init(ctx, x);
+    ctx->init(x);
 
     for (i = 0; i < ell; i++)
         for (j = 0; j < n; j++)
         {
             y = rowsC[i] + j * ctx->size;
-            ctx->zero(ctx, y);
+            ctx->zero(y);
             for (k = 0; k < m; k++)
             {
-                ctx->mul(ctx, x, rowsA[i] + k * ctx->size, 
+                ctx->mul(x, rowsA[i] + k * ctx->size, 
                             rowsB[k] + j * ctx->size);
-                ctx->add(ctx, y, y, x);
+                ctx->add(y, y, x);
             }
         }
 
-    ctx->clear(ctx, x);
+    ctx->clear(x);
     free(x);
 }
 

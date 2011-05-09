@@ -70,10 +70,10 @@ main(void)
 
         r = n_randint(state, m);
         c = n_randint(state, n);
-        if (ctx->is_zero(ctx, mat_entry(B, r, c, ctx)))
-            ctx->randtest_not_zero(ctx, mat_entry(B, r, c, ctx), state);
+        if (ctx->is_zero(mat_entry(B, r, c, ctx)))
+            ctx->randtest_not_zero(mat_entry(B, r, c, ctx), state);
         else
-            ctx->zero(ctx, mat_entry(B, r, c, ctx));
+            ctx->zero(mat_entry(B, r, c, ctx));
 
         result = !mat_equal(A, B, ctx);
         if (!result)
@@ -148,10 +148,10 @@ main(void)
 
         r = n_randint(state, m);
         c = n_randint(state, n);
-        if (ctx->is_zero(ctx, mat_entry(B, r, c, ctx)))
-            ctx->randtest_not_zero(ctx, mat_entry(B, r, c, ctx), state);
+        if (ctx->is_zero(mat_entry(B, r, c, ctx)))
+            ctx->randtest_not_zero(mat_entry(B, r, c, ctx), state);
         else
-            ctx->zero(ctx, mat_entry(B, r, c, ctx));
+            ctx->zero(mat_entry(B, r, c, ctx));
 
         result = !mat_equal(A, B, ctx);
         if (!result)

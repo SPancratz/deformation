@@ -11,7 +11,7 @@ int mat_csr_debug(const mat_csr_t A, const mat_ctx_t ctx)
     printf("x     = [ ");
     for (k = 0; k < A->alloc; k++)
     {
-        ctx->print(ctx, A->x + k * (ctx->size));
+        ctx->print(A->x + k * (ctx->size));
         printf(" ");
     }
     printf("]\n");
