@@ -1,6 +1,6 @@
 #include "gmconnection.h"
 
-#define DEBUG  0
+#define DEBUG  1
 
 /*
     Sets the polynomial \code{rop} to the derivative of \code{op} 
@@ -65,7 +65,7 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
     
     /*
         Arrays for the auxiliary matrices;  the arrays are of length u + 1 
-        but they are unused when k < l
+        but they are NULL when k < l
      */
     mat_csr_t *aux;
     mon_t **aux_rows, **aux_cols;
@@ -91,7 +91,9 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
     #if (DEBUG > 0)
     printf("Derivatives:\n");
     for (i = 0; i < n; i++)
+    {
         printf("  dPdX %ld = ", i), mpoly_print(dP[i], ctx), printf("\n");
+    }
     printf("  dPdt = "), mpoly_print(dPdt, ctx), printf("\n");
     #endif
     
@@ -136,7 +138,7 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
 
         gmc_init_auxmatrix(aux[k], aux_rows + k, aux_cols + k, aux_p[k], 
                            P, k, ctx);
-        mat_csr_sort_rows(aux[k], ctx);
+
         mat_csr_solve_init(aux_s[k], aux[k], ctx);
     }
     
