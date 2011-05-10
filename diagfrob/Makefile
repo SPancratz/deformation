@@ -1,19 +1,35 @@
-###############################################################################
-## Copyright (C) 2010 Sebastian Pancratz                                     ##
-###############################################################################
+SOURCES = $(wildcard *.c)
 
-CC = gcc
-CFLAGS = -g -ansi -Wall -O2
-LIBS = -lgmp -lm
-INCS = -I ../ -I ../monv/ -I ../basis/ -I ../padics/ -I ../padics/padic/
+OBJS = $(patsubst %.c, %.o, $(SOURCES))
 
-OBJS = $(patsubst %.c, %.o, $(wildcard *.c))
+LIB_OBJS = $(patsubst %.c, %.lo, $(SOURCES))
+
+TEST_SOURCES = $(wildcard test/*.c)
+
+PROF_SOURCES = $(wildcard profile/*.c)
+
+TESTS = $(patsubst %.c, %, $(TEST_SOURCES))
+
+PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 all: $(OBJS)
 
+library: $(LIB_OBJS)
+
+profile:
+	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c ../profiler.o -o $(prog) $(LIBS) -ldeformation;)
+        
 %.o: %.c
 	$(CC) $(CFLAGS) -c $(INCS) $< -o $@
 
-clean: 
-	rm *.o
+%.lo: %.c
+	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
 
+clean:
+	rm -f $(OBJS) $(LIB_OBJS) $(TESTS)	
+
+check: library
+	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS) -ldeformation;)
+	$(foreach prog, $(TESTS), $(prog);)
+
+.PHONY: profile clean check all
