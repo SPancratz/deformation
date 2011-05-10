@@ -19,3 +19,7 @@
 
 #define DIAGFROB_MOD(x, m)  (((x) % (m) >= 0) ? (x) % (m) : (x) % (m) + (m))
 
+void diagfrob_falling_fac_mpq(mpq_t rop, long u, long d, long r);
+
+#endif
+
