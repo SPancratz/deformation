@@ -16,4 +16,14 @@ DIAGFROB_MOD(ulong x, ulong m)
 
     This is not a sophisticated or fast implementation.
 
+void diagfrob_falling_fac_mpq(mpq_t rop, long u, long d, long r)
+
+    Computes the product
+    \begin{equation*}
+    \bigl( \frac{u}{d} \bigr)_r 
+        = \prod_{j=0}^{r-1} \bigl( \frac{u}{d} + j \bigr)
+    \end{equation*}
+    as an exact rational number.
+
+    Assumes that $d \neq 0$, $r \geq 0$.
 
