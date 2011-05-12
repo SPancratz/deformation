@@ -27,3 +27,29 @@ void diagfrob_falling_fac_mpq(mpq_t rop, long u, long d, long r)
 
     Assumes that $d \neq 0$, $r \geq 0$.
 
+void diagfrob_coefficient_mpq(mpq_t rop, long m, long p)
+
+    Sets \code{rop} to the coefficient $\lambda_m$ of $z^m$ in the series 
+    expansion of $\exp(\pi (z - z^p))$, where $\pi^{p-1} = -p$, 
+    ignoring the power of $\pi$.
+
+    More precisely, let $r$ with $0 \leq r < p-1$ denote the remainder 
+    of $m$ upon division by $p-1$.  This method computes the rational 
+    number $\pi^{-r} \lambda_m$.
+
+void diagfrob_coefficient(padic_t rop, long m, const padic_ctx_t ctx)
+
+    Sets \code{rop} to the coefficient $\lambda_m$ of $z^m$ in the series 
+    expansion of $\exp(\pi (z - z^p))$, where $\pi^{p-1} = -p$, 
+    ignoring the power of $\pi$.
+
+    More precisely, let $r$ with $0 \leq r < p-1$ denote the remainder 
+    of $m$ upon division by $p-1$.  It is not hard to show that the 
+    rational number $\pi^{-r} \lambda_m$ lies in $\mathbf{Z}_p$.  
+
+    This method computes $\pi^{-r} \lambda_m$ to guaranteed $p$-adic 
+    precision $N$.  Some intermediate calculations are carried out to 
+    precision $N^{+} = N + \floor{\floor{m/p}/(p-1)}\f$.
+
+    Assumes that $m \geq 2$.
+
