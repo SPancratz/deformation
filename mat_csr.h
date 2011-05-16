@@ -58,6 +58,11 @@ void mat_csr_clear(mat_csr_t A, const mat_ctx_t ctx);
 
 void mat_csr_fit_length(mat_csr_t A, long len, const mat_ctx_t ctx);
 
+void _mat_csr_sort_rows(long m, char *x, long *j, long *p, long *lenr, 
+                        const mat_ctx_t ctx);
+
+void mat_csr_sort_rows(mat_csr_t A, const mat_ctx_t ctx);
+
 /* Assignment ****************************************************************/
 
 void mat_csr_set_mat(mat_csr_t A, const mat_t mat, const mat_ctx_t ctx);
