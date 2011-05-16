@@ -1,4 +1,5 @@
 #include "mat.h"
+#include "vec.h"
 
 int 
 _mat_lup_decompose(long *pi, char **rows, long m, const mat_ctx_t ctx)
@@ -6,8 +7,13 @@ _mat_lup_decompose(long *pi, char **rows, long m, const mat_ctx_t ctx)
     long i, j, k, t;
     char *p, *x;
 
-    x = malloc(ctx->size);
-    ctx->init(x);
+    if (m == 1)
+    {
+        pi[0] = 0;
+        return 0;
+    }
+
+    x = _vec_init(1, ctx);
 
     for (i = 0; i < m; i++)
         pi[i] = i;
@@ -70,8 +76,7 @@ _mat_lup_decompose(long *pi, char **rows, long m, const mat_ctx_t ctx)
         }
     }
 
-    ctx->clear(x);
-    free(x);
+    _vec_clear(x, 1, ctx);
 
     return 0;
 }
