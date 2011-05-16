@@ -4,13 +4,19 @@
 #include "vec.h"
 
 void _mat_lup_solve(char *x, char ** const rows, long m, long n, 
-                          const long *pi, const char *b, const mat_ctx_t ctx)
+                    const long *pi, const char *b, const mat_ctx_t ctx)
 {
     long i, j;
     char *t;
 
     assert(m == n);
     assert(x != b);
+
+    if (m == 1 && n == 1)
+    {
+        ctx->div(x, b, rows[0]);
+        return;
+    }
 
     t = _vec_init(1, ctx);
 
