@@ -46,3 +46,5 @@ gmconnection
 ============
 
 * Port the old cover over into a new module
+* Add special handling for 1x1 blocks
+
