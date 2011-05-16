@@ -121,8 +121,9 @@ int main(int argc, char *argv[])
     free(out1);
     free(out2);
 
+    printf("... ");
+
     printf("PASS\n");
-    printf("=====\n");
     fflush(stdout);
     return EXIT_SUCCESS;
 }

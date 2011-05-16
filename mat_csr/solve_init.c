@@ -1,12 +1,10 @@
 #include <assert.h>
-#include <stdlib.h>
 
-#include "mat.h"
 #include "vec.h"
 
 #include "mat_csr.h"
 
-#define DEBUG  1
+#define DEBUG  0
 
 void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat, 
                         const mat_ctx_t ctx)
@@ -78,35 +76,13 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
         s->j[i] = mat->j[i];
 
     /* Set A := P A */
-
-    #if (DEBUG > 0)
-    printf("Calling _mat_csr_permute_rows()\n");
-    fflush(stdout);
-    #endif
-
     _mat_csr_permute_rows(m, s->p, s->lenr, s->pi);
 
     /* Find Q s.t. Q P A Q^t is block triangular */
-
-    #if (DEBUG > 0)
-    printf("Calling _mat_csr_block_triangularise()\n");
-    fflush(stdout);
-    #endif
-
     s->nb = _mat_csr_block_triangularise(s->qi, s->B, m, s->j, s->p, s->lenr, w);
     s->B[s->nb] = m;
 
-    #if (DEBUG > 0)
-    printf("Calling _mat_csr_permute_rows()\n");
-    fflush(stdout);
-    #endif
-
     _mat_csr_permute_rows(m, s->p, s->lenr, s->qi);
-
-    #if (DEBUG > 0)
-    printf("Calling _mat_csr_permute_cols()\n");
-    fflush(stdout);
-    #endif
 
     _mat_csr_permute_cols(m, m, s->j, s->p, s->lenr, s->qi);
 

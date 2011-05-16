@@ -85,6 +85,7 @@ main(void)
         mat_csr_clear(A, ctx);
         mat_ctx_clear(ctx);
     }
+    printf("... ");
 
     for (i = 0; i < 1000; i++)
     {

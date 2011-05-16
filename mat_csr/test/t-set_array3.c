@@ -74,8 +74,10 @@ main(void)
         mat_csr_clear(A, ctx);
         mat_ctx_clear(ctx);
     }
+    printf("... ");
 
     flint_randclear(state);
     _fmpz_cleanup();
+    printf("PASS\n");
     return EXIT_SUCCESS;
 }

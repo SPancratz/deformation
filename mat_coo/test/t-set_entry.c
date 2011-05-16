@@ -16,9 +16,7 @@ main(void)
 
     flint_randinit(state);
 
-    /*
-        Run a single example
-     */
+    /* Run a single example */
     {
         mat_ctx_t ctx;
         mat_coo_t A;
@@ -48,17 +46,18 @@ main(void)
         x = 1;
         mat_coo_set_entry(A, 3, 1, &x, ctx);
 
-        printf("Matrix A, debug:\n");
+        printf("Matrix A (debug):\n");
         mat_coo_debug(A, ctx);
         printf("\n");
 
-        printf("Matrix A:\n");
+        printf("Matrix A (dense):\n");
         mat_coo_print_dense(A, ctx);
         printf("\n");
 
         mat_coo_clear(A, 1, ctx);
         mat_ctx_clear(ctx);
     }
+    printf("... ");
 
     /* Unmanaged type (long) */
     for (i = 0; i < 1000; i++)

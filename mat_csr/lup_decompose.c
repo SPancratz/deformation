@@ -67,8 +67,6 @@ mat_csr_lupdecompose(mat_csr_t L, mat_csr_t U, long *pi, const mat_csr_t A,
     ctx->clear(x);
     free(x);
 
-
-
     /* No `clearing' of individual coefficients */
     free(mem);
 }

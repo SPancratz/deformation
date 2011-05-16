@@ -10,8 +10,7 @@ main(void)
     int i;
     flint_rand_t state;
 
-    printf("init/ clear\n");
-    printf("-----------\n");
+    printf("init/ clear... ");
     fflush(stdout);
 
     flint_randinit(state);

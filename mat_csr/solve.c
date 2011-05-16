@@ -5,7 +5,7 @@
 
 #include "mat_csr.h"
 
-#define DEBUG  1
+#define DEBUG  0
 
 void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b, 
                    const mat_ctx_t ctx)

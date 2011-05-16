@@ -21,7 +21,6 @@ main(void)
     flint_randinit(state);
 
     mat_ctx_init_long(ctx);
-
     {
         mpoly_t a;
 
@@ -35,8 +34,9 @@ main(void)
         printf("a = "), mpoly_print(a, ctx), printf("\n");
         mpoly_clear(a, ctx);
     }
-
     mat_ctx_clear(ctx);
+
+    printf("... ");
 
     flint_randclear(state);
     _fmpz_cleanup();
