@@ -42,12 +42,12 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
     long quot;
     
     fmpz_t ppow;                /* Power of p */
-    fmpz_t ai;                  /* Teichmuller lift */
     fmpz_t dinv;                /* d^{-1} */
     padic_t factor;             /* ith factor */
     long e_product, e_factor;   /* Exponents of pi */
     padic_t summand;
     padic_t lambda;
+    padic_t ai;                 /* Teichmuller lift */
     fmpz_t falling_fac1;        /* u[i] (u[i] + d) ... (u[i] + (r-1) d) */
     fmpz_t falling_fac2;        /* u[i] + (r-1) d */
     long e_falling_fac;
@@ -55,11 +55,9 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
     const long p = *(ctx0->p), N = ctx0->N;
     padic_ctx_t ctx;
 
-    M = 2 * p * p * (N + 2 * n - 1) / (p - 1);
-
     /* Check the size of the input parameters */
     {
-        mpz_t x;
+        mpz_t t;
 
         if (N > LONG_MAX - (2*n - 1))
         {
@@ -67,19 +65,21 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
             abort();
         }
 
-        mpz_init_set_ui(x, 2);
-        mpz_mul_ui(x, x, p);
-        mpz_mul_ui(x, x, p);
-        mpz_mul_ui(x, x, N + (2*n - 1));
-        mpz_fdiv_q_ui(x, x, p - 1);
+        mpz_init_set_ui(t, 2);
+        mpz_mul_ui(t, t, p);
+        mpz_mul_ui(t, t, p);
+        mpz_mul_ui(t, t, N + (2*n - 1));
+        mpz_fdiv_q_ui(t, t, p - 1);
 
-        if (!mpz_fits_slong_p(x))
+        if (!mpz_fits_slong_p(t))
         {
             printf("ERROR (diagfrob_alpha).  M too large\n");
             abort();
         }
+        else
+            M = mpz_get_si(t);
 
-        mpz_clear(x);
+        mpz_clear(t);
     }
 
     /* Ensure that no factor in the product is (obviously) zero. */
@@ -106,7 +106,7 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
     }
     
     /* Set bounds */
-    Nt  = Nt >= 0 ? N : N + (n + 1) * (-Nt * (p - 1) / (p * p)) + 1;
+    Nt = (Nt >= 0) ? N : (N + (n + 1) * (-Nt * (p - 1) / (p * p)) + 1);
 
     /* Initialisation */
     padic_ctx_init(ctx, ctx0->p, Nt, PADIC_SERIES);
@@ -114,15 +114,16 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
     padic_init(factor, ctx);
     padic_init(summand, ctx);
     padic_init(lambda, ctx);
+    padic_init(ai, ctx);
 
     fmpz_init(ppow);
-    fmpz_pow_ui(ppow, ctx->p, Nt);
-    fmpz_init(ai);
     fmpz_init(falling_fac1);
     fmpz_init(falling_fac2);
     fmpz_init(dinv);
+
+    fmpz_pow_ui(ppow, ctx->p, Nt);
     fmpz_set_ui(dinv, d);
-    fmpz_invmod(dinv, dinv, ppow);
+    _padic_inv(dinv, dinv, ctx->p, ctx->N);
 
     /* Outer product.. */
     padic_one(rop, ctx);
@@ -149,16 +150,9 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
         }
 
         /* Power of Teichmuller lift */
-        {
-            padic_t x;
-
-            padic_init(x, ctx);
-            padic_set_fmpz(x, a + i, ctx);
-            padic_teichmuller(x, x, ctx);
-            padic_get_fmpz(ai, x, ctx);
-            padic_clear(x, ctx);
-        }
-        fmpz_powm_ui(ai, ai, DIAGFROB_MOD(lhs, p - 1), ppow);
+        padic_set_fmpz(ai, a + i, ctx);
+        padic_teichmuller(ai, ai, ctx);
+        fmpz_powm_ui(ai, ai, DIAGFROB_MOD(m - r, p - 1), ppow);
         
         padic_zero(factor, ctx);
         e_factor = DIAGFROB_MOD(m - r, p - 1);
@@ -166,7 +160,7 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
         /* Compute the pre-initial value of (u_i / d)_r */
         if (r == 0)
         {
-            fmpz_set_si(falling_fac1, 1);
+            fmpz_set_ui(falling_fac1, 1);
             e_falling_fac = 0;
         }
         else
@@ -174,10 +168,10 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
             fmpz_powm_ui(falling_fac1, dinv, r - 1, ppow);
             for (j = 0; j < r - 1; j++)
             {
-                fmpz_mul_si(falling_fac1, falling_fac1, ui + j * d);
+                fmpz_mul_ui(falling_fac1, falling_fac1, ui + j * d);
                 fmpz_mod(falling_fac1, falling_fac1, ppow);
             }
-            e_falling_fac = fmpz_remove(falling_fac1, falling_fac1, ctx->p);
+            e_falling_fac = _fmpz_remove(falling_fac1, ctx->p, ctx->pinv);
         }
 
         for ( ; m <= M; r++, m += p)
@@ -186,10 +180,12 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
             
             if (r > 0)
             {
-                fmpz_set_si(falling_fac2, ui + (r - 1) * d);
-                e_falling_fac += fmpz_remove(falling_fac2, falling_fac2, ctx->p);
+                if (ui + (r - 1) * d == 0)
+                    break;
+
+                fmpz_set_ui(falling_fac2, ui + (r - 1) * d);
+                e_falling_fac += _fmpz_remove(falling_fac2, ctx->p, ctx->pinv);
                 fmpz_mul(falling_fac1, falling_fac1, falling_fac2);
-                fmpz_mod(falling_fac1, falling_fac1, ppow);
                 fmpz_mul(falling_fac1, falling_fac1, dinv);
                 fmpz_mod(falling_fac1, falling_fac1, ppow);
             }
@@ -199,11 +195,11 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
                exponent as quot * (p-1) + rem with 0 <= rem < p-1
              */
             quot = fdiv_si(m % (p - 1) - r, p - 1);
-            
+
             fmpz_mul(summand, lambda, falling_fac1);
             fmpz_mod(summand, summand, ppow);
             summand[1] = 0;
-            
+
             if ((r + quot) % 2 != 0)
                 padic_neg(summand, summand, ctx);
             
@@ -244,10 +240,10 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
     padic_clear(factor, ctx);
     padic_clear(summand, ctx);
     padic_clear(lambda, ctx);
+    padic_clear(ai, ctx);
     padic_ctx_clear(ctx);
 
     fmpz_clear(ppow);
-    fmpz_clear(ai);
     fmpz_clear(falling_fac1);
     fmpz_clear(falling_fac2);
     fmpz_clear(dinv);
