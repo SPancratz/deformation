@@ -18,7 +18,7 @@ int main(void)
     int i, result;
     flint_rand_t state;
    
-    printf("falling_fac_mpq...");
+    printf("falling_fac_mpq... ");
     fflush(stdout);
    
     flint_randinit(state);
