@@ -53,3 +53,11 @@ void diagfrob_coefficient(padic_t rop, long m, const padic_ctx_t ctx)
 
     Assumes that $m \geq 2$.
 
+void diagfrob_alpha_mpq(mpq_t rop, mpz_t *a, long n, long d, 
+                        const mon_t u, const mon_t v, 
+                        long p, long N)
+
+void diagfrob_alpha_padic(padic_ptr rop, mpz_t *a, int n, int d, 
+                          const mon_t u, const mon_t v, 
+                          const padic_ctx_t ctx)
+
