@@ -32,11 +32,19 @@ void diagfrob_coefficient_mpq(mpq_t rop, long m, long p);
 
 void diagfrob_coefficient(padic_t rop, long m, const padic_ctx_t ctx);
 
-void diagfrob_alpha_mpq(mpq_t rop, fmpz *a, long n, long d, 
+void diagfrob_alpha_mpq(mpq_t rop, const fmpz *a, long n, long d, 
                         const mon_t u, const mon_t v, 
                         const padic_ctx_t ctx);
 
 void diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d, 
+                    const mon_t u, const mon_t v, 
+                    const padic_ctx_t ctx);
+
+void diagfrob_entry_mpq(mpq_t rop, const fmpz *a, long n, long d, 
+                        const mon_t u, const mon_t v, 
+                        const padic_ctx_t ctx);
+
+void diagfrob_entry(padic_t rop, const fmpz *a, long n, long d, 
                     const mon_t u, const mon_t v, 
                     const padic_ctx_t ctx);
 

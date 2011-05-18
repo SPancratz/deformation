@@ -35,7 +35,7 @@
                   over finite fields</i>, 2003
  */
 void 
-diagfrob_alpha_mpq(mpq_t rop, fmpz *a, long n, long d, 
+diagfrob_alpha_mpq(mpq_t rop, const fmpz *a, long n, long d, 
                    const mon_t u, const mon_t v, 
                    const padic_ctx_t ctx)
 {
