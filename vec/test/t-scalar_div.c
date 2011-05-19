@@ -83,7 +83,7 @@ main(void)
             _vec_randtest_not_zero(x, 1, state, ctx);
             _vec_randtest_not_zero(y, 1, state, ctx);
 
-            ctx->mul(z, x, y);
+            ctx->mul(ctx, z, x, y);
             _vec_scalar_div(C, A, n, z, ctx);
 
             _vec_scalar_div(B, A, n, x, ctx);

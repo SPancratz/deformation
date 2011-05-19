@@ -38,36 +38,36 @@ main(void)
         x = malloc(ctx->size);
         y = malloc(ctx->size);
         z = malloc(ctx->size);
-        ctx->init(x);
-        ctx->init(y);
-        ctx->init(z);
-        ctx->randtest(x, state);
+        ctx->init(ctx, x);
+        ctx->init(ctx, y);
+        ctx->init(ctx, z);
+        ctx->randtest(ctx, x, state);
 
         mpoly_init(a, n, ctx);
         mpoly_randtest(a, state, d, N, ctx);
 
         mpoly_get_coeff(y, a, m, ctx);
-        ctx->add(y, y, x);
+        ctx->add(ctx, y, y, x);
 
         mpoly_add_coeff(a, m, x, ctx);
         mpoly_get_coeff(z, a, m, ctx);
 
-        result = (ctx->equal(y, z));
+        result = (ctx->equal(ctx, y, z));
         if (!result)
         {
             printf("FAIL:\n");
             mpoly_print(a, ctx); printf("\n");
-            ctx->print(x); printf("\n");
-            ctx->print(y); printf("\n");
-            ctx->print(z); printf("\n");
+            ctx->print(ctx, x); printf("\n");
+            ctx->print(ctx, y); printf("\n");
+            ctx->print(ctx, z); printf("\n");
             abort();
         }
 
         mpoly_clear(a, ctx);
         mon_clear(m);
-        ctx->clear(x);
-        ctx->clear(y);
-        ctx->clear(z);
+        ctx->clear(ctx, x);
+        ctx->clear(ctx, y);
+        ctx->clear(ctx, z);
         free(x);
         free(y);
         free(z);

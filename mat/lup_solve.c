@@ -14,7 +14,7 @@ void _mat_lup_solve(char *x, char ** const rows, long m, long n,
 
     if (m == 1 && n == 1)
     {
-        ctx->div(x, b, rows[0]);
+        ctx->div(ctx, x, b, rows[0]);
         return;
     }
 
@@ -24,11 +24,11 @@ void _mat_lup_solve(char *x, char ** const rows, long m, long n,
 
     for (i = 0; i < m; i++)
     {
-        ctx->set(x + i * ctx->size, b + pi[i] * ctx->size);
+        ctx->set(ctx, x + i * ctx->size, b + pi[i] * ctx->size);
         for (j = 0; j < i; j++)
         {
-            ctx->mul(t, rows[i] + j * ctx->size, x + j * ctx->size);
-            ctx->sub(x + i * ctx->size, x + i * ctx->size, t);
+            ctx->mul(ctx, t, rows[i] + j * ctx->size, x + j * ctx->size);
+            ctx->sub(ctx, x + i * ctx->size, x + i * ctx->size, t);
         }
     }
 
@@ -38,10 +38,10 @@ void _mat_lup_solve(char *x, char ** const rows, long m, long n,
     {
         for (j = i + 1; j < m; j++)
         {
-            ctx->mul(t, rows[i] + j * ctx->size, x + j * ctx->size);
-            ctx->sub(x + i * ctx->size, x + i * ctx->size, t);
+            ctx->mul(ctx, t, rows[i] + j * ctx->size, x + j * ctx->size);
+            ctx->sub(ctx, x + i * ctx->size, x + i * ctx->size, t);
         }
-        ctx->div(x + i * ctx->size, x + i * ctx->size, rows[i] + i * ctx->size);
+        ctx->div(ctx, x + i * ctx->size, x + i * ctx->size, rows[i] + i * ctx->size);
     }
 
     _vec_clear(t, 1, ctx);

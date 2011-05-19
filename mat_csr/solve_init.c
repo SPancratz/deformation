@@ -128,7 +128,7 @@ void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat,
                     long c = s->j[q] - s->B[k];
 
                     if (0 <= c && c < len)
-                        ctx->set(rows[r] + c * ctx->size, s->x + q * ctx->size);
+                        ctx->set(ctx, rows[r] + c * ctx->size, s->x + q * ctx->size);
                 }
 
             off += len * len * ctx->size;

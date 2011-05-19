@@ -13,7 +13,7 @@ void mpoly_neg(mpoly_t rop, const mpoly_t op, const ctx_t ctx)
     mpoly_iter_init(iter, rop);
     while ((t = mpoly_iter_next(iter)))
     {
-        ctx->neg(t->val, t->val);
+        ctx->neg(ctx, t->val, t->val);
     }
     mpoly_iter_clear(iter);
 }

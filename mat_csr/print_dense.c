@@ -17,7 +17,7 @@ _mat_csr_print_dense(long m, long n, const char *x, const long *j,
                     break;
             printf(" ");
             if (k < p[i] + lenr[i])
-                ctx->print(x + k * ctx->size);
+                ctx->print(ctx, x + k * ctx->size);
             else
                 printf("0");
         }

@@ -66,8 +66,8 @@ main(void)
         mon_init(m);
         mon_randtest(m, state, n, d);
         x = malloc(ctx->size);
-        ctx->init(x);
-        ctx->randtest_not_zero(x, state);
+        ctx->init(ctx, x);
+        ctx->randtest_not_zero(ctx, x, state);
 
         mpoly_init(a, n, ctx);
         mpoly_init(b, n, ctx);
@@ -83,14 +83,14 @@ main(void)
             mpoly_print(a, ctx); printf("\n");
             mpoly_print(b, ctx); printf("\n");
             mon_print(m, n); printf("\n");
-            ctx->print(x); printf("\n");
+            ctx->print(ctx, x); printf("\n");
             abort();
         }
 
         mpoly_clear(a, ctx);
         mpoly_clear(b, ctx);
         mon_clear(m);
-        ctx->clear(x);
+        ctx->clear(ctx, x);
         free(x);
     }
 

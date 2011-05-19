@@ -11,11 +11,11 @@ void mpoly_get_coeff(void *rop, const mpoly_t op, const mon_t m,
 
     if (find)
     {
-        ctx->set(rop, c2);
+        ctx->set(ctx, rop, c2);
     }
     else
     {
-        ctx->zero(rop);
+        ctx->zero(ctx, rop);
     }
 }
 

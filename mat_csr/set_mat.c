@@ -22,7 +22,7 @@ void mat_csr_set_mat(mat_csr_t A, const mat_t mat, const ctx_t ctx)
 
     for (i = 0; i < mat->m; i++)
         for (j = 0; j < mat->n; j++)
-            if (!ctx->is_zero(mat_entry(mat, i, j, ctx)))
+            if (!ctx->is_zero(ctx, mat_entry(mat, i, j, ctx)))
                 lenr[i] ++;
 
     sum = 0;
@@ -36,11 +36,11 @@ void mat_csr_set_mat(mat_csr_t A, const mat_t mat, const ctx_t ctx)
         A->p[i] = (i > 0) ? A->p[i - 1] + A->lenr[i - 1] : 0;
 
         for (j = 0; j < mat->n; j++)
-            if (!ctx->is_zero(mat_entry(mat, i, j, ctx)))
+            if (!ctx->is_zero(ctx, mat_entry(mat, i, j, ctx)))
             {
                 long q = A->p[i] + A->lenr[i];
 
-                ctx->set(A->x + q * ctx->size, mat_entry(mat, i, j, ctx));
+                ctx->set(ctx, A->x + q * ctx->size, mat_entry(mat, i, j, ctx));
                 A->j[q] = j;
                 A->lenr[i] ++;
             }

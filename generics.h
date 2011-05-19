@@ -12,38 +12,38 @@
 
 #include "fmpz_poly_q.h"
 
-typedef struct
+typedef struct __ctx_struct 
 {
     size_t size;
 
-    void (*init)(void *op);
-    void (*clear)(void *op);
+    void (*init)(const struct __ctx_struct * ctx, void *op);
+    void (*clear)(const struct __ctx_struct * ctx, void *op);
 
-    void (*set)(void *rop, const void *op);
-    void (*set_si)(void *rop, long op);
-    void (*swap)(void *op1, void *op2);
-    void (*zero)(void *rop);
-    void (*one)(void *rop);
+    void (*set)(const struct __ctx_struct * ctx, void *rop, const void *op);
+    void (*set_si)(const struct __ctx_struct * ctx, void *rop, long op);
+    void (*swap)(const struct __ctx_struct * ctx, void *op1, void *op2);
+    void (*zero)(const struct __ctx_struct * ctx, void *rop);
+    void (*one)(const struct __ctx_struct * ctx, void *rop);
 
-    void (*randtest)(void *rop, flint_rand_t state);
-    void (*randtest_not_zero)(void *rop, flint_rand_t state);
+    void (*randtest)(const struct __ctx_struct * ctx, void *rop, flint_rand_t state);
+    void (*randtest_not_zero)(const struct __ctx_struct * ctx, void *rop, flint_rand_t state);
 
-    int (*equal)(const void *op1, const void *op2);
-    int (*is_zero)(const void *op);
-    int (*is_one)(const void *op);
+    int (*equal)(const struct __ctx_struct * ctx, const void *op1, const void *op2);
+    int (*is_zero)(const struct __ctx_struct * ctx, const void *op);
+    int (*is_one)(const struct __ctx_struct * ctx, const void *op);
 
-    void (*neg)(void *rop, const void *op);
+    void (*neg)(const struct __ctx_struct * ctx, void *rop, const void *op);
 
-    void (*add)(void *rop, const void *op1, const void *op2);
-    void (*sub)(void *rop, const void *op1, const void *op2);
-    void (*mul)(void *rop, const void *op1, const void *op2);
-    void (*div)(void *rop, const void *op1, const void *op2);
+    void (*add)(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2);
+    void (*sub)(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2);
+    void (*mul)(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2);
+    void (*div)(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2);
 
-    void (*derivative)(void *rop, const void *op);
+    void (*derivative)(const struct __ctx_struct * ctx, void *rop, const void *op);
 
-    int (*print)(const void *op);
-    char * (*get_str)(const void *op);
-    int (*set_str)(void *rop, const char * str);
+    int (*print)(const struct __ctx_struct * ctx, const void *op);
+    char * (*get_str)(const struct __ctx_struct * ctx, const void *op);
+    int (*set_str)(const struct __ctx_struct * ctx, void *rop, const char * str);
 
 } __ctx_struct;
 
@@ -53,14 +53,14 @@ typedef __ctx_struct ctx_t[1];
 
 /* long **********************************************************************/
 
-static void ld_init(void *op)
+static void ld_init(const struct __ctx_struct * ctx, void *op)
     { *(long *) op = 0; }
-static void ld_clear(void *op) { }
-static void ld_set(void *rop, const void *op)
+static void ld_clear(const struct __ctx_struct * ctx, void *op) { }
+static void ld_set(const struct __ctx_struct * ctx, void *rop, const void *op)
     { *(long *) rop = *(const long *) op; }
-static void ld_set_si(void *rop, long op)
+static void ld_set_si(const struct __ctx_struct * ctx, void *rop, long op)
     { *(long *) rop = op; }
-static void ld_swap(void *op1, void *op2)
+static void ld_swap(const struct __ctx_struct * ctx, void *op1, void *op2)
 {
     long t;
 
@@ -68,33 +68,33 @@ static void ld_swap(void *op1, void *op2)
     *(long *) op1 = *(long *) op2;
     *(long *) op2 = t;
 }
-static void ld_zero(void *rop)
+static void ld_zero(const struct __ctx_struct * ctx, void *rop)
     { *(long *) rop = 0; }
-static void ld_one(void *rop)
+static void ld_one(const struct __ctx_struct * ctx, void *rop)
     { *(long *) rop = 1; }
-static void ld_randtest(void *rop, flint_rand_t state)
+static void ld_randtest(const struct __ctx_struct * ctx, void *rop, flint_rand_t state)
     { *(long *) rop = z_randtest(state); }
-static void ld_randtest_not_zero(void *rop, flint_rand_t state)
+static void ld_randtest_not_zero(const struct __ctx_struct * ctx, void *rop, flint_rand_t state)
     { *(long *) rop = z_randtest_not_zero(state); }
-static int ld_equal(const void *op1, const void *op2)
+static int ld_equal(const struct __ctx_struct * ctx, const void *op1, const void *op2)
     { return *(long *) op1 == *(long *) op2; }
-static int ld_is_zero(const void *op)
+static int ld_is_zero(const struct __ctx_struct * ctx, const void *op)
     { return *(long *) op == 0; }
-static int ld_is_one(const void *op)
+static int ld_is_one(const struct __ctx_struct * ctx, const void *op)
     { return *(long *) op == 1; }
-static void ld_neg(void *rop, const void *op)
+static void ld_neg(const struct __ctx_struct * ctx, void *rop, const void *op)
     { *(long *) rop = - (*(long *) op); }
-static void ld_add(void *rop, const void *op1, const void *op2)
+static void ld_add(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
     { *(long *) rop = *(long *) op1 + *(long *) op2; }
-static void ld_sub(void *rop, const void *op1, const void *op2)
+static void ld_sub(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
     { *(long *) rop = *(long *) op1 - *(long *) op2; }
-static void ld_mul(void *rop, const void *op1, const void *op2)
+static void ld_mul(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
     { *(long *) rop = *(long *) op1 * *(long *) op2; }
-static void ld_div(void *rop, const void *op1, const void *op2)
+static void ld_div(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
     { *(long *) rop = *(long *) op1 / *(long *) op2; }
-static int ld_print(const void *op)
+static int ld_print(const struct __ctx_struct * ctx, const void *op)
     { return printf("%ld", *(long *) op); }
-static char * ld_get_str(const void *op)
+static char * ld_get_str(const struct __ctx_struct * ctx, const void *op)
 {
     char *s;
 
@@ -107,7 +107,7 @@ static char * ld_get_str(const void *op)
     sprintf(s, "%ld", *(long *) op);
     return s;
 }
-static int ld_set_str(void *rop, const char *str)
+static int ld_set_str(const struct __ctx_struct * ctx, void *rop, const char *str)
 {
     *(long *) rop = atoi(str);
     return 1;  /* TODO */
@@ -142,28 +142,28 @@ static void ctx_init_long(ctx_t ctx)
 
 /* mpq_t **********************************************************************/
 
-static void _mpq_init(void *op)
+static void _mpq_init(const struct __ctx_struct * ctx, void *op)
     { mpq_init(op); }
-static void _mpq_clear(void *op)
+static void _mpq_clear(const struct __ctx_struct * ctx, void *op)
     { mpq_clear(op); }
-static void _mpq_set(void *rop, const void *op)
+static void _mpq_set(const struct __ctx_struct * ctx, void *rop, const void *op)
     { mpq_set(rop, op); }
-static void _mpq_set_si(void *rop, long op)
+static void _mpq_set_si(const struct __ctx_struct * ctx, void *rop, long op)
     { mpq_set_si(rop, op, 1); }
-static void _mpq_swap(void *op1, void *op2)
+static void _mpq_swap(const struct __ctx_struct * ctx, void *op1, void *op2)
     { mpq_swap(op1, op2); }
-static void _mpq_zero(void *rop)
+static void _mpq_zero(const struct __ctx_struct * ctx, void *rop)
     { mpq_set_ui(rop, 0, 1); }
-static void _mpq_one(void *rop)
+static void _mpq_one(const struct __ctx_struct * ctx, void *rop)
     { mpq_set_ui(rop, 1, 1); }
-static void _mpq_randtest(void *rop, flint_rand_t state)
+static void _mpq_randtest(const struct __ctx_struct * ctx, void *rop, flint_rand_t state)
 {
     mpz_rrandomb(mpq_numref((__mpq_struct *) rop), (__gmp_randstate_struct *) state, FLINT_BITS);
     while (mpz_sgn(mpq_denref((__mpq_struct *) rop)) == 0)
         mpz_rrandomb(mpq_denref((__mpq_struct *) rop), (__gmp_randstate_struct *) state, FLINT_BITS);
     mpq_canonicalize(rop);
 }
-static void _mpq_randtest_not_zero(void *rop, flint_rand_t state)
+static void _mpq_randtest_not_zero(const struct __ctx_struct * ctx, void *rop, flint_rand_t state)
 {
     while (mpz_sgn(mpq_numref((__mpq_struct *) rop)) == 0)
         mpz_rrandomb(mpq_numref((__mpq_struct *) rop), (__gmp_randstate_struct *) state, FLINT_BITS);
@@ -171,27 +171,27 @@ static void _mpq_randtest_not_zero(void *rop, flint_rand_t state)
         mpz_rrandomb(mpq_denref((__mpq_struct *) rop), (__gmp_randstate_struct *) state, FLINT_BITS);
     mpq_canonicalize(rop);
 }
-static int _mpq_equal(const void *op1, const void *op2)
+static int _mpq_equal(const struct __ctx_struct * ctx, const void *op1, const void *op2)
     { return mpq_equal(op1, op2); }
-static int _mpq_is_zero(const void *op)
+static int _mpq_is_zero(const struct __ctx_struct * ctx, const void *op)
     { return mpq_sgn((__mpq_struct *) op) == 0; }
-static int _mpq_is_one(const void *op)
+static int _mpq_is_one(const struct __ctx_struct * ctx, const void *op)
     { return mpq_cmp_ui((__mpq_struct *) op, 1, 1) == 0; }
-static void _mpq_neg(void *rop, const void *op)
+static void _mpq_neg(const struct __ctx_struct * ctx, void *rop, const void *op)
     { mpq_neg(rop, op); }
-static void _mpq_add(void *rop, const void *op1, const void *op2)
+static void _mpq_add(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
     { mpq_add(rop, op1, op2); }
-static void _mpq_sub(void *rop, const void *op1, const void *op2)
+static void _mpq_sub(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
     { mpq_sub(rop, op1, op2); }
-static void _mpq_mul(void *rop, const void *op1, const void *op2)
+static void _mpq_mul(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
     { mpq_mul(rop, op1, op2); }
-static void _mpq_div(void *rop, const void *op1, const void *op2)
+static void _mpq_div(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
     { mpq_div(rop, op1, op2); }
-static int _mpq_print(const void *op)
+static int _mpq_print(const struct __ctx_struct * ctx, const void *op)
     { return gmp_printf("%Qd", op); }
-static char * _mpq_get_str(const void *op)
+static char * _mpq_get_str(const struct __ctx_struct * ctx, const void *op)
     { return mpq_get_str(NULL, 10, op); }
-static int _mpq_set_str(void *rop, const char *str)
+static int _mpq_set_str(const struct __ctx_struct * ctx, void *rop, const char *str)
     { return (mpq_set_str(rop, str, 10) == 0) ? 1 : 0; }
 
 static void ctx_init_mpq(ctx_t ctx)
@@ -223,60 +223,60 @@ static void ctx_init_mpq(ctx_t ctx)
 
 /* Rational functions ********************************************************/
 
-static void _fmpz_poly_q_init(void *rop)
+static void _fmpz_poly_q_init(const struct __ctx_struct * ctx, void *rop)
     { fmpz_poly_q_init(rop); }
-static void _fmpz_poly_q_clear(void *rop)
+static void _fmpz_poly_q_clear(const struct __ctx_struct * ctx, void *rop)
     { fmpz_poly_q_clear(rop); }
 
-static void _fmpz_poly_q_set(void *rop, const void *op)
+static void _fmpz_poly_q_set(const struct __ctx_struct * ctx, void *rop, const void *op)
     { fmpz_poly_q_set(rop, op); }
-static void _fmpz_poly_q_set_si(void *rop, long op)
+static void _fmpz_poly_q_set_si(const struct __ctx_struct * ctx, void *rop, long op)
     { fmpz_poly_q_set_si(rop, op); }
-static void _fmpz_poly_q_swap(void *op1, void *op2)
+static void _fmpz_poly_q_swap(const struct __ctx_struct * ctx, void *op1, void *op2)
     { fmpz_poly_q_swap(op1, op2); }
-static void _fmpz_poly_q_zero(void *rop)
+static void _fmpz_poly_q_zero(const struct __ctx_struct * ctx, void *rop)
     { fmpz_poly_q_zero(rop); }
-static void _fmpz_poly_q_one(void *rop)
+static void _fmpz_poly_q_one(const struct __ctx_struct * ctx, void *rop)
     { fmpz_poly_q_one(rop); }
 
-static void _fmpz_poly_q_randtest(void *rop, flint_rand_t state)
+static void _fmpz_poly_q_randtest(const struct __ctx_struct * ctx, void *rop, flint_rand_t state)
 {
     fmpz_poly_q_randtest(rop, state, n_randint(state, 50), 80, 
                                      n_randint(state, 49) + 1, 80);
 }
-static void _fmpz_poly_q_randtest_not_zero(void *rop, flint_rand_t state)
+static void _fmpz_poly_q_randtest_not_zero(const struct __ctx_struct * ctx, void *rop, flint_rand_t state)
 {
     fmpz_poly_q_randtest_not_zero(rop, state, n_randint(state, 49) + 1, 80, 
                                               n_randint(state, 49) + 1, 80);
 }
 
-static int _fmpz_poly_q_equal(const void *op1, const void *op2)
+static int _fmpz_poly_q_equal(const struct __ctx_struct * ctx, const void *op1, const void *op2)
     { return fmpz_poly_q_equal(op1, op2); }
-static int _fmpz_poly_q_is_zero(const void *op)
+static int _fmpz_poly_q_is_zero(const struct __ctx_struct * ctx, const void *op)
     { return fmpz_poly_q_is_zero(op); }
-static int _fmpz_poly_q_is_one(const void *op)
+static int _fmpz_poly_q_is_one(const struct __ctx_struct * ctx, const void *op)
     { return fmpz_poly_q_is_one(op); }
 
-static void _fmpz_poly_q_neg(void *rop, const void *op)
+static void _fmpz_poly_q_neg(const struct __ctx_struct * ctx, void *rop, const void *op)
     { fmpz_poly_q_neg(rop, op); }
 
-static void _fmpz_poly_q_add(void *rop, const void *op1, const void *op2)
+static void _fmpz_poly_q_add(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
     { fmpz_poly_q_add(rop, op1, op2); }
-static void _fmpz_poly_q_sub(void *rop, const void *op1, const void *op2)
+static void _fmpz_poly_q_sub(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
     { fmpz_poly_q_sub(rop, op1, op2); }
-static void _fmpz_poly_q_mul(void *rop, const void *op1, const void *op2)
+static void _fmpz_poly_q_mul(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
     { fmpz_poly_q_mul(rop, op1, op2); }
-static void _fmpz_poly_q_div(void *rop, const void *op1, const void *op2)
+static void _fmpz_poly_q_div(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
     { fmpz_poly_q_div(rop, op1, op2); }
 
-static void _fmpz_poly_q_derivative(void *rop, const void *op)
+static void _fmpz_poly_q_derivative(const struct __ctx_struct * ctx, void *rop, const void *op)
     { fmpz_poly_q_derivative(rop, op); }
 
-static int _fmpz_poly_q_print(const void *op)
+static int _fmpz_poly_q_print(const struct __ctx_struct * ctx, const void *op)
     { return fmpz_poly_q_print(op); }
-static char * _fmpz_poly_q_get_str(const void *op)
+static char * _fmpz_poly_q_get_str(const struct __ctx_struct * ctx, const void *op)
     { return fmpz_poly_q_get_str(op); }
-static int _fmpz_poly_q_set_str(void *rop, const char *str)
+static int _fmpz_poly_q_set_str(const struct __ctx_struct * ctx, void *rop, const char *str)
     { return fmpz_poly_q_set_str(rop, str); }
 
 static void ctx_init_fmpz_poly_q(ctx_t ctx)

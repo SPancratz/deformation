@@ -84,7 +84,7 @@ main(void)
             _vec_randtest(x, 1, state, ctx);
             _vec_randtest(y, 1, state, ctx);
 
-            ctx->mul(z, x, y);
+            ctx->mul(ctx, z, x, y);
             _vec_scalar_mul(C, A, n, z, ctx);
 
             _vec_scalar_mul(B, A, n, y, ctx);

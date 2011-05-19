@@ -30,15 +30,15 @@ void mpoly_randhom(mpoly_t rop, flint_rand_t state, long d, long N,
         }
 
         c1 = malloc(ctx->size);
-        ctx->init(c1);
-        ctx->randtest_not_zero(c1, state);
+        ctx->init(ctx, c1);
+        ctx->randtest_not_zero(ctx, c1, state);
 
         ins = RBTREE_INSERT(mpoly, &m2, &c2, rop->dict, m1, c1, &mon_cmp);
 
         if (ins)
         {
             mon_clear(m2);
-            ctx->clear(c2);
+            ctx->clear(ctx, c2);
             free(c2);
         }
     }

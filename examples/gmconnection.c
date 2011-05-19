@@ -20,7 +20,7 @@ int _gmc_mat_print(char ** const rows, long m, long n, const ctx_t ctx)
         printf("[");
         for (j = 0; j < n; j++)
         {
-            ctx->print(rows[i] + j * ctx->size);
+            ctx->print(ctx, rows[i] + j * ctx->size);
             if (j != n - 1)
                 printf(" ");
         }

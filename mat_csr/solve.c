@@ -52,8 +52,8 @@ void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b,
 
                 if (i1 <= j && j < i2)
                 {
-                    ctx->mul(t, s->x + q * ctx->size, x + j * ctx->size);
-                    ctx->sub(c + i * ctx->size, c + i * ctx->size, t);
+                    ctx->mul(ctx, t, s->x + q * ctx->size, x + j * ctx->size);
+                    ctx->sub(ctx, c + i * ctx->size, c + i * ctx->size, t);
                 }
             }
         }

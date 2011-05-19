@@ -40,9 +40,9 @@ void mpoly_derivative(mpoly_t rop, const mpoly_t op, int var,
             void *c2;
 
             c = malloc(ctx->size);
-            ctx->init(c);
-            ctx->set_si(c, deg);
-            ctx->mul(c, c, t->val);
+            ctx->init(ctx, c);
+            ctx->set_si(ctx, c, deg);
+            ctx->mul(ctx, c, c, t->val);
 
             mon_set_exp(m, var, deg - 1);
 

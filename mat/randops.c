@@ -26,12 +26,12 @@ void mat_randops(mat_t mat, flint_rand_t state, long count,
                 continue;
             if (n_randint(state, 2))
                 for (k = 0; k < n; k++)
-                    ctx->add(mat_entry(mat, j, k, ctx), 
+                    ctx->add(ctx, mat_entry(mat, j, k, ctx), 
                              mat_entry(mat, j, k, ctx), 
                              mat_entry(mat, i, k, ctx));
             else
                 for (k = 0; k < n; k++)
-                    ctx->sub(mat_entry(mat, j, k, ctx), 
+                    ctx->sub(ctx, mat_entry(mat, j, k, ctx), 
                              mat_entry(mat, j, k, ctx), 
                              mat_entry(mat, i, k, ctx));
         }
@@ -41,12 +41,12 @@ void mat_randops(mat_t mat, flint_rand_t state, long count,
                 continue;
             if (n_randint(state, 2))
                 for (k = 0; k < m; k++)
-                    ctx->add(mat_entry(mat, k, j, ctx), 
+                    ctx->add(ctx, mat_entry(mat, k, j, ctx), 
                              mat_entry(mat, k, j, ctx), 
                              mat_entry(mat, k, i, ctx));
             else
                 for (k = 0; k < m; k++)
-                    ctx->sub(mat_entry(mat, k, j, ctx), 
+                    ctx->sub(ctx, mat_entry(mat, k, j, ctx), 
                              mat_entry(mat, k, j, ctx), 
                              mat_entry(mat, k, i, ctx));
         }
