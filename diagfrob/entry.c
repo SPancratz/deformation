@@ -9,11 +9,14 @@
     (-1)^{u'+v'} \frac{(v'-1)!}{(u'-1)!} p^n \alpha_{u+1,v+1}^{-1}.
     \end{equation*}
 
+    Expects \code{bound} to be a lower bound for the valuations 
+    of the entries in the matrix $p^{-1} F$.
+
     The entry is computed modulo $p^N$.
  */
 void 
 diagfrob_entry(padic_t rop, const fmpz *a, long n, long d, 
-               const mon_t u, const mon_t v, 
+               const mon_t u, const mon_t v, long bound, 
                const padic_ctx_t ctx)
 {
     mon_t up1, vp1;       /* u + 1, v + 1 */
@@ -60,15 +63,16 @@ diagfrob_entry(padic_t rop, const fmpz *a, long n, long d,
 
     /* Update the precision */
     N1 = ctx->N - e;
-    N2 = N1 + 2 * ctx->N;  /* TODO.  Use a better bound! */
+    N2 = ctx->N + e - 2 * bound;
 
     padic_ctx_init(ctx2, ctx->p, N2, PADIC_SERIES);
 
     /* Set rop to alpha_{u+1,v+1}^{-1} */
     diagfrob_alpha(rop, a, n, d, up1, vp1, ctx2);
+
+    _padic_inv(rop, rop, ctx->p, N1 + rop[1]);
     e -= rop[1];
     rop[1] = 0;
-    _padic_inv(rop, rop, ctx->p, N1);
 
     /* Compute final product */
     {

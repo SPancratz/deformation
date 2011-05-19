@@ -41,11 +41,11 @@ void diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
                     const padic_ctx_t ctx);
 
 void diagfrob_entry_mpq(mpq_t rop, const fmpz *a, long n, long d, 
-                        const mon_t u, const mon_t v, 
+                        const mon_t u, const mon_t v, long bound, 
                         const padic_ctx_t ctx);
 
 void diagfrob_entry(padic_t rop, const fmpz *a, long n, long d, 
-                    const mon_t u, const mon_t v, 
+                    const mon_t u, const mon_t v, long bound, 
                     const padic_ctx_t ctx);
 
 #endif

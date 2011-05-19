@@ -8,18 +8,23 @@
     (-1)^{u'+v'} \frac{(v'-1)!}{(u'-1)!} p^n \alpha_{u+1,v+1}^{-1}.
     \end{equation*}
 
+    Expects \code{bound} to be a lower bound for the valuations 
+    of the entries in the matrix $p^{-1} F$.
+
     The entry is computed modulo $p^N$.
  */
 void 
 diagfrob_entry_mpq(mpq_t rop, const fmpz *a, long n, long d, 
-                   const mon_t u, const mon_t v, 
+                   const mon_t u, const mon_t v, long bound, 
                    const padic_ctx_t ctx)
 {
-    long i;
+    long i, e;
     long up, vp;
     mon_t up1, vp1;
     mpq_t x;
     mpz_t y;
+    mpz_t pmpz;
+    padic_ctx_t ctx2;
     
     const long p = *(ctx->p);
     
@@ -43,24 +48,10 @@ diagfrob_entry_mpq(mpq_t rop, const fmpz *a, long n, long d,
     
     mpq_init(x);
     mpz_init(y);
+    mpz_init_set_ui(pmpz, p);
     
     up = ((long) mon_degree(u) + (n + 1)) / d;
     vp = ((long) mon_degree(v) + (n + 1)) / d;
-    
-    /* Set rop to alpha_{u+1,v+1}^{-1} */
-    diagfrob_alpha_mpq(rop, a, n, d, up1, vp1, ctx);
-    if (mpq_sgn(rop) == 0)
-    {
-        printf("ERROR (diagfrob_entry).  Found a zero value of alpha.\n");
-        abort();
-    }
-    mpq_inv(rop, rop);
-    
-    /* Multiply by p^n */
-    mpz_set_si(y, p);
-    mpz_pow_ui(y, y, n);
-    mpz_mul(mpq_numref(rop), mpq_numref(rop), y);
-    mpq_canonicalize(rop);
     
     /* Multiply by (-1)^{u'+v'} (v'-1)! / (u'-1)! */
     mpz_fac_ui(mpq_numref(x), vp - 1 <= 0 ? 1 : vp - 1);
@@ -70,11 +61,47 @@ diagfrob_entry_mpq(mpq_t rop, const fmpz *a, long n, long d,
     {
         mpz_neg(mpq_numref(x), mpq_numref(x));
     }
-    mpq_mul(rop, x, rop);
-    
+
+    /* Multiply by p^n */
+    mpz_set_ui(y, p);
+    mpz_pow_ui(y, y, n);
+    mpz_mul(mpq_numref(rop), mpq_numref(x), y);
+    mpz_set(mpq_denref(rop), mpq_denref(x));
+    mpq_canonicalize(rop);
+
+    e  = mpz_remove(mpq_numref(rop), mpq_numref(rop), pmpz);
+    e -= mpz_remove(mpq_denref(rop), mpq_denref(rop), pmpz);
+
+    padic_ctx_init(ctx2, ctx->p, ctx->N + e - 2 * bound, PADIC_SERIES);
+
+    /* Set rop to alpha_{u+1,v+1}^{-1} */
+    diagfrob_alpha_mpq(x, a, n, d, up1, vp1, ctx2);
+    if (mpq_sgn(x) == 0)
+    {
+        printf("ERROR (diagfrob_entry).  Found a zero value of alpha.\n");
+        abort();
+    }
+    mpq_inv(x, x);
+    mpq_mul(rop, rop, x);
+
+    if (e > 0)
+    {
+        mpz_pow_ui(y, pmpz, e);
+        mpz_mul(mpq_numref(rop), mpq_numref(rop), y);
+        mpq_canonicalize(rop);
+    }
+    else if (e < 0)
+    {
+        mpz_pow_ui(y, pmpz, -e);
+        mpz_mul(mpq_denref(rop), mpq_denref(rop), y);
+        mpq_canonicalize(rop);
+    }
+
     mon_clear(up1);
     mon_clear(vp1);
     mpq_clear(x);
     mpz_clear(y);
+    mpz_clear(pmpz);
+    padic_ctx_clear(ctx2);
 }
 

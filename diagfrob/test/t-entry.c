@@ -13,8 +13,6 @@
 #include "gmconnection.h"
 #include "diagfrob.h"
 
-#define DEBUG  0
-
 /*
     Computes the entries in the Frobenius matrix of a 
     diagonal hypersurface using both rational and $p$-adic 
@@ -55,21 +53,13 @@ int main(void)
             prime = n_randprime(state, 5, 1);
         while (d % prime == 0);
         fmpz_set_ui(p, prime);
-        N = n_randint(state, 100) + 1;
+        N = n_randint(state, 50) + 1;
 
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         a = _fmpz_vec_init(n + 1);
         for (j = 0; j <= n; j++)
             fmpz_set_ui(a + j, n_randint(state, prime - 1) + 1);
-
-        if (DEBUG)
-        {
-            printf("  Test case (p = %ld, d = %ld, n = %ld)\n", prime, d, n);
-            printf("    a = {");
-            _fmpz_vec_print(a, n + 1);
-            printf("}\n");
-        }
 
         F1 = (mpq_t *) malloc(lenB * lenB * sizeof(mpq_t));
         F2 = (padic_t *) malloc(lenB * lenB * sizeof(padic_t));
@@ -85,8 +75,8 @@ int main(void)
         {
             for (v = 0; v < lenB; v++)
             {
-                diagfrob_entry_mpq(F1[u*lenB + v], a, n, d, B[u], B[v], ctx);
-                diagfrob_entry(F2[u*lenB + v], a, n, d, B[u], B[v], ctx);
+                diagfrob_entry_mpq(F1[u*lenB + v], a, n, d, B[u], B[v], -5, ctx);
+                diagfrob_entry(F2[u*lenB + v], a, n, d, B[u], B[v], -5, ctx);
                 padic_set_mpq(F3[u*lenB + v], F1[u*lenB + v], ctx);
 
                 result = (padic_equal(F2[u*lenB + v], F3[u*lenB + v], ctx));
