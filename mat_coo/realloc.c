@@ -1,6 +1,6 @@
 #include "mat_coo.h"
 
-void mat_coo_realloc(mat_coo_t A, long alloc, const mat_ctx_t ctx)
+void mat_coo_realloc(mat_coo_t A, long alloc, const ctx_t ctx)
 {
     long k, u = 2 * sizeof(long) + ctx->size;
 

@@ -3,7 +3,7 @@
 
 #include "vec.h"
 
-char * _vec_init(long n, const mat_ctx_t ctx)
+char * _vec_init(long n, const ctx_t ctx)
 {
     char *vec;
     long i;

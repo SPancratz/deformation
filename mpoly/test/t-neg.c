@@ -13,14 +13,14 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    mat_ctx_t ctx;
+    ctx_t ctx;
 
     printf("neg... ");
     fflush(stdout);
 
     flint_randinit(state);
 
-    mat_ctx_init_mpq(ctx);
+    ctx_init_mpq(ctx);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 1000; i++)

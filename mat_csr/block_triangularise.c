@@ -173,7 +173,7 @@ long _mat_csr_block_triangularise(long *arp, long *b, long n, const long *j,
 }
 
 long mat_csr_block_triangularise(long *pi, long *b, const mat_csr_t A, 
-                                                    const mat_ctx_t ctx)
+                                                    const ctx_t ctx)
 {
     long blocks, *w;
 

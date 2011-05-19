@@ -1,7 +1,7 @@
 #include "mpoly.h"
 
 void mpoly_get_coeff(void *rop, const mpoly_t op, const mon_t m, 
-                     const mat_ctx_t ctx)
+                     const ctx_t ctx)
 {
     int find;
     mon_t m2;

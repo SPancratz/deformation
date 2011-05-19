@@ -13,17 +13,17 @@ main(void)
     flint_rand_t state;
 
     int c;
-    __mat_ctx_struct *ctx;
-    mat_ctx_t *CTX;
+    __ctx_struct *ctx;
+    ctx_t *CTX;
 
     printf("set_mat... ");
     fflush(stdout);
 
     flint_randinit(state);
 
-    CTX = malloc(2 * sizeof(mat_ctx_t));
-    mat_ctx_init_long(CTX[0]);
-    mat_ctx_init_mpq(CTX[1]);
+    CTX = malloc(2 * sizeof(ctx_t));
+    ctx_init_long(CTX[0]);
+    ctx_init_mpq(CTX[1]);
 
     for (c = 0; c < 2; c++)
     {
@@ -51,8 +51,8 @@ main(void)
         }
     }
 
-    mat_ctx_clear(CTX[0]);
-    mat_ctx_clear(CTX[1]);
+    ctx_clear(CTX[0]);
+    ctx_clear(CTX[1]);
     free(CTX);
 
     flint_randclear(state);

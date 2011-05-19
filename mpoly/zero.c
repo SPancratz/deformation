@@ -1,6 +1,6 @@
 #include "mpoly.h"
 
-void mpoly_zero(mpoly_t rop, const mat_ctx_t ctx)
+void mpoly_zero(mpoly_t rop, const ctx_t ctx)
 {
     mpoly_iter_t iter;
     mpoly_term t;

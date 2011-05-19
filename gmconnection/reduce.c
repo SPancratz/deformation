@@ -31,7 +31,7 @@ void gmc_reduce(mpoly_t *R,
                 mat_csr_solve_t *s, 
                 mon_t **rows, mon_t **cols, long **p, 
                 long l, long u, 
-                const mat_ctx_t ctx)
+                const ctx_t ctx)
 {
     long i;
     long n;

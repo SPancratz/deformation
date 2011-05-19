@@ -1,6 +1,6 @@
 #include "vec.h"
 
-void _vec_set(char *vec1, const char *vec2, long n, const mat_ctx_t ctx)
+void _vec_set(char *vec1, const char *vec2, long n, const ctx_t ctx)
 {
     long i;
 

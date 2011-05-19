@@ -1,6 +1,6 @@
 #include "mat_csr.h"
 
-void mat_csr_realloc(mat_csr_t A, long alloc, const mat_ctx_t ctx)
+void mat_csr_realloc(mat_csr_t A, long alloc, const ctx_t ctx)
 {
     long k;
 

@@ -4,7 +4,7 @@
 #include "mat_csr.h"
 
 static 
-void _mat_csr_sort_row(char *x, long *j, long len, const mat_ctx_t ctx)
+void _mat_csr_sort_row(char *x, long *j, long len, const ctx_t ctx)
 {
     long i, k, key;
     char *y;
@@ -37,7 +37,7 @@ void _mat_csr_sort_row(char *x, long *j, long len, const mat_ctx_t ctx)
 }
 
 void _mat_csr_sort_rows(long m, char *x, long *j, long *p, long *lenr, 
-                        const mat_ctx_t ctx)
+                        const ctx_t ctx)
 {
     long i;
 
@@ -45,7 +45,7 @@ void _mat_csr_sort_rows(long m, char *x, long *j, long *p, long *lenr,
         _mat_csr_sort_row(x + p[i] * ctx->size, j + p[i], lenr[i], ctx);
 }
 
-void mat_csr_sort_rows(mat_csr_t A, const mat_ctx_t ctx)
+void mat_csr_sort_rows(mat_csr_t A, const ctx_t ctx)
 {
     _mat_csr_sort_rows(A->m, A->x, A->j, A->p, A->lenr, ctx);
 }

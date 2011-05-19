@@ -1,6 +1,6 @@
 #include "mat_csr.h"
 
-int mat_csr_is_zero(const mat_csr_t A, const mat_ctx_t ctx)
+int mat_csr_is_zero(const mat_csr_t A, const ctx_t ctx)
 {
     long i;
 

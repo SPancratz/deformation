@@ -4,7 +4,7 @@
 
 #include "vec.h"
 
-int _vec_print(const char *vec, long n, const mat_ctx_t ctx)
+int _vec_print(const char *vec, long n, const ctx_t ctx)
 {
     assert(n >= 0);
 

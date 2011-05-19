@@ -1,6 +1,6 @@
 #include "mat.h"
 
-void mat_zero(mat_t mat, const mat_ctx_t ctx)
+void mat_zero(mat_t mat, const ctx_t ctx)
 {
     long i;
 

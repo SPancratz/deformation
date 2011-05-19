@@ -1,6 +1,6 @@
 #include "mpoly.h"
 
-void mpoly_init(mpoly_t rop, long n, const mat_ctx_t ctx)
+void mpoly_init(mpoly_t rop, long n, const ctx_t ctx)
 {
     if (!(1 <= n && n <= 8))
     {

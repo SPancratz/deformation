@@ -1,6 +1,6 @@
 #include "gmconnection.h"
 
-void gmc_derivatives(mpoly_t *D, const mpoly_t P, const mat_ctx_t ctx)
+void gmc_derivatives(mpoly_t *D, const mpoly_t P, const ctx_t ctx)
 {
     long i;
 

@@ -13,14 +13,14 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    mat_ctx_t ctx;
+    ctx_t ctx;
 
     printf("all... ");
     fflush(stdout);
 
     flint_randinit(state);
 
-    mat_ctx_init_long(ctx);
+    ctx_init_long(ctx);
     {
         mpoly_t a;
 
@@ -34,7 +34,7 @@ main(void)
         printf("a = "), mpoly_print(a, ctx), printf("\n");
         mpoly_clear(a, ctx);
     }
-    mat_ctx_clear(ctx);
+    ctx_clear(ctx);
 
     printf("... ");
 

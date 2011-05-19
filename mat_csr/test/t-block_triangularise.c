@@ -41,11 +41,11 @@ main(void)
     {
         long m, n;
         mat_csr_t A;
-        mat_ctx_t ctx;
+        ctx_t ctx;
 
         long *P, *Q, *B, nz, b;
 
-        mat_ctx_init_long(ctx);
+        ctx_init_long(ctx);
         m = n = 10;
 
         P = malloc(n * sizeof(long));
@@ -83,7 +83,7 @@ main(void)
         free(B);
 
         mat_csr_clear(A, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
     printf("... ");
 
@@ -91,11 +91,11 @@ main(void)
     {
         long m, n;
         mat_csr_t A;
-        mat_ctx_t ctx;
+        ctx_t ctx;
 
         long *P, *Q, *B, nz, b;
 
-        mat_ctx_init_long(ctx);
+        ctx_init_long(ctx);
         m = n = 100;
 
         P = malloc(n * sizeof(long));
@@ -126,7 +126,7 @@ main(void)
         free(B);
 
         mat_csr_clear(A, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     flint_randclear(state);

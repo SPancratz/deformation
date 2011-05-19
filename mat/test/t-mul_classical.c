@@ -21,13 +21,13 @@ main(void)
     for (i = 0; i < 100; i++)
     {
         long m, n;
-        mat_ctx_t ctx;
+        ctx_t ctx;
         mat_t A, B, C, D;
 
         m = n_randint(state, 50) + 1;
         n = m;
 
-        mat_ctx_init_long(ctx);
+        ctx_init_long(ctx);
         mat_init(A, m, n, ctx);
         mat_init(B, m, n, ctx);
         mat_init(C, m, n, ctx);
@@ -55,20 +55,20 @@ main(void)
         mat_clear(B, ctx);
         mat_clear(C, ctx);
         mat_clear(D, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     /* Managed element type (mpq_t) */
     for (i = 0; i < 100; i++)
     {
         long m, n;
-        mat_ctx_t ctx;
+        ctx_t ctx;
         mat_t A, B, C, D;
 
         m = n_randint(state, 50) + 1;
         n = m;
 
-        mat_ctx_init_mpq(ctx);
+        ctx_init_mpq(ctx);
         mat_init(A, m, n, ctx);
         mat_init(B, m, n, ctx);
         mat_init(C, m, n, ctx);
@@ -96,7 +96,7 @@ main(void)
         mat_clear(B, ctx);
         mat_clear(C, ctx);
         mat_clear(D, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     /* Check that A * (B + C) == A * B + A * C */
@@ -105,14 +105,14 @@ main(void)
     for (i = 0; i < 100; i++)
     {
         long ell, m, n;
-        mat_ctx_t ctx;
+        ctx_t ctx;
         mat_t A, B, C, D, E, T1, T2;
 
         ell = n_randint(state, 50) + 1;
         m   = n_randint(state, 50) + 1;
         n   = n_randint(state, 50) + 1;
 
-        mat_ctx_init_long(ctx);
+        ctx_init_long(ctx);
         mat_init(A, ell, m, ctx);
         mat_init(B, m, n, ctx);
         mat_init(C, m, n, ctx);
@@ -154,21 +154,21 @@ main(void)
         mat_clear(E, ctx);
         mat_clear(T1, ctx);
         mat_clear(T2, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     /* Managed element type (mpq) */
     for (i = 0; i < 100; i++)
     {
         long ell, m, n;
-        mat_ctx_t ctx;
+        ctx_t ctx;
         mat_t A, B, C, D, E, T1, T2;
 
         ell = n_randint(state, 50) + 1;
         m   = n_randint(state, 50) + 1;
         n   = n_randint(state, 50) + 1;
 
-        mat_ctx_init_mpq(ctx);
+        ctx_init_mpq(ctx);
         mat_init(A, ell, m, ctx);
         mat_init(B, m, n, ctx);
         mat_init(C, m, n, ctx);
@@ -210,7 +210,7 @@ main(void)
         mat_clear(E, ctx);
         mat_clear(T1, ctx);
         mat_clear(T2, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     flint_randclear(state);

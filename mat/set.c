@@ -2,7 +2,7 @@
 
 #include "mat.h"
 
-void mat_set(mat_t mat1, const mat_t mat2, const mat_ctx_t ctx)
+void mat_set(mat_t mat1, const mat_t mat2, const ctx_t ctx)
 {
     assert(mat1->m == mat2->m && mat1->n == mat2->n);
 

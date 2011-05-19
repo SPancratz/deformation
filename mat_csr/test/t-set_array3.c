@@ -19,13 +19,13 @@ main(void)
         Run a single example
      */
     {
-        mat_ctx_t ctx;
+        ctx_t ctx;
         mat_csr_t A;
 
         char *mem;
         long k, len, u;
 
-        mat_ctx_init_long(ctx);
+        ctx_init_long(ctx);
 
         u   = 2 * sizeof(long) + ctx->size;
         len = 6;
@@ -72,7 +72,7 @@ main(void)
 
         free(mem);
         mat_csr_clear(A, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
     printf("... ");
 

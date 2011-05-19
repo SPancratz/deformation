@@ -85,7 +85,7 @@ static mon_t mpoly_mon_set_str(const char * str, int n)
     return rop;
 }
 
-int mpoly_set_str(mpoly_t rop, const char * str, const mat_ctx_t ctx)
+int mpoly_set_str(mpoly_t rop, const char * str, const ctx_t ctx)
 {
     int i, j, n, num;
     const size_t len = strlen(str);

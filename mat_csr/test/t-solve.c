@@ -23,7 +23,7 @@ main(void)
     for (i = 0; i < 100; i++)
     {
         long m;
-        mat_ctx_t ctx;
+        ctx_t ctx;
         mat_csr_t A;
         mat_csr_solve_t S;
         mat_t B;
@@ -31,7 +31,7 @@ main(void)
 
         m = n_randint(state, 100) + 1;
 
-        mat_ctx_init_mpq(ctx);
+        ctx_init_mpq(ctx);
         mat_init(B, m, m, ctx);
 
         mat_randrank(B, state, m, ctx);
@@ -69,7 +69,7 @@ main(void)
         mat_csr_clear(A, ctx);
         mat_csr_solve_clear(S, ctx);
         mat_clear(B, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     flint_randclear(state);

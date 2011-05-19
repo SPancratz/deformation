@@ -11,16 +11,16 @@ main(void)
     flint_rand_t state;
 
     int c;
-    __mat_ctx_struct *ctx;
-    mat_ctx_t *CTX;
+    __ctx_struct *ctx;
+    ctx_t *CTX;
 
     printf("scalar_div... ");
     fflush(stdout);
 
     flint_randinit(state);
 
-    CTX = malloc(1 * sizeof(mat_ctx_t));
-    mat_ctx_init_mpq(CTX[0]);
+    CTX = malloc(1 * sizeof(ctx_t));
+    ctx_init_mpq(CTX[0]);
 
     for (c = 0; c < 1; c++)
     {
@@ -107,7 +107,7 @@ main(void)
 
     }
 
-    mat_ctx_clear(CTX[0]);
+    ctx_clear(CTX[0]);
     free(CTX);
 
     flint_randclear(state);

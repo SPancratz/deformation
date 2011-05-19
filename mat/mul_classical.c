@@ -2,7 +2,7 @@
 
 void _mat_mul_classical(char **rowsC, 
                               char ** const rowsA, char ** const rowsB, 
-                              long ell, long m, long n, const mat_ctx_t ctx)
+                              long ell, long m, long n, const ctx_t ctx)
 {
     long i, j, k;
     char *x, *y;
@@ -28,7 +28,7 @@ void _mat_mul_classical(char **rowsC,
 }
 
 void mat_mul_classical(mat_t C, const mat_t A, 
-                             const mat_t B, const mat_ctx_t ctx)
+                             const mat_t B, const ctx_t ctx)
 {
     if (!(C->m == A->m && A->n == B->m && B->n == C->n))
     {

@@ -5,7 +5,7 @@ void gmc_decompose_poly(mpoly_t * A, const mpoly_t poly,
                         mon_t * const rows, 
                         mon_t * const cols, 
                         long * const p, 
-                        const mat_ctx_t ctx)
+                        const ctx_t ctx)
 {
     char *x, *b;
     long j, var;

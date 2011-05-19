@@ -1,6 +1,6 @@
 #include "mat.h"
 
-int mat_is_one(const mat_t mat, const mat_ctx_t ctx)
+int mat_is_one(const mat_t mat, const ctx_t ctx)
 {
     long i, j;
 

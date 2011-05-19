@@ -2,7 +2,7 @@
 #include "vec.h"
 
 int 
-_mat_lup_decompose(long *pi, char **rows, long m, const mat_ctx_t ctx)
+_mat_lup_decompose(long *pi, char **rows, long m, const ctx_t ctx)
 {
     long i, j, k, t;
     char *p, *x;
@@ -82,7 +82,7 @@ _mat_lup_decompose(long *pi, char **rows, long m, const mat_ctx_t ctx)
 }
 
 int mat_lup_decompose(mat_t out, long *pi, const mat_t mat, 
-                            const mat_ctx_t ctx)
+                            const ctx_t ctx)
 {
     if (!(mat->m == out->m && mat->n && out->n && mat->m == mat->n))
     {

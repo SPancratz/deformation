@@ -17,14 +17,14 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    mat_ctx_t ctx;
+    ctx_t ctx;
 
     printf("array2poly... ");
     fflush(stdout);
 
     flint_randinit(state);
 
-    mat_ctx_init_fmpz_poly_q(ctx);
+    ctx_init_fmpz_poly_q(ctx);
 
     printf("[");
     for (i = 0; i < RUNS; i++)
@@ -82,7 +82,7 @@ main(void)
     }
     printf("] ");
 
-    mat_ctx_clear(ctx);
+    ctx_clear(ctx);
 
     flint_randclear(state);
     _fmpz_cleanup();

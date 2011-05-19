@@ -45,9 +45,9 @@ typedef struct
     char * (*get_str)(const void *op);
     int (*set_str)(void *rop, const char * str);
 
-} __mat_ctx_struct;
+} __ctx_struct;
 
-typedef __mat_ctx_struct mat_ctx_t[1];
+typedef __ctx_struct ctx_t[1];
 
 /* Predefined contexts *******************************************************/
 
@@ -113,7 +113,7 @@ static int ld_set_str(void *rop, const char *str)
     return 1;  /* TODO */
 }
 
-static void mat_ctx_init_long(mat_ctx_t ctx)
+static void ctx_init_long(ctx_t ctx)
 {
     ctx->size              = sizeof(long);
 
@@ -194,7 +194,7 @@ static char * _mpq_get_str(const void *op)
 static int _mpq_set_str(void *rop, const char *str)
     { return (mpq_set_str(rop, str, 10) == 0) ? 1 : 0; }
 
-static void mat_ctx_init_mpq(mat_ctx_t ctx)
+static void ctx_init_mpq(ctx_t ctx)
 {
     ctx->size              = sizeof(__mpq_struct);
 
@@ -279,7 +279,7 @@ static char * _fmpz_poly_q_get_str(const void *op)
 static int _fmpz_poly_q_set_str(void *rop, const char *str)
     { return fmpz_poly_q_set_str(rop, str); }
 
-static void mat_ctx_init_fmpz_poly_q(mat_ctx_t ctx)
+static void ctx_init_fmpz_poly_q(ctx_t ctx)
 {
     ctx->size              = sizeof(fmpz_poly_q_struct);
 
@@ -306,7 +306,7 @@ static void mat_ctx_init_fmpz_poly_q(mat_ctx_t ctx)
     ctx->set_str           = &_fmpz_poly_q_set_str;
 }
 
-static void mat_ctx_clear(mat_ctx_t ctx)
+static void ctx_clear(ctx_t ctx)
     { }
 
 #endif

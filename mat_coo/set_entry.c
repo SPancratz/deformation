@@ -4,7 +4,7 @@
 
 void 
 mat_coo_set_entry(mat_coo_t A, long i, long j, const void *x, 
-                  const mat_ctx_t ctx)
+                  const ctx_t ctx)
 {
     long k, u = 2 * sizeof(long) + ctx->size;
 

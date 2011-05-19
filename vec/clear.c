@@ -3,7 +3,7 @@
 
 #include "vec.h"
 
-void _vec_clear(char *vec, long n, const mat_ctx_t ctx)
+void _vec_clear(char *vec, long n, const ctx_t ctx)
 {
     long i;
 

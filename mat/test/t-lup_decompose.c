@@ -21,7 +21,7 @@ main(void)
     for (i = 0; i < 100; i++)
     {
         long m, n;
-        mat_ctx_t ctx;
+        ctx_t ctx;
         mat_t A, L, U, T;
         long i, j;
         long *pi;
@@ -31,7 +31,7 @@ main(void)
 
         pi = malloc(m * sizeof(long));
 
-        mat_ctx_init_mpq(ctx);
+        ctx_init_mpq(ctx);
         mat_init(A, m, n, ctx);
         mat_init(L, m, n, ctx);
         mat_init(U, m, n, ctx);
@@ -76,7 +76,7 @@ main(void)
         mat_clear(L, ctx);
         mat_clear(U, ctx);
         mat_clear(T, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     flint_randclear(state);

@@ -27,7 +27,7 @@ void _mat_csr_permute_rows(long m, long *p, long *lenr, const long *pi)
     free(v);
 }
 
-void mat_csr_permute_rows(mat_csr_t A, const long *pi, const mat_ctx_t ctx)
+void mat_csr_permute_rows(mat_csr_t A, const long *pi, const ctx_t ctx)
 {
     _mat_csr_permute_rows(A->m, A->p, A->lenr, pi);
 }

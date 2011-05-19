@@ -36,7 +36,7 @@ static char * _mpoly_mon_get_str(mon_t x, int n)
     return str;
 }
 
-char * mpoly_get_str(const mpoly_t op, const mat_ctx_t ctx)
+char * mpoly_get_str(const mpoly_t op, const ctx_t ctx)
 {
     char *s, *str;
     char **coeffs, **mons;

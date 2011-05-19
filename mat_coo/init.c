@@ -1,6 +1,6 @@
 #include "mat_coo.h"
 
-void mat_coo_init(mat_coo_t A, long m, long n, const mat_ctx_t ctx)
+void mat_coo_init(mat_coo_t A, long m, long n, const ctx_t ctx)
 {
     A->m = m;
     A->n = n;
@@ -10,7 +10,7 @@ void mat_coo_init(mat_coo_t A, long m, long n, const mat_ctx_t ctx)
     A->list   = NULL;
 }
 
-void mat_coo_init2(mat_coo_t A, long m, long n, long alloc, const mat_ctx_t ctx)
+void mat_coo_init2(mat_coo_t A, long m, long n, long alloc, const ctx_t ctx)
 {
     A->m = m;
     A->n = n;

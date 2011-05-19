@@ -1,7 +1,7 @@
 #include "mat.h"
 
 void mat_randtest(mat_t mat, flint_rand_t state, 
-                        const mat_ctx_t ctx)
+                        const ctx_t ctx)
 {
     long i;
 

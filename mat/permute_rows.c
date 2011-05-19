@@ -11,7 +11,7 @@ void _mat_permute_rows(char **rows, long m, const long *pi, char **w)
         rows[i] = w[pi[i]];
 }
 
-void mat_permute_rows(mat_t mat, const long *pi, const mat_ctx_t ctx)
+void mat_permute_rows(mat_t mat, const long *pi, const ctx_t ctx)
 {
     char **w;
 

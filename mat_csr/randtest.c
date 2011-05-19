@@ -5,7 +5,7 @@
 
 void 
 mat_csr_randtest(mat_csr_t A, 
-                 flint_rand_t state, double d, const mat_ctx_t ctx)
+                 flint_rand_t state, double d, const ctx_t ctx)
 {
     char *mem;
     long f, i, j, k, len, u;

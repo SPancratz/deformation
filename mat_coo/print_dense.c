@@ -2,7 +2,7 @@
 
 int 
 _mat_coo_print_dense(long m, long n, const char *list, long len, 
-                     const mat_ctx_t ctx)
+                     const ctx_t ctx)
 {
     long i, j, k, u = 2 * sizeof(long) + ctx->size;
     char *x;
@@ -34,7 +34,7 @@ _mat_coo_print_dense(long m, long n, const char *list, long len,
 }
 
 int 
-mat_coo_print_dense(const mat_coo_t A, const mat_ctx_t ctx)
+mat_coo_print_dense(const mat_coo_t A, const ctx_t ctx)
 {
     return _mat_coo_print_dense(A->m, A->n, A->list, A->length, ctx);
 }

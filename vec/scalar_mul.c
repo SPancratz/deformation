@@ -1,7 +1,7 @@
 #include "vec.h"
 
 void _vec_scalar_mul(char *res, const char *vec, long n, const char *x, 
-                     const mat_ctx_t ctx)
+                     const ctx_t ctx)
 {
     long i;
 

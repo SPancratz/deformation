@@ -1,6 +1,6 @@
 #include "mat_csr.h"
 
-void mat_csr_fit_length(mat_csr_t A, long len, const mat_ctx_t ctx)
+void mat_csr_fit_length(mat_csr_t A, long len, const ctx_t ctx)
 {
     if (len > A->alloc)
     {

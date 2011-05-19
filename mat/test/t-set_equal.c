@@ -19,13 +19,13 @@ main(void)
     for (i = 0; i < 100; i++)
     {
         long m, n;
-        mat_ctx_t ctx;
+        ctx_t ctx;
         mat_t A, B;
 
         m = n_randint(state, 100) + 1;
         n = n_randint(state, 100) + 1;
 
-        mat_ctx_init_long(ctx);
+        ctx_init_long(ctx);
         mat_init(A, m, n, ctx);
         mat_init(B, m, n, ctx);
 
@@ -47,7 +47,7 @@ main(void)
 
         mat_clear(A, ctx);
         mat_clear(B, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     /* Unmanaged element type (long), unequal */
@@ -55,13 +55,13 @@ main(void)
     {
         long m, n;
         long r, c;
-        mat_ctx_t ctx;
+        ctx_t ctx;
         mat_t A, B;
 
         m = n_randint(state, 100) + 1;
         n = n_randint(state, 100) + 1;
 
-        mat_ctx_init_long(ctx);
+        ctx_init_long(ctx);
         mat_init(A, m, n, ctx);
         mat_init(B, m, n, ctx);
 
@@ -90,20 +90,20 @@ main(void)
 
         mat_clear(A, ctx);
         mat_clear(B, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     /* Managed element type (mpq_t), equal */
     for (i = 0; i < 100; i++)
     {
         long m, n;
-        mat_ctx_t ctx;
+        ctx_t ctx;
         mat_t A, B;
 
         m = n_randint(state, 100) + 1;
         n = n_randint(state, 100) + 1;
 
-        mat_ctx_init_mpq(ctx);
+        ctx_init_mpq(ctx);
         mat_init(A, m, n, ctx);
         mat_init(B, m, n, ctx);
 
@@ -125,7 +125,7 @@ main(void)
 
         mat_clear(A, ctx);
         mat_clear(B, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     /* Managed element type (mpq_t), unequal */
@@ -133,13 +133,13 @@ main(void)
     {
         long m, n;
         long r, c;
-        mat_ctx_t ctx;
+        ctx_t ctx;
         mat_t A, B;
 
         m = n_randint(state, 100) + 1;
         n = n_randint(state, 100) + 1;
 
-        mat_ctx_init_mpq(ctx);
+        ctx_init_mpq(ctx);
         mat_init(A, m, n, ctx);
         mat_init(B, m, n, ctx);
 
@@ -168,7 +168,7 @@ main(void)
 
         mat_clear(A, ctx);
         mat_clear(B, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     flint_randclear(state);

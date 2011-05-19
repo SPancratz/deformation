@@ -1,6 +1,6 @@
 #include "mat_csr.h"
 
-void mat_csr_clear(mat_csr_t A, const mat_ctx_t ctx)
+void mat_csr_clear(mat_csr_t A, const ctx_t ctx)
 {
     if (A->alloc)
     {

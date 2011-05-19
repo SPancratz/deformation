@@ -1,6 +1,6 @@
 #include "mat_coo.h"
 
-void mat_coo_zero(mat_coo_t A, const mat_ctx_t ctx)
+void mat_coo_zero(mat_coo_t A, const ctx_t ctx)
 {
     long k, u = 2 * sizeof(long) + ctx->size;
 

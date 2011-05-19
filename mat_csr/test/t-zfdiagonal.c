@@ -20,14 +20,14 @@ main(void)
     {
         long m;
         mat_csr_t A;
-        mat_ctx_t ctx;
+        ctx_t ctx;
 
         char *mem;
         long k, len, u;
 
         long *pi, numnz;
 
-        mat_ctx_init_long(ctx);
+        ctx_init_long(ctx);
         m = 4;
 
         u   = 2 * sizeof(long) + ctx->size;
@@ -93,7 +93,7 @@ main(void)
         free(pi);
 
         mat_csr_clear(A, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
     printf("... ");
 
@@ -102,14 +102,14 @@ main(void)
     {
         long m;
         mat_csr_t A;
-        mat_ctx_t ctx;
+        ctx_t ctx;
 
         char *mem;
         long k, len, u;
 
         long *pi, numnz;
 
-        mat_ctx_init_long(ctx);
+        ctx_init_long(ctx);
         m = n_randint(state, 100) + 1;
 
         u   = 2 * sizeof(long) + ctx->size;
@@ -148,7 +148,7 @@ main(void)
         free(pi);
 
         mat_csr_clear(A, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     /* Matrices with at most m entries */
@@ -156,14 +156,14 @@ main(void)
     {
         long m;
         mat_csr_t A;
-        mat_ctx_t ctx;
+        ctx_t ctx;
 
         char *mem;
         long k, len, u;
 
         long *pi, numnz, count;
 
-        mat_ctx_init_long(ctx);
+        ctx_init_long(ctx);
         m = n_randint(state, 100) + 1;
 
         u   = 2 * sizeof(long) + ctx->size;
@@ -207,7 +207,7 @@ main(void)
         free(pi);
 
         mat_csr_clear(A, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     flint_randclear(state);

@@ -11,7 +11,7 @@
 #include "gmconnection.h"
 
 static 
-int _gmc_mat_print(char ** const rows, long m, long n, const mat_ctx_t ctx)
+int _gmc_mat_print(char ** const rows, long m, long n, const ctx_t ctx)
 {
     long i, j;
 
@@ -34,7 +34,7 @@ int _gmc_mat_print(char ** const rows, long m, long n, const mat_ctx_t ctx)
 }
 
 static 
-int gmc_mat_print(const mat_t mat, const mat_ctx_t ctx)
+int gmc_mat_print(const mat_t mat, const ctx_t ctx)
 {
     return _gmc_mat_print(mat->rows, mat->m, mat->n, ctx);
 }
@@ -43,7 +43,7 @@ int gmc_mat_print(const mat_t mat, const mat_ctx_t ctx)
 int 
 main(int argc, const char* argv[])
 {
-    mat_ctx_t ctx;
+    ctx_t ctx;
 
     mpoly_t P;
     mat_t M;
@@ -56,7 +56,7 @@ main(int argc, const char* argv[])
         return EXIT_FAILURE;
     }
 
-    mat_ctx_init_fmpz_poly_q(ctx);
+    ctx_init_fmpz_poly_q(ctx);
 
     mpoly_init(P, 1, ctx);
     mpoly_set_str(P, argv[1], ctx);
@@ -70,7 +70,7 @@ main(int argc, const char* argv[])
     free(rows);
     free(cols);
 
-    mat_ctx_clear(ctx);
+    ctx_clear(ctx);
 
     _fmpz_cleanup();
     return EXIT_SUCCESS;

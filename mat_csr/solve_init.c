@@ -7,7 +7,7 @@
 #define DEBUG  0
 
 void mat_csr_solve_init(mat_csr_solve_t s, const mat_csr_t mat, 
-                        const mat_ctx_t ctx)
+                        const ctx_t ctx)
 {
     long *w;
     long *mem;

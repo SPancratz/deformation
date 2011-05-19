@@ -1,6 +1,6 @@
 #include "mpoly.h"
 
-long mpoly_degree(const mpoly_t op, long var, const mat_ctx_t ctx)
+long mpoly_degree(const mpoly_t op, long var, const ctx_t ctx)
 {
     long deg;
     mpoly_iter_t iter;

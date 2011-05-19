@@ -1,7 +1,7 @@
 #include "mpoly.h"
 
 void mpoly_addmul(mpoly_t rop, const mpoly_t op1, const mpoly_t op2, 
-                  const mat_ctx_t ctx)
+                  const ctx_t ctx)
 {
     mpoly_t temp;
 

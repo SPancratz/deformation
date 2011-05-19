@@ -1,7 +1,7 @@
 #include "mpoly.h"
 
 void mpoly_set_coeff(mpoly_t rop, const mon_t m, const void *c,
-                     const mat_ctx_t ctx)
+                     const ctx_t ctx)
 {
     if (ctx->is_zero(c))
     {

@@ -3,7 +3,7 @@
 #include "vec.h"
 
 void 
-_vec_permute(char *res, const char *vec, long n, long *pi, const mat_ctx_t ctx)
+_vec_permute(char *res, const char *vec, long n, long *pi, const ctx_t ctx)
 {
     long i;
 

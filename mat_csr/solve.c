@@ -8,7 +8,7 @@
 #define DEBUG  0
 
 void mat_csr_solve(char *x, const mat_csr_solve_t s, const char *b, 
-                   const mat_ctx_t ctx)
+                   const ctx_t ctx)
 {
     char *c, *t;
     long i, k, m;

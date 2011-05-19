@@ -22,13 +22,13 @@ main(void)
     for (i = 0; i < 100; i++)
     {
         long m;
-        mat_ctx_t ctx;
+        ctx_t ctx;
         mat_t A;
         char *x, *y;
 
         m = n_randint(state, 50) + 1;
 
-        mat_ctx_init_long(ctx);
+        ctx_init_long(ctx);
         mat_init(A, m, m, ctx);
         mat_one(A, ctx);
 
@@ -51,7 +51,7 @@ main(void)
         _vec_clear(y, m, ctx);
 
         mat_clear(A, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     /* Check that A * (x + y) == A * x + A * y */
@@ -60,14 +60,14 @@ main(void)
     for (i = 0; i < 100; i++)
     {
         long m, n;
-        mat_ctx_t ctx;
+        ctx_t ctx;
         mat_t A;
         char *x, *y, *z1, *z2;
 
         m = n_randint(state, 50) + 1;
         n = n_randint(state, 50) + 1;
 
-        mat_ctx_init_long(ctx);
+        ctx_init_long(ctx);
         mat_init(A, m, n, ctx);
         mat_randtest(A, state, ctx);
 
@@ -101,7 +101,7 @@ main(void)
         _vec_clear(z2, m, ctx);
 
         mat_clear(A, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     flint_randclear(state);

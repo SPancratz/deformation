@@ -15,14 +15,14 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    mat_ctx_t ctx;
+    ctx_t ctx;
 
     printf("all... ");
     fflush(stdout);
 
     flint_randinit(state);
 
-    mat_ctx_init_fmpz_poly_q(ctx);
+    ctx_init_fmpz_poly_q(ctx);
 
     /*
         Manually computing basis sets for 
@@ -104,7 +104,7 @@ main(void)
         mpoly_clear(P, ctx);
     }
 
-    mat_ctx_clear(ctx);
+    ctx_clear(ctx);
 
     flint_randclear(state);
     _fmpz_cleanup();

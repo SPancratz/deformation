@@ -22,7 +22,7 @@ main(void)
     for (i = 0; i < 100; i++)
     {
         long m;
-        mat_ctx_t ctx;
+        ctx_t ctx;
         mat_t A, LU;
         long *pi;
         char *x, *b, *c;
@@ -32,7 +32,7 @@ main(void)
 
         pi = malloc(m * sizeof(long));
 
-        mat_ctx_init_mpq(ctx);
+        ctx_init_mpq(ctx);
         mat_init(A, m, m, ctx);
         mat_init(LU, m, m, ctx);
 
@@ -84,7 +84,7 @@ main(void)
 
         mat_clear(A, ctx);
         mat_clear(LU, ctx);
-        mat_ctx_clear(ctx);
+        ctx_clear(ctx);
     }
 
     flint_randclear(state);

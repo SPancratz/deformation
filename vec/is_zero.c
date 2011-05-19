@@ -1,6 +1,6 @@
 #include "vec.h"
 
-int _vec_is_zero(const char *vec, long n, const mat_ctx_t ctx)
+int _vec_is_zero(const char *vec, long n, const ctx_t ctx)
 {
     long i;
 

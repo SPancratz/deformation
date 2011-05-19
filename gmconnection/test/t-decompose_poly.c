@@ -17,14 +17,14 @@ main(void)
 {
     int i, j, result;
     flint_rand_t state;
-    mat_ctx_t ctx;
+    ctx_t ctx;
 
     printf("decompose_poly... ");
     fflush(stdout);
 
     flint_randinit(state);
 
-    mat_ctx_init_mpq(ctx);
+    ctx_init_mpq(ctx);
 
     {
         mpoly_t P;
@@ -142,7 +142,7 @@ main(void)
         free(iB);
     }
 
-    mat_ctx_clear(ctx);
+    ctx_clear(ctx);
 
     flint_randclear(state);
     _fmpz_cleanup();

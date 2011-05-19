@@ -2,7 +2,7 @@
 
 #include "mat.h"
 
-int mat_equal(const mat_t mat1, const mat_t mat2, const mat_ctx_t ctx)
+int mat_equal(const mat_t mat1, const mat_t mat2, const ctx_t ctx)
 {
     assert(mat1->m == mat2->m && mat1->n == mat2->n);
 

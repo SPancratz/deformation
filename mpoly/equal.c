@@ -1,6 +1,6 @@
 #include "mpoly.h"
 
-int mpoly_equal(const mpoly_t op1, const mpoly_t op2, const mat_ctx_t ctx)
+int mpoly_equal(const mpoly_t op1, const mpoly_t op2, const ctx_t ctx)
 {
     long len1, len2;
     mpoly_iter_t iter;

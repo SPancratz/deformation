@@ -3,7 +3,7 @@
 int 
 _mat_csr_print_dense(long m, long n, const char *x, const long *j, 
                                      const long *p, const long *lenr, 
-                                     const mat_ctx_t ctx)
+                                     const ctx_t ctx)
 {
     long i, c, k;
 
@@ -31,7 +31,7 @@ _mat_csr_print_dense(long m, long n, const char *x, const long *j,
     return 1;
 }
 
-int mat_csr_print_dense(const mat_csr_t A, const mat_ctx_t ctx)
+int mat_csr_print_dense(const mat_csr_t A, const ctx_t ctx)
 {
     return _mat_csr_print_dense(A->m, A->n, A->x, A->j, A->p, A->lenr, ctx);
 }

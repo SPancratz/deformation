@@ -1,6 +1,6 @@
 #include "mat_coo.h"
 
-void mat_coo_clear(mat_coo_t A, int clear, const mat_ctx_t ctx)
+void mat_coo_clear(mat_coo_t A, int clear, const ctx_t ctx)
 {
     if (A->alloc)
     {

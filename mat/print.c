@@ -3,7 +3,7 @@
 
 #include "mat.h"
 
-int _mat_print(char ** const rows, long m, long n, const mat_ctx_t ctx)
+int _mat_print(char ** const rows, long m, long n, const ctx_t ctx)
 {
     long i, j;
 
@@ -23,7 +23,7 @@ int _mat_print(char ** const rows, long m, long n, const mat_ctx_t ctx)
     return 1;
 }
 
-int mat_print(const mat_t mat, const mat_ctx_t ctx)
+int mat_print(const mat_t mat, const ctx_t ctx)
 {
     return _mat_print(mat->rows, mat->m, mat->n, ctx);
 }

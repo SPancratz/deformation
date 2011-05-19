@@ -1,7 +1,7 @@
 #include "gmconnection.h"
 
 void gmc_array2poly(mpoly_t poly, const char *c, const mon_t *m, long len,
-                    const mat_ctx_t ctx)
+                    const ctx_t ctx)
 {
     long i;
 

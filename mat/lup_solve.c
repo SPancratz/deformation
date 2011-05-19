@@ -4,7 +4,7 @@
 #include "vec.h"
 
 void _mat_lup_solve(char *x, char ** const rows, long m, long n, 
-                    const long *pi, const char *b, const mat_ctx_t ctx)
+                    const long *pi, const char *b, const ctx_t ctx)
 {
     long i, j;
     char *t;
@@ -48,7 +48,7 @@ void _mat_lup_solve(char *x, char ** const rows, long m, long n,
 }
 
 void mat_lup_solve(char *x, const mat_t mat, const long *pi, 
-                         const char *b, const mat_ctx_t ctx)
+                         const char *b, const ctx_t ctx)
 {
     _mat_lup_solve(x, mat->rows, mat->m, mat->n, pi, b, ctx);
 }

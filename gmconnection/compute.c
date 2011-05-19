@@ -6,7 +6,7 @@
     Sets the polynomial \code{rop} to the derivative of \code{op} 
     with respect to the indeterminate $t$ of the base field.
  */
-static void mpoly_tderivative(mpoly_t rop, const mpoly_t op, const mat_ctx_t ctx)
+static void mpoly_tderivative(mpoly_t rop, const mpoly_t op, const ctx_t ctx)
 {
     mpoly_t temp;
     
@@ -52,7 +52,7 @@ static void mpoly_tderivative(mpoly_t rop, const mpoly_t op, const mat_ctx_t ctx
 }
 
 void gmc_compute(mat_t M, mon_t **rows, mon_t **cols, 
-                 const mpoly_t P, const mat_ctx_t ctx)
+                 const mpoly_t P, const ctx_t ctx)
 {
     long i, j, k, colk, rowk;
     mpoly_t *dP, dPdt;

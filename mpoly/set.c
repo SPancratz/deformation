@@ -1,6 +1,6 @@
 #include "mpoly.h"
 
-void mpoly_set(mpoly_t rop, const mpoly_t op, const mat_ctx_t ctx)
+void mpoly_set(mpoly_t rop, const mpoly_t op, const ctx_t ctx)
 {
     if (rop != op)
     {

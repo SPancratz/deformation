@@ -1,6 +1,6 @@
 #include "mpoly.h"
 
-void _mpoly_sub_in_place(mpoly_t rop, const mpoly_t op, const mat_ctx_t ctx)
+void _mpoly_sub_in_place(mpoly_t rop, const mpoly_t op, const ctx_t ctx)
 {
     mpoly_iter_t iter;
     mpoly_term t;
@@ -62,7 +62,7 @@ void _mpoly_sub_in_place(mpoly_t rop, const mpoly_t op, const mat_ctx_t ctx)
 }
 
 void mpoly_sub(mpoly_t rop, const mpoly_t op1, const mpoly_t op2, 
-               const mat_ctx_t ctx)
+               const ctx_t ctx)
 {
     if (op1->n != op2->n)
     {

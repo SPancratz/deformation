@@ -1,6 +1,6 @@
 #include "mat_coo.h"
 
-void mat_coo_fit_length(mat_coo_t A, long len, const mat_ctx_t ctx)
+void mat_coo_fit_length(mat_coo_t A, long len, const ctx_t ctx)
 {
     if (len > A->alloc)
     {

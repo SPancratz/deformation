@@ -1,7 +1,7 @@
 #include "mpoly.h"
 
 void mpoly_scalar_mul(mpoly_t rop, const mpoly_t op, const void *x, 
-                      const mat_ctx_t ctx)
+                      const ctx_t ctx)
 {
     mpoly_iter_t iter;
     mpoly_term t;

@@ -1,7 +1,7 @@
 #include "mpoly.h"
 
 void mpoly_randtest(mpoly_t rop, flint_rand_t state, long d, long N, 
-                    const mat_ctx_t ctx)
+                    const ctx_t ctx)
 {
     long i, n = rop->n;
 
@@ -33,7 +33,7 @@ void mpoly_randtest(mpoly_t rop, flint_rand_t state, long d, long N,
 }
 
 void mpoly_randtest_not_zero(mpoly_t rop, flint_rand_t state, long d, long N, 
-                             const mat_ctx_t ctx)
+                             const ctx_t ctx)
 {
     long i, n = rop->n;
 

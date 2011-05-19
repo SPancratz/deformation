@@ -2,7 +2,7 @@
 
 #include "mat_csr.h"
 
-void mat_csr_set_array3(mat_csr_t A, char *mem, long len, int copy, const mat_ctx_t ctx)
+void mat_csr_set_array3(mat_csr_t A, char *mem, long len, int copy, const ctx_t ctx)
 {
     long i, j, k, u;
     long *lenr;

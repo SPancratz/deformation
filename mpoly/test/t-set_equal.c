@@ -13,14 +13,14 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    mat_ctx_t ctx;
+    ctx_t ctx;
 
     printf("set/equal... ");
     fflush(stdout);
 
     flint_randinit(state);
 
-    mat_ctx_init_mpq(ctx);
+    ctx_init_mpq(ctx);
 
     /* Equal polynomials */
     for (i = 0; i < 1000; i++)
@@ -94,7 +94,7 @@ main(void)
         free(x);
     }
 
-    mat_ctx_clear(ctx);
+    ctx_clear(ctx);
 
     flint_randclear(state);
     _fmpz_cleanup();

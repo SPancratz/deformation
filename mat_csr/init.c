@@ -1,6 +1,6 @@
 #include "mat_csr.h"
 
-void mat_csr_init(mat_csr_t A, long m, long n, const mat_ctx_t ctx)
+void mat_csr_init(mat_csr_t A, long m, long n, const ctx_t ctx)
 {
     A->m = m;
     A->n = n;
@@ -19,7 +19,7 @@ void mat_csr_init(mat_csr_t A, long m, long n, const mat_ctx_t ctx)
     }
 }
 
-void mat_csr_init2(mat_csr_t A, long m, long n, long alloc, const mat_ctx_t ctx)
+void mat_csr_init2(mat_csr_t A, long m, long n, long alloc, const ctx_t ctx)
 {
     A->m = m;
     A->n = n;

@@ -4,7 +4,7 @@
 
 #include "mat_csr.h"
 
-void mat_csr_solve_clear(mat_csr_solve_t s, const mat_ctx_t ctx)
+void mat_csr_solve_clear(mat_csr_solve_t s, const ctx_t ctx)
 {
     long k, len, sum = 0;
 

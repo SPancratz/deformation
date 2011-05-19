@@ -1,6 +1,6 @@
 #include "mpoly.h"
 
-void mpoly_swap(mpoly_t op1, mpoly_t op2, const mat_ctx_t ctx)
+void mpoly_swap(mpoly_t op1, mpoly_t op2, const ctx_t ctx)
 {
     long tn;
 

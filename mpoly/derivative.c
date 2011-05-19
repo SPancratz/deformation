@@ -1,7 +1,7 @@
 #include "mpoly.h"
 
 void mpoly_derivative(mpoly_t rop, const mpoly_t op, int var, 
-                      const mat_ctx_t ctx)
+                      const ctx_t ctx)
 {
     mpoly_t temp;
 

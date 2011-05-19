@@ -2,7 +2,7 @@
 
 
 void mpoly_add_coeff(mpoly_t rop, const mon_t m, const void *x, 
-                     const mat_ctx_t ctx)
+                     const ctx_t ctx)
 {
     int find;
     mon_t m2;

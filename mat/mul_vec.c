@@ -1,7 +1,7 @@
 #include "mat.h"
 
 void _mat_mul_vec(char *y, char ** const rows, long m, long n, 
-                        const char *x, const mat_ctx_t ctx)
+                        const char *x, const ctx_t ctx)
 {
     long i, j;
     char *t;
@@ -31,7 +31,7 @@ void _mat_mul_vec(char *y, char ** const rows, long m, long n,
 }
 
 void mat_mul_vec(char *y, const mat_t A, const char *x, 
-                       const mat_ctx_t ctx)
+                       const ctx_t ctx)
 {
     _mat_mul_vec(y, A->rows, A->m, A->n, x, ctx);
 }

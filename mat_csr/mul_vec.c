@@ -6,7 +6,7 @@ _mat_csr_mul_vec(char *res,
                  long m, long n, 
                  const char *x, const long *j, const long *p, const long *lenr, 
                  const char *vec, 
-                 const mat_ctx_t ctx)
+                 const ctx_t ctx)
 {
     char *t;
     long r, q;
@@ -28,7 +28,7 @@ _mat_csr_mul_vec(char *res,
 
 void 
 mat_csr_mul_vec(char *res, const mat_csr_t mat, const char *vec, 
-                const mat_ctx_t ctx)
+                const ctx_t ctx)
 {
     char *in;
 

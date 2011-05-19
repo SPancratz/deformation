@@ -22,7 +22,7 @@ void _mat_csr_permute_cols(long m, long n, long *j, long *p, long *lenr, const l
     free(pi_inv);
 }
 
-void mat_csr_permute_cols(mat_csr_t A, const long *pi, const mat_ctx_t ctx)
+void mat_csr_permute_cols(mat_csr_t A, const long *pi, const ctx_t ctx)
 {
     _mat_csr_permute_cols(A->m, A->n, A->j, A->p, A->lenr, pi);
 }

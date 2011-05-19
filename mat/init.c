@@ -2,7 +2,7 @@
 
 #include "mat.h"
 
-void mat_init(mat_t mat, long m, long n, const mat_ctx_t ctx)
+void mat_init(mat_t mat, long m, long n, const ctx_t ctx)
 {
     long i;
 

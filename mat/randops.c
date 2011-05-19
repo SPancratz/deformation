@@ -11,7 +11,7 @@
 #include "ulong_extras.h"
 
 void mat_randops(mat_t mat, flint_rand_t state, long count, 
-                       const mat_ctx_t ctx)
+                       const ctx_t ctx)
 {
     long c, i, j, k, m, n;
 

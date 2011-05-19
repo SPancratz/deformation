@@ -33,7 +33,7 @@ static long gmc_bsearch(const mon_t *a, long l, long u, const mon_t x)
 void gmc_init_auxmatrix(mat_csr_t M, 
                         mon_t **R, mon_t **C, long *p, 
                         const mpoly_t P, long k, 
-                        const mat_ctx_t ctx)
+                        const ctx_t ctx)
 {
     const long d = mpoly_degree(P, -1, ctx);
     const long n = P->n;

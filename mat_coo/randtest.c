@@ -2,7 +2,7 @@
 
 #define N  1000
 
-void mat_coo_randtest(mat_coo_t A, flint_rand_t state, double d, const mat_ctx_t ctx)
+void mat_coo_randtest(mat_coo_t A, flint_rand_t state, double d, const ctx_t ctx)
 {
     long i, j;
     long f;

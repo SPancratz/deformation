@@ -5,7 +5,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-void _vec_randtest(char *vec, long n, flint_rand_t state, const mat_ctx_t ctx)
+void _vec_randtest(char *vec, long n, flint_rand_t state, const ctx_t ctx)
 {
     long i;
 
@@ -13,7 +13,7 @@ void _vec_randtest(char *vec, long n, flint_rand_t state, const mat_ctx_t ctx)
         ctx->randtest(vec + i * ctx->size, state);
 }
 
-void _vec_randtest_not_zero(char *vec, long n, flint_rand_t state, const mat_ctx_t ctx)
+void _vec_randtest_not_zero(char *vec, long n, flint_rand_t state, const ctx_t ctx)
 {
     long i;
 

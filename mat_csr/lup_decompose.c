@@ -4,7 +4,7 @@
 
 void 
 mat_csr_lupdecompose(mat_csr_t L, mat_csr_t U, long *pi, const mat_csr_t A, 
-                     const mat_ctx_t ctx)
+                     const ctx_t ctx)
 {
     char *mem, *x;
     long i, j, k, n, q;
