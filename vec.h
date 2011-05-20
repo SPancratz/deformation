@@ -3,6 +3,8 @@
 
 #include "generics.h"
 
+#define _vec_entry(v, i, ctx)  ((v) + (i) * (ctx)->size)
+
 /* Memory management *********************************************************/
 
 char * _vec_init(long n, const ctx_t ctx);
