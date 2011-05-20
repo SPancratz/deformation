@@ -377,7 +377,7 @@ static void ctx_init_padic(ctx_t ctx, const padic_ctx_struct * pctx)
     ctx->get_str           = &__padic_get_str;
     ctx->set_str           = NULL;
 
-    ctx->pctx              = pctx;
+    ctx->pctx              = (padic_ctx_struct *) pctx;
 }
 
 static void ctx_clear(ctx_t ctx)
