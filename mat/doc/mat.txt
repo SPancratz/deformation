@@ -221,6 +221,21 @@ int mat_lup_decompose(mat_t out, long *pi,
 
 *******************************************************************************
 
+    Characteristic polynomial
+
+*******************************************************************************
+
+void mat_revcharpoly(char *poly, mat_t mat, const ctx_t ctx)
+
+    Computes the reverse characteristic polynomial $f$ of the 
+    square matrix $M$ without divisions.
+
+    Notationally, this is $\det(1 - t M)$.
+
+    Asserts that $M$ is a square matrix.
+
+*******************************************************************************
+
     Input and output
 
 *******************************************************************************

@@ -95,6 +95,10 @@ _mat_lup_decompose(long *pi, char **rows, long m, const ctx_t ctx);
 int mat_lup_decompose(mat_t out, long *pi, const mat_t mat, 
                             const ctx_t ctx);
 
+/* Charpoly ******************************************************************/
+
+void mat_revcharpoly(char *poly, mat_t mat, const ctx_t ctx);
+
 /* Input and output **********************************************************/
 
 int mat_debug(const mat_t mat, const ctx_t ctx);
