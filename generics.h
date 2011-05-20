@@ -6,11 +6,13 @@
 #include <string.h>
 
 #include <mpir.h>
+
 #include "flint.h"
 #include "long_extras.h"
 #include "ulong_extras.h"
 
 #include "fmpz_poly_q.h"
+#include "padic.h"
 
 typedef struct __ctx_struct 
 {
@@ -44,6 +46,8 @@ typedef struct __ctx_struct
     int (*print)(const struct __ctx_struct * ctx, const void *op);
     char * (*get_str)(const struct __ctx_struct * ctx, const void *op);
     int (*set_str)(const struct __ctx_struct * ctx, void *rop, const char * str);
+
+    padic_ctx_struct *pctx;
 
 } __ctx_struct;
 
@@ -304,6 +308,76 @@ static void ctx_init_fmpz_poly_q(ctx_t ctx)
     ctx->print             = &_fmpz_poly_q_print;
     ctx->get_str           = &_fmpz_poly_q_get_str;
     ctx->set_str           = &_fmpz_poly_q_set_str;
+}
+
+/* padic_t *******************************************************************/
+
+static void __padic_init(const struct __ctx_struct * ctx, void *op)
+    { padic_init(op, ctx->pctx); }
+static void __padic_clear(const struct __ctx_struct * ctx, void *op)
+    { padic_clear(op, ctx->pctx); }
+static void __padic_set(const struct __ctx_struct * ctx, void *rop, const void *op)
+    { padic_set(rop, op, ctx->pctx); }
+static void __padic_set_si(const struct __ctx_struct * ctx, void *rop, long op)
+    { padic_set_si(rop, op, ctx->pctx); }
+static void __padic_swap(const struct __ctx_struct * ctx, void *op1, void *op2)
+    { padic_swap(op1, op2, ctx->pctx); }
+static void __padic_zero(const struct __ctx_struct * ctx, void *rop)
+    { padic_zero(rop, ctx->pctx); }
+static void __padic_one(const struct __ctx_struct * ctx, void *rop)
+    { padic_one(rop, ctx->pctx); }
+static void __padic_randtest(const struct __ctx_struct * ctx, void *rop, flint_rand_t state)
+    { padic_randtest(rop, state, ctx->pctx); }
+static void __padic_randtest_not_zero(const struct __ctx_struct * ctx, void *rop, flint_rand_t state)
+    { padic_randtest_not_zero(rop, state, ctx->pctx); }
+static int __padic_equal(const struct __ctx_struct * ctx, const void *op1, const void *op2)
+    { return padic_equal(op1, op2, ctx->pctx); }
+static int __padic_is_zero(const struct __ctx_struct * ctx, const void *op)
+    { return padic_is_zero(op, ctx->pctx); }
+static int __padic_is_one(const struct __ctx_struct * ctx, const void *op)
+    { return padic_is_one(op, ctx->pctx); }
+static void __padic_neg(const struct __ctx_struct * ctx, void *rop, const void *op)
+    { padic_neg(rop, op, ctx->pctx); }
+static void __padic_add(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
+    { padic_add(rop, op1, op2, ctx->pctx); }
+static void __padic_sub(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
+    { padic_sub(rop, op1, op2, ctx->pctx); }
+static void __padic_mul(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
+    { padic_mul(rop, op1, op2, ctx->pctx); }
+static void __padic_div(const struct __ctx_struct * ctx, void *rop, const void *op1, const void *op2)
+    { padic_div(rop, op1, op2, ctx->pctx); }
+static int __padic_print(const struct __ctx_struct * ctx, const void *op)
+    { return padic_print(op, ctx->pctx); }
+static char * __padic_get_str(const struct __ctx_struct * ctx, const void *op)
+    { return padic_get_str(op, ctx->pctx); }
+
+static void ctx_init_padic(ctx_t ctx, const padic_ctx_struct * pctx)
+{
+    ctx->size              = 2 * sizeof(long);
+
+    ctx->init              = &__padic_init;
+    ctx->clear             = &__padic_clear;
+    ctx->set               = &__padic_set;
+    ctx->set_si            = &__padic_set_si;
+    ctx->swap              = &__padic_swap;
+    ctx->zero              = &__padic_zero;
+    ctx->one               = &__padic_one;
+    ctx->randtest          = &__padic_randtest;
+    ctx->randtest_not_zero = &__padic_randtest_not_zero;
+    ctx->equal             = &__padic_equal;
+    ctx->is_zero           = &__padic_is_zero;
+    ctx->is_one            = &__padic_is_one;
+    ctx->neg               = &__padic_neg;
+    ctx->add               = &__padic_add;
+    ctx->sub               = &__padic_sub;
+    ctx->mul               = &__padic_mul;
+    ctx->div               = &__padic_div;
+    ctx->derivative        = NULL;
+    ctx->print             = &__padic_print;
+    ctx->get_str           = &__padic_get_str;
+    ctx->set_str           = NULL;
+
+    ctx->pctx              = pctx;
 }
 
 static void ctx_clear(ctx_t ctx)
