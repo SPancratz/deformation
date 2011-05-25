@@ -1,6 +1,6 @@
 #include "gmconnection.h"
 
-#define DEBUG  1
+#define DEBUG  0
 
 /*
     Sets the polynomial \code{rop} to the derivative of \code{op} 
