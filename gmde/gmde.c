@@ -9,12 +9,8 @@
 
 #include "gmde.h"
 
-/*
-    Takes a matrix M over "fmpz_poly_q" and splits it up into C/u of type
-    "fmpz_poly".
- */
-void gmde_convert_matrix(mat_t C, fmpz_poly_t u, const ctx_t ctxC, 
-                         const mat_t M, const ctx_t ctxM)
+void gmde_convert_gmc(mat_t C, fmpz_poly_t u, const ctx_t ctxC, 
+                      const mat_t M, const ctx_t ctxM)
 {
     fmpz_poly_t t;
     long i, j;
@@ -27,28 +23,26 @@ void gmde_convert_matrix(mat_t C, fmpz_poly_t u, const ctx_t ctxC,
     for (i = 0; i < M->m; i++)
         for (j = 0; j < M->n; j++)
         {
-            fmpz_poly_lcm(t, u, fmpz_poly_q_denref((fmpz_poly_q_struct *) mat_entry(M, i, j, ctxM)));
+            fmpz_poly_lcm(t, u, fmpz_poly_q_denref(
+                (fmpz_poly_q_struct *) mat_entry(M, i, j, ctxM)));
             fmpz_poly_swap(u, t);
         }
 
     for (i = 0; i < M->m; i++)
         for (j = 0; j < M->n; j++)
         {
-            fmpz_poly_divides(t, 
-                              u, fmpz_poly_q_denref((fmpz_poly_q_struct *) mat_entry(M, i, j, ctxM)));
+            fmpz_poly_divides(t, u, fmpz_poly_q_denref(
+                (fmpz_poly_q_struct *) mat_entry(M, i, j, ctxM)));
             fmpz_poly_mul((fmpz_poly_struct *) mat_entry(C, i, j, ctxC), 
-                          fmpz_poly_q_numref((fmpz_poly_q_struct *) mat_entry(M, i, j, ctxM)), t);
+                          fmpz_poly_q_numref(
+                (fmpz_poly_q_struct *) mat_entry(M, i, j, ctxM)), t);
         }
 
     fmpz_poly_clear(t);
 }
 
-/*
-    Given an $n \times n$ matrix $M$ defined over "fmpz_poly_q" 
-    finds the matrices $C$ modulo $t^N$.
- */
-void gmde_solve_series(fmpq_mat_struct *C, long N, 
-                       const mat_t M, const ctx_t ctxM)
+void gmde_solve_series_fmpq(fmpq_mat_struct *C, long N, 
+                            const mat_t M, const ctx_t ctxM)
 {
     const long n = M->m;
 
@@ -78,7 +72,7 @@ void gmde_solve_series(fmpq_mat_struct *C, long N,
         mat_init(Mnum, n, n, XXX);
 
         /* Set Mden, lenR, and Mden0 */
-        gmde_convert_matrix(Mnum, Mden, XXX, M, ctxM);
+        gmde_convert_gmc(Mnum, Mden, XXX, M, ctxM);
         fmpz_poly_get_coeff_fmpz(Mden0, Mden, 0);
         lenR = fmpz_poly_length(Mden);
 
@@ -86,7 +80,8 @@ void gmde_solve_series(fmpq_mat_struct *C, long N,
         lenB = 0;
         for (i = 0; i < n; i++)
             for (j = 0; j < n; j++)
-                lenB = FLINT_MAX(lenB, fmpz_poly_length((fmpz_poly_struct *) mat_entry(Mnum, i, j, XXX)));
+                lenB = FLINT_MAX(lenB, fmpz_poly_length(
+                    (fmpz_poly_struct *) mat_entry(Mnum, i, j, XXX)));
         
         /* Rewrite Mnum (a matrix of polynomials) as b (a list of matrices / Q) */
         B = malloc(lenB * sizeof(fmpq_mat_struct));
@@ -161,15 +156,8 @@ void gmde_solve_series(fmpq_mat_struct *C, long N,
     free(B);
 }
 
-/*
-    Converts an array of length $N$ of $n \times n$ matrices over 
-    the rationals to an $n \times n$ matrix of rational polynomials.
-
-    The matrix $A$ is expected to be a matrix over objects of type 
-    \code{fmpq_poly_t}.
- */
-void gmde_solve_convert(mat_t A, const ctx_t ctxA, 
-                        const fmpq_mat_struct *C, long N)
+void gmde_convert_soln_fmpq(mat_t A, const ctx_t ctxA, 
+                            const fmpq_mat_struct *C, long N)
 {
     long i, j, k;
 

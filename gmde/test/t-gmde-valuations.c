@@ -90,9 +90,9 @@ int main(void)
     C = malloc(N * sizeof(fmpq_mat_struct));
     for(i = 0; i < N; i++)
         fmpq_mat_init(C + i, b, b);
-printf("XXX"), fflush(stdout);
-    gmde_solve_series(C, N, M, ctxM);
-printf("YYY"), fflush(stdout);
+
+    gmde_solve_series_fmpq(C, N, M, ctxM);
+
     fmpz_init(p);
     fmpz_set_ui(p, 7);
 
@@ -101,7 +101,7 @@ printf("YYY"), fflush(stdout);
     for (i = 0; i < N; i++)
     {
         long v = fmpq_mat_ord_p(C + i, p);
-printf("i = %ld\n", i), fflush(stdout);
+
         if (v < LONG_MAX)
             printf("  i = %ld val = %ld val/log(i) = %f\n", i, v, 
                 (i > 1) ? (double) v / log(i) : 0);

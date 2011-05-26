@@ -1,0 +1,37 @@
+/******************************************************************************
+
+    Copyright (C) 2011 Sebastian Pancratz
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Functions
+
+*******************************************************************************
+
+void gmde_convert_gmc(mat_t C, fmpz_poly_t u, const ctx_t ctxC, 
+                      const mat_t M, const ctx_t ctxM)
+
+    Takes a matrix $M$ over \code{fmpz_poly_q} and splits it up as $C/u$ 
+    where $C$ is a matrix over $\mathbf{Z}[t]$ and $u$ is an integer 
+    polynomial, all implemented via the module \code{fmpz_poly}.
+
+void gmde_solve_series_fmpq(fmpq_mat_struct *C, long N, 
+                            const mat_t M, const ctx_t ctxM)
+
+    Given an $n \times n$ matrix $M$ defined over elements of the module 
+    \code{fmpz_poly_q}, finds the matrices $C_i$ over $\mathbf{Q}$, where 
+    \begin{equation*}
+    \bigl( \frac{d}{dt} + M \bigr) C = 0 \pmod{t^N}.
+    \end{equation*}
+
+void gmde_convert_soln_fmpq(mat_t A, const ctx_t ctxA, 
+                            const fmpq_mat_struct *C, long N)
+
+    Converts an array of length $N$ of $n \times n$ matrices over 
+    the rationals to an $n \times n$ matrix of rational polynomials.
+
+    The matrix $A$ is expected to be a matrix over objects of type 
+    \code{fmpq_poly_t}.
+

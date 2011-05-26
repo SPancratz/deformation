@@ -67,8 +67,8 @@ int main(void)
     for(i = 0; i < N; i++)
         fmpq_mat_init(C + i, b, b);
 
-    gmde_solve_series(C, N, M, ctxM);
-    gmde_solve_convert(B, ctxB, C, N);
+    gmde_solve_series_fmpq(C, N, M, ctxM);
+    gmde_convert_soln_fmpq(B, ctxB, C, N);
 
     for (i = 0; i < b; i++)
         for (j = 0; j < b; j++)
