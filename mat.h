@@ -68,11 +68,24 @@ void mat_mul_vec(char *y, const mat_t A, const char *x,
 /* Matrix multiplication *****************************************************/
 
 void _mat_mul_classical(char **rowsC, 
-                              char ** const rowsA, char ** const rowsB, 
-                              long ell, long m, long n, const ctx_t ctx);
+                        char ** const rowsA, char ** const rowsB, 
+                        long ell, long m, long n, const ctx_t ctx);
 
 void mat_mul_classical(mat_t C, const mat_t A, 
-                             const mat_t B, const ctx_t ctx);
+                                const mat_t B, const ctx_t ctx);
+
+static __inline__ 
+void _mat_mul(char **rowsC, char ** const rowsA, char ** const rowsB, 
+                            long ell, long m, long n, const ctx_t ctx)
+{
+    _mat_mul_classical(rowsC, rowsA, rowsB, ell, m, n, ctx);
+}
+
+static __inline__ 
+void mat_mul(mat_t C, const mat_t A, const mat_t B, const ctx_t ctx)
+{
+    mat_mul_classical(C, A, B, ctx);
+}
 
 /* Permutations **************************************************************/
 

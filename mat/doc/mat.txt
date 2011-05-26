@@ -125,11 +125,11 @@ void mat_mul_vec(char *y, const mat_t A, const char *x,
 *******************************************************************************
 
 void _mat_mul_classical(char **rowsC, 
-                              char ** const rowsA, char ** const rowsB, 
-                              long ell, long m, long n, const mat_ctx_t ctx);
+                        char ** const rowsA, char ** const rowsB, 
+                        long ell, long m, long n, const mat_ctx_t ctx);
 
 void mat_mul_classical(mat_t C, const mat_t A, 
-                             const mat_t B, const mat_ctx_t ctx);
+                                const mat_t B, const mat_ctx_t ctx);
 
     Sets the $\ell \times n$ matrix $C$ to the product of the 
     $\ell \times m$ matrix $A$ and the $m \times n$ matrix $B$.
@@ -138,6 +138,13 @@ void mat_mul_classical(mat_t C, const mat_t A,
     multiplication.  Assumes that the underlying addition function 
     \code{ctx->add()} supports aliasing of the first two arguments.
     Does not allow aliasing.
+
+void _mat_mul(char **rowsC, 
+              char ** const rowsA, char ** const rowsB, 
+              long ell, long m, long n, const mat_ctx_t ctx);
+
+void mat_mul(mat_t C, const mat_t A, 
+                      const mat_t B, const mat_ctx_t ctx);
 
 *******************************************************************************
 
