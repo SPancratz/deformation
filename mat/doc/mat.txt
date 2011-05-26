@@ -228,6 +228,20 @@ int mat_lup_decompose(mat_t out, long *pi,
 
 *******************************************************************************
 
+    Matrix inverse
+
+*******************************************************************************
+
+void matrix_inv(mat_t B, const mat_t A, const ctx_t ctx)
+
+    Computes the inverse of the square matrix $A$.
+
+    Write $P A = L U$.  Then $B = A^{-1} = U^{-1} L^{-1} P$.
+
+    For the last operation, not that $(B P)_{i, \pi(j)} = B_{i, j}$.
+
+*******************************************************************************
+
     Characteristic polynomial
 
 *******************************************************************************
