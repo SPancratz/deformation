@@ -29,6 +29,11 @@ void mat_zero(mat_t mat, const ctx_t ctx);
 
 void mat_one(mat_t mat, const ctx_t ctx);
 
+void _mat_transpose(char **rowsB, char ** const rowsA, long m, long n, 
+                    const ctx_t ctx);
+
+void mat_transpose(mat_t B, const mat_t A, const ctx_t ctx);
+
 /* Randomisation *************************************************************/
 
 void mat_randtest(mat_t mat, flint_rand_t state, 

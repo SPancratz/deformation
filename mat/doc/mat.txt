@@ -37,6 +37,11 @@ void mat_one(mat_t mat, const mat_ctx_t ctx)
     Sets the matrix \code{mat} to the identity matrix.  Assumes that the 
     matrix is a square matrix.
 
+void mat_transpose(mat_t B, const mat_t A, const ctx_t ctx)
+
+    Sets the matrix $B$ to $A^t$, the transpose of the matrix $A$, 
+    assuming that the dimensions of $A$ and $B$ are compatible.
+
 *******************************************************************************
 
     Randomisation
