@@ -65,7 +65,7 @@ void diagfrob_coefficient(padic_t rop, long m, const padic_ctx_t ctx)
         }
 
         rop[1] = 0;
-        padic_normalise(rop, ctx);
+        padic_reduce(rop, ctx);
 
         if ((m / (p - 1)) & 1L)
             padic_neg(rop, rop, ctx);

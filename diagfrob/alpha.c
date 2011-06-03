@@ -204,14 +204,14 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
                 padic_neg(summand, summand, ctx);
             
             summand[1] = lambda[1] + e_falling_fac + quot;
-            padic_normalise(summand, ctx);
+            padic_reduce(summand, ctx);
             
             /* Now summand is the p-adic coefficient of pi^{rem} */
             padic_add(factor, factor, summand, ctx);
         }
 
         fmpz_mul(factor, factor, ai);
-        padic_normalise(factor, ctx);
+        padic_reduce(factor, ctx);
         
         /* Set the product */
         padic_mul(rop, rop, factor, ctx);
