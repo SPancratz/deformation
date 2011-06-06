@@ -10,7 +10,7 @@ void _mat_transpose(char **rowsB, char ** const rowsA, long m, long n,
         for (i = 0; i < m; i++)
             for (j = 0; j < i; j++)
                 ctx->swap(ctx, 
-                          rowsB[j] + i * ctx->size, rowsA[i] + j * ctx->size);
+                          rowsB[j] + i * ctx->size, rowsB[i] + j * ctx->size);
     }
     else
     {
