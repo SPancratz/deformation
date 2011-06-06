@@ -10,18 +10,22 @@
 
 *******************************************************************************
 
-void gmde_convert_gmc(mat_t C, fmpz_poly_t u, const ctx_t ctxC, 
+void gmde_convert_gmc(fmpq_mat_struct **B, long *lenB, fmpz_poly_t denB, 
                       const mat_t M, const ctx_t ctxM)
 
-    Takes a matrix $M$ over \code{fmpz_poly_q} and splits it up as $C/u$ 
-    where $C$ is a matrix over $\mathbf{Z}[t]$ and $u$ is an integer 
+    Takes a matrix $M$ over \code{fmpz_poly_q} and splits it up as $B/r$ 
+    where $B$ is a matrix over $\mathbf{Z}[t]$ and $r$ is an integer 
     polynomial, all implemented via the module \code{fmpz_poly}.
+    Finally, the matrix $B$ is then re-written as 
+    $B = B_0 + B_1 t + B_2 t^2 + \dotsb$, an array of matrices over 
+    $\mathbf{Q}$ of length \code{lenB}.
 
-void gmde_solve_series_fmpq(fmpq_mat_struct *C, long N, 
-                            const mat_t M, const ctx_t ctxM)
+void gmde_solve_fmpq(fmpq_mat_struct *C, long N, 
+                     const mat_t M, const ctx_t ctxM)
 
     Given an $n \times n$ matrix $M$ defined over elements of the module 
     \code{fmpz_poly_q}, finds the matrices $C_i$ over $\mathbf{Q}$, where 
+    $C = C_0 + C_1 t + \dotsb$ satisfies
     \begin{equation*}
     \bigl( \frac{d}{dt} + M \bigr) C = 0 \pmod{t^N}.
     \end{equation*}

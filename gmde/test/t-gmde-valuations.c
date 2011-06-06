@@ -72,7 +72,7 @@ int main(void)
     /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[2 1 0] (2  0 1)[0 2 1] (2  0 1)[1 0 2]"; */
 
     n = atoi(str) - 1;
-    N = 100;
+    N = 300;
 
     ctx_init_fmpz_poly_q(ctxM);
 
@@ -91,7 +91,7 @@ int main(void)
     for(i = 0; i < N; i++)
         fmpq_mat_init(C + i, b, b);
 
-    gmde_solve_series_fmpq(C, N, M, ctxM);
+    gmde_solve_fmpq(C, N, M, ctxM);
 
     fmpz_init(p);
     fmpz_set_ui(p, 7);
