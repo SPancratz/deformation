@@ -29,6 +29,11 @@ void mat_zero(mat_t mat, const ctx_t ctx);
 
 void mat_one(mat_t mat, const ctx_t ctx);
 
+void _mat_neg(char **rowsb, char ** const rowsa, long m, long n, 
+              const ctx_t ctx);
+
+void mat_neg(mat_t b, const mat_t a, const ctx_t ctx);
+
 void _mat_transpose(char **rowsB, char ** const rowsA, long m, long n, 
                     const ctx_t ctx);
 

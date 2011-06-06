@@ -37,6 +37,14 @@ void mat_one(mat_t mat, const mat_ctx_t ctx)
     Sets the matrix \code{mat} to the identity matrix.  Assumes that the 
     matrix is a square matrix.
 
+void _mat_neg(char **rowsb, char ** const rowsa, long m, long n, 
+              const ctx_t ctx)
+
+void mat_neg(mat_t b, const mat_t a, const ctx_t ctx)
+
+    Sets the matrix $B$ to $-A$, the additive inverse of the matrix $A$, 
+    assuming that the dimensions of $A$ and $B$ are compatible.
+
 void mat_transpose(mat_t B, const mat_t A, const ctx_t ctx)
 
     Sets the matrix $B$ to $A^t$, the transpose of the matrix $A$, 
