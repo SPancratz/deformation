@@ -6,7 +6,12 @@ void diagfrob(mat_t F, const fmpz *a, long n, long d, const ctx_t ctx)
     mon_t *B;
     long *iB, lenB, l, u;
 
-    long bound = -5;  /* TODO */
+    /*
+        Whenever $p > n - 1$ the monomial basis for $H_{rig}^n(U)$ is 
+        crystalline and Frobenius is integral.  Thus, we can set the 
+        bound on the valuations of the denominators to 0.
+     */
+    long bound = 0;
 
     long i, j;
 
