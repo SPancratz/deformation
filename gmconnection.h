@@ -6,7 +6,9 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_poly.h"
 #include "fmpz_poly_q.h"
+#include "fmpz_poly_mat.h"
 
 #include "generics.h"
 #include "mat.h"
@@ -52,5 +54,8 @@ void gmc_derivatives(mpoly_t *D, const mpoly_t P, const ctx_t ctx);
 
 void gmc_compute(mat_t M, mon_t **rows, mon_t **cols, 
                  const mpoly_t P, const ctx_t ctx);
+
+void gmc_convert(fmpz_poly_mat_t numM, fmpz_poly_t denM, 
+                 const mat_t M, const ctx_t ctx);
 
 #endif
