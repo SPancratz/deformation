@@ -10,8 +10,8 @@
 
 *******************************************************************************
 
-void gmde_convert_gmc(fmpq_mat_struct **B, long *lenB, fmpz_poly_t denB, 
-                      const mat_t M, const ctx_t ctxM)
+void gmde_convert_gmc_fmpq(fmpq_mat_struct **B, long *lenB, fmpz_poly_t denB, 
+                           const mat_t M, const ctx_t ctxM)
 
     Takes a matrix $M$ over \code{fmpz_poly_q} and splits it up as $B/r$ 
     where $B$ is a matrix over $\mathbf{Z}[t]$ and $r$ is an integer 

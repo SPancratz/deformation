@@ -24,7 +24,7 @@ void gmde_convert_soln_fmpq(mat_t A, const ctx_t ctxA,
 
             for (k = N - 1; k >= 0; k--)
             {
-                if (fmpq_sgn(fmpq_mat_entry(C + k, i, j)))
+                if (!fmpq_is_zero(fmpq_mat_entry(C + k, i, j)))
                 {
                     fmpq_poly_set_coeff_fmpq(
                         (fmpq_poly_struct *) mat_entry(A, i, j, ctxA), 
@@ -32,5 +32,36 @@ void gmde_convert_soln_fmpq(mat_t A, const ctx_t ctxA,
                 }
             }
         }
+}
+
+void gmde_convert_soln(mat_t A, const ctx_t ctxA, 
+                       const padic_mat_struct *C, long N)
+{
+    long i, j, k;
+    padic_t t;
+
+    assert(N > 0);
+    assert(A->m == C->r && A->n == C->c);
+
+    _padic_init(t);
+
+    for (i = 0; i < A->m; i++)
+        for (j = 0; j < A->n; j++)
+        {
+            ctxA->zero(ctxA, mat_entry(A, i, j, ctxA));
+
+            for (k = N - 1; k >= 0; k--)
+            {
+                if (!fmpz_is_zero(fmpz_mat_entry(C + k, i, j)))
+                {
+                    _padic_mat_get_entry_padic(t, C + k, i, j, ctxA->pctx);
+                    padic_poly_set_coeff_padic(
+                        (padic_poly_struct *) mat_entry(A, i, j, ctxA), k, t, 
+                        ctxA->pctx);
+                }
+            }
+        }
+
+    _padic_clear(t);
 }
 

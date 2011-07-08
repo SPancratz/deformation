@@ -17,8 +17,30 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 #include "fmpz_poly_q.h"
-#include "padic.h"
-#include "padic_mat.h"
+
+static long fmpq_mat_ord_p(const fmpq_mat_t M, const fmpz_t p)
+{
+    long i, j, val = LONG_MAX;
+    fmpz_t t;
+
+    fmpz_init(t);
+
+    for (i = 0; i < M->r; i++)
+        for (j = 0; j < M->c; j++)
+            if (fmpq_sgn(fmpq_mat_entry(M, i, j)))
+            {
+                long cur;
+    
+                cur  = fmpz_remove(t, fmpq_mat_entry_num(M, i, j), p);
+                cur -= fmpz_remove(t, fmpq_mat_entry_den(M, i, j), p);
+
+                if (cur < val)
+                    val = cur;
+            }
+
+    fmpz_clear(t);
+    return val;
+}
 
 int main(void)
 {
@@ -34,9 +56,8 @@ int main(void)
 
     mon_t *rows, *cols;
 
-    padic_mat_struct *C;
+    fmpq_mat_struct *C;
     fmpz_t p;
-    padic_ctx_t pctx;
 
     /* Example 3-1-1 */
     /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]"; */
@@ -66,21 +87,20 @@ int main(void)
     mat_print(M, ctxM);
     printf("\n");
 
+    C = malloc(N * sizeof(fmpq_mat_struct));
+    for(i = 0; i < N; i++)
+        fmpq_mat_init(C + i, b, b);
+
+    gmde_solve_fmpq(C, N, M, ctxM);
+
     fmpz_init(p);
     fmpz_set_ui(p, 7);
-    padic_ctx_init(pctx, p, 40, PADIC_VAL_UNIT);
-
-    C = malloc(N * sizeof(padic_mat_struct));
-    for(i = 0; i < N; i++)
-        _padic_mat_init(C + i, b, b);
-
-    gmde_solve(C, N, pctx, M, ctxM);
 
     printf("Valuations\n");
 
     for (i = 0; i < N; i++)
     {
-        long v = padic_mat_val(C + i);
+        long v = fmpq_mat_ord_p(C + i, p);
 
         if (v < LONG_MAX)
             printf("  i = %ld val = %ld val/log(i) = %f\n", i, v, 
@@ -90,11 +110,10 @@ int main(void)
     }
 
     fmpz_clear(p);
-    padic_ctx_clear(pctx);
     mpoly_clear(P, ctxM);
     mat_clear(M, ctxM);
     for (i = 0; i < N; i++)
-        _padic_mat_clear(C + i);
+        fmpq_mat_clear(C + i);
     free(C);
     ctx_clear(ctxM);
 
