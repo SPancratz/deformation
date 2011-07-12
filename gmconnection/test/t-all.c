@@ -29,6 +29,7 @@ main(void)
 
             X^3 + Y^3 + Z^3 + t X Y Z.
      */
+    if (0)
     {
         mpoly_t P;
 
@@ -81,6 +82,7 @@ main(void)
 
             X^3 + Y^3 + Z^3 + t X Y Z.
      */
+    if (0)
     {
         mpoly_t P;
 
@@ -92,6 +94,40 @@ main(void)
 
         mpoly_init(P, 3, ctx);
         mpoly_set_str(P, "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]", ctx);
+
+        gmc_compute(M, &rows, &cols, P, ctx);
+
+        printf("M = \n"), mat_print(M, ctx), printf("\n");
+
+        mat_clear(M, ctx);
+        free(rows);
+        free(cols);
+
+        mpoly_clear(P, ctx);
+    }
+
+    /*
+        Computing Gauss--Manin connection for 
+
+            P(0) = W^3 + X^3 + Y^3 + Z^3
+            P(1) = W^3 + X^3 + Y^3 + Z^3 
+                 + (W + X)(W + 2Y)(W + 3Z) + 3XY(W + X + Z)
+            Q(t) = A^3 - (1 - t)P(0) - t P(1)
+     */
+    {
+        mpoly_t P;
+        char *str;
+
+        mat_t M;
+        mon_t *rows, *cols;
+
+        printf("\n");
+        fflush(stdout);
+
+        str = "5  [3 0 0 0 0] (2  -1 -1) [0 3 0 0 0] (1  -1) [0 0 3 0 0] (1  -1) [0 0 0 3 0] (1  -1) [0 0 0 0 3] (2  0 -1) [0 2 1 0 0] (2  0 -2) [0 2 0 1 0] (2  0 -5) [0 1 1 1 0] (2  0 -3) [0 0 2 1 0] (2  0 -3) [0 2 0 0 1] (2  0 -3) [0 1 1 0 1] (2  0 -6) [0 1 0 1 1] (2  0 -9) [0 0 1 1 1]";
+
+        mpoly_init(P, 5, ctx);
+        mpoly_set_str(P, str, ctx);
 
         gmc_compute(M, &rows, &cols, P, ctx);
 
