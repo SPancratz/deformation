@@ -1,0 +1,143 @@
+/******************************************************************************
+
+    Copyright (C) 2011 Sebastian Pancratz
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Functions
+
+*******************************************************************************
+
+long gmc_basis_size(long n, long d)
+
+    Given two integers $n$ and $d$, returns the dimension 
+    of $\mathcal{H}_{rig}^{n}(\mathcal{U})$, where 
+    $X$ is a hypersurface in $\mathcal{P}^{n}$ defined 
+    by a homogeneous polynomial in $n+1$~variables of total 
+    degree~$d$.
+
+void gmc_basis_sets(mon_t **B, long **iB, long *lenB, long *l, long *u, 
+                    long n, long d)
+
+    Computes a graded monomial basis for $\mathcal{H}_{rig}^{n}(\mathcal{U})$ 
+    in the array \code{*B} of length \code{*lenB} with the grading stored in 
+    the array \code{*iB}.
+
+    Sets $u = \floor{((n + 1) (d - 1)) / d}$ and $\ell = (n + 1) - u$, 
+    which are the highest and lowest indices of meaningful entries in 
+    \code{*B}, respectively.
+
+    For an integer $k$ in the range $\ell \leq k \leq u$, let $i_1$ 
+    and $i_2$ be given by \code{(*iB)[k]} and \code{(*iB)[k+1]}, 
+    respectively.  The monomials in the $k$th graded part, i.e.\ those 
+    of degree $k d - (n + 1)$, are stored in the range $[i_1, i_2)$ in 
+    the array \code{*B}.  For convenience, we also set 
+    \code{(*iB)[*u + 1] = *lenB}.
+
+int gmc_basis_contains(const mpoly_t f, long d)
+
+    Returns whether the homogeneous polynomial $f$ of appropriate 
+    degree of the form $k d - (n + 1)$ is contained in the span of 
+    the monomial basis.  This is the case if and only if all of its 
+    partial degrees are less than $d - 1$.
+
+void gmc_basis_print(const mon_t *B, const long *iB, long lenB, long n, long d)
+
+    Prints the graded basis for $\mathcal{H}_{rig}^{n}(\mathcal{U})$.
+
+void gmc_init_auxmatrix(mat_csr_t M, 
+                        mon_t **R, mon_t **C, long *p, 
+                        const mpoly_t P, long k, 
+                        const ctx_t ctx);
+
+    Given a homogeneous polynomial $P$ of degree $d$ over $\mathbf{Q}(t)$ 
+    defining a family of smooth projective hypersurfaces, computes the 
+    matrix governing the reduction in de~Rham cohomology from $n$-forms 
+    of pole order $k$ to $n$-forms of pole orders $k - 1$.
+
+void gmc_array2poly(mpoly_t poly, const char *c, const mon_t *m, long len, 
+                    const ctx_t ctx)
+
+    Given an array $c$ of coefficients and an array $m$ of monomials, 
+    both of length \code{len}, constructs the polynomial $\sum_{i} c_i m_i$.
+
+void gmc_poly2array(char *c, const mpoly_t poly, const mon_t *m, long len, 
+                    const ctx_t ctx)
+
+    Given a polynomial \code{poly} and an array of monomial $m$ of length 
+    \code{len}, constructs an array $c$ of the same length containing the 
+    corresponding coefficients of \code{poly}.
+
+void gmc_decompose_poly(mpoly_t * A, const mpoly_t poly, 
+                        const mat_csr_solve_t s, 
+                        mon_t * const rows, 
+                        mon_t * const cols, 
+                        long * const p, 
+                        const ctx_t ctx)
+
+    Decomposes a homogenous polynomial \code{poly} 
+    in $L[x_0, \dotsc, x_n]$ into the sum 
+    \begin{equation*}
+    \sum_{i=0}^{n} A_i \partial_i P
+    \end{equation*}
+    modulo monomials in the chosen basis for 
+    $\mathcal{H}_{dR}^{n}(\mathcal{U})$.
+
+    Assumes that $p$ is an array of length $n + 2$ providing indices 
+    into \code{cols}, where for convenience \code{p[n + 1]} denotes 
+    the length of the array \code{cols}.
+
+void gmc_reduce(mpoly_t *R, 
+                const mpoly_t Q, long k, long d, mpoly_t *dP, 
+                mat_csr_solve_t *s, 
+                mon_t **rows, mon_t **cols, long **p, 
+                long l, long u, 
+                const ctx_t ctx)
+
+    Reduces the element $Q \Omega / P^k$ in de Rham cohomology.
+
+    Assumes that $Q$ is a homogenous polynomial of degree $k d - (n+1)$ 
+    that is to be reduced, where $k = 2, \dotsc, n, n + 1$ is sufficiently 
+    large for this to make sense.  
+    In fact, we assume $\ell \leq k \leq u + 1$.
+
+    This method sets the elements of the array $R$ as 
+    $g_{\ell}, \dotsc, g_u$ such that $g_i$ is a basis 
+    element in $B_i$.  The entries of $R$ for 
+    $0, \dotsc, \ell - 1$ are not touched.
+
+void gmc_derivatives(mpoly_t *D, const mpoly_t P, const ctx_t ctx)
+
+    Computes an array of the partial derivatives of the polynomial $P$ 
+    with respect to all variables $x_0, \dotsc, x_n$.
+
+void gmc_compute(mat_t M, mon_t **rows, mon_t **cols, 
+                 const mpoly_t P, const ctx_t ctx);
+
+    Computes the Gauss--Manin connection matrix $M$ 
+    of the smooth projective hypersurface given by the 
+    polynomial $P$ with respect to the bases \code{*rows} 
+    and \code{*cols}, which are also computed during the 
+    routine.
+
+    Currently, both index sets for the rows and columns 
+    are set to the standard monomial basis.
+
+    Assumes that the polynomial $P$ is given over 
+    the field $\mathbf{Q}(t)$ implemented via the 
+    module \code{fmpz_poly_q}.
+
+    Assumes also that the matrix $M$ is initialised 
+    to the right dimensions, which can be obtained by 
+    using the function \code{gmc_basis_size()}.
+
+void gmc_convert(fmpz_poly_mat_t numM, fmpz_poly_t denM, 
+                 const mat_t M, const ctx_t ctx)
+
+    Given a matrix $M$ over $\mathbf{Q}(t)$ implemented 
+    via the module \code{fmpz_poly_q}, computes a least 
+    common denominator \code{denM} in $\mathbf{Z}[t]$ and 
+    and numerator \code{numM} in $\mathcal{M}(\mathbf{Z}[t])$.
+
