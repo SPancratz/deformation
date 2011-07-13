@@ -29,7 +29,6 @@ main(void)
 
             X^3 + Y^3 + Z^3 + t X Y Z.
      */
-    if (0)
     {
         mpoly_t P;
 
@@ -82,7 +81,6 @@ main(void)
 
             X^3 + Y^3 + Z^3 + t X Y Z.
      */
-    if (0)
     {
         mpoly_t P;
 
@@ -114,6 +112,7 @@ main(void)
                  + (W + X)(W + 2Y)(W + 3Z) + 3XY(W + X + Z)
             Q(t) = A^3 - (1 - t)P(0) - t P(1)
      */
+    if (FLINT_BITS == 64)
     {
         mpoly_t P;
         char *str;
