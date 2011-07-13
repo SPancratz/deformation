@@ -36,7 +36,7 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
 {
     const long n = P->n - 1;
     const long d = mpoly_degree(P, -1, ctxFracQt);
-    const long b = gmc_basis_size(n + 1, mpoly_degree(P, -1, ctxFracQt));
+    const long b = gmc_basis_size(n, mpoly_degree(P, -1, ctxFracQt));
     const long p = fmpz_get_si(ctxF->pctx->p);
 
     long K;

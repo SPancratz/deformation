@@ -4,8 +4,8 @@ void gmc_basis_print(const mon_t *B, const long *iB, long lenB, long n, long d)
 {
     long i, k;
 
-    const long u = (n * (d - 1)) / d;
-    const long l = n - u;
+    const long u = ((n + 1) * (d - 1)) / d;
+    const long l = (n + 1) - u;
 
     printf("[");
     for (k = 1; k < l; k++)
@@ -15,11 +15,11 @@ void gmc_basis_print(const mon_t *B, const long *iB, long lenB, long n, long d)
         for (i = iB[k]; i < iB[k + 1]; i++)
         {
             printf(i == iB[k] ? " " : ", ");
-            mon_print(B[i], n);
+            mon_print(B[i], n + 1);
         }
         printf(" |");
     }
-    for ( ; k < n - 1; k++)
+    for ( ; k < n; k++)
         printf(" |");
     printf(" ]");
 }

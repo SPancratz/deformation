@@ -55,7 +55,7 @@ main(void)
         printf("P = "), mpoly_print(P, ctxFracQt), printf("\n");
 
         d = mpoly_degree(P, -1, ctxFracQt);
-        b = gmc_basis_size(n + 1, d);
+        b = gmc_basis_size(n, d);
 
         mat_init(F0, b, b, ctxZp);
 

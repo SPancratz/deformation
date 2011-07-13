@@ -15,7 +15,7 @@ void diagfrob(mat_t F, const fmpz *a, long n, long d, const ctx_t ctx)
 
     long i, j;
 
-    gmc_basis_sets(&B, &iB, &lenB, &l, &u, n + 1, d);
+    gmc_basis_sets(&B, &iB, &lenB, &l, &u, n, d);
     
     mat_clear(F, ctx);
     mat_init(F, lenB, lenB, ctx);

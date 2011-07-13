@@ -34,7 +34,7 @@ int main(void)
    
     flint_randinit(state);
 
-    gmc_basis_sets(&B, &iB, &lenB, &l, &u, n + 1, d);
+    gmc_basis_sets(&B, &iB, &lenB, &l, &u, n, d);
 
     for (i = 0; i < 10; i++)
     {

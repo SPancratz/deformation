@@ -52,7 +52,7 @@ main(void)
         mpoly_set_str(P, str, ctxFracQt);
         printf("P = "), mpoly_print(P, ctxFracQt), printf("\n");
 
-        b = gmc_basis_size(n + 1, mpoly_degree(P, -1, ctxFracQt));
+        b = gmc_basis_size(n, mpoly_degree(P, -1, ctxFracQt));
         mat_init(F, b, b, ctxF);
 
         frob_with_precisions(F, ctxF, P, ctxFracQt, 390, 1100, 0);

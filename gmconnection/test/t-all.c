@@ -42,7 +42,7 @@ main(void)
         mpoly_init(P, 3, ctx);
         mpoly_set_str(P, "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]", ctx);
 
-        n = P->n;
+        n = P->n - 1;
         d = mpoly_degree(P, -1, ctx);
 
         gmc_basis_sets(&B, &iB, &lenB, &l, &u, n, d);
@@ -58,7 +58,7 @@ main(void)
             mon_t *rows, *cols;
             long *p;
 
-            p = malloc((n + 1) * sizeof(long));
+            p = malloc((n + 2) * sizeof(long));
             gmc_init_auxmatrix(mat, &rows, &cols, p, P, k, ctx);
 
             printf("k = %ld\n", k);

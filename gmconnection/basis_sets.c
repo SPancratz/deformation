@@ -5,8 +5,8 @@ void gmc_basis_sets(mon_t **B, long **iB, long *lenB, long *l, long *u,
 {
     long j, k;
 
-    *u = (n * (d - 1)) / d;
-    *l = n - *u;
+    *u = ((n + 1) * (d - 1)) / d;
+    *l = (n + 1) - *u;
 
     *lenB = gmc_basis_size(n, d);
     *B    = malloc(*lenB * sizeof(mon_t));
@@ -22,20 +22,19 @@ void gmc_basis_sets(mon_t **B, long **iB, long *lenB, long *l, long *u,
         long i, len, var;
 
         (*iB)[k] = j;
-        L = mon_generate_by_degree_invlex(&len, n, k * d - n);
+        L = mon_generate_by_degree_invlex(&len, n + 1, k * d - (n + 1));
         for (i = 0; i < len; i++)
         {
-            for (var = 0; var < n; var++)
+            for (var = 0; var <= n; var++)
                 if (mon_get_exp(L[i], var) >= d - 1)
                     break;
-            if (var == n)
+            if (var == n + 1)
             {
                 mon_init((*B)[j]);
                 mon_set((*B)[j], L[i]);
                 j++;
             }
         }
-        /* Clean up */
         for (i = 0; i < len; i++)
             mon_clear(L[i]);
         free(L);

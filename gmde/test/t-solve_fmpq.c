@@ -56,7 +56,7 @@ int main(void)
 
     printf("P = "), mpoly_print(P, ctxM), printf("\n");
 
-    b = gmc_basis_size(n + 1, mpoly_degree(P, -1, ctxM));
+    b = gmc_basis_size(n, mpoly_degree(P, -1, ctxM));
 
     mat_init(B, b, b, ctxB);
     mat_init(LHS, b, b, ctxB);

@@ -60,7 +60,7 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
     mon_t *B;
     long *iB, l, u, lenB;
 
-    const long n = P->n;
+    const long n = P->n - 1;
     const long d = mpoly_degree(P, -1, ctx);
     
     /*
@@ -81,16 +81,16 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
         Compute all partial derivatives of P, and the derivative of P with 
         respect to t, the variable of the coefficient field
      */
-    dP = malloc(n * sizeof(mpoly_t));
-    for (i = 0; i < n; i++)
-        mpoly_init(dP[i], n, ctx);
+    dP = malloc((n + 1) * sizeof(mpoly_t));
+    for (i = 0; i <= n; i++)
+        mpoly_init(dP[i], n + 1, ctx);
     gmc_derivatives(dP, P, ctx);
-    mpoly_init(dPdt, n, ctx);
+    mpoly_init(dPdt, n + 1, ctx);
     mpoly_tderivative(dPdt, P, ctx);
     
     #if (DEBUG > 0)
     printf("Derivatives:\n");
-    for (i = 0; i < n; i++)
+    for (i = 0; i <= n; i++)
     {
         printf("  dPdX %ld = ", i), mpoly_print(dP[i], ctx), printf("\n");
     }
@@ -117,24 +117,24 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
 
         To ease indexing, we include the empty set in the case k = 0.
      */
-    aux      = malloc((n + 1) * sizeof(mat_csr_t));
-    aux_rows = malloc((n + 1) * sizeof(mon_t *));
-    aux_cols = malloc((n + 1) * sizeof(mon_t *));
-    aux_p    = malloc((n + 1) * sizeof(long *));
-    aux_s    = malloc((n + 1) * sizeof(mat_csr_solve_t));
+    aux      = malloc((n + 2) * sizeof(mat_csr_t));
+    aux_rows = malloc((n + 2) * sizeof(mon_t *));
+    aux_cols = malloc((n + 2) * sizeof(mon_t *));
+    aux_p    = malloc((n + 2) * sizeof(long *));
+    aux_s    = malloc((n + 2) * sizeof(mat_csr_solve_t));
 
     #if (DEBUG > 0)
     printf("Computing auxiliary matrices..\n");
     #endif
 
-    for (k = ((n - 1) + (d - 1)) / d + 1; k <= u + 1; k++)
+    for (k = (n + (d - 1)) / d + 1; k <= u + 1; k++)
     {
         
         #if (DEBUG > 0)
         printf("  k = %ld\n", k), fflush(stdout);
         #endif
         
-        aux_p[k] = malloc((n + 1) * sizeof(long));
+        aux_p[k] = malloc((n + 2) * sizeof(long));
 
         gmc_init_auxmatrix(aux[k], aux_rows + k, aux_cols + k, aux_p[k], 
                            P, k, ctx);
@@ -154,10 +154,10 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
         {
             mpoly_t Q, *R;
 
-            mpoly_init(Q, n, ctx);
-            R = malloc((n + 1) * sizeof(mpoly_t));
-            for (i = 0; i <= n; i++)
-                mpoly_init(R[i], n, ctx);
+            mpoly_init(Q, n + 1, ctx);
+            R = malloc((n + 2) * sizeof(mpoly_t));
+            for (i = 0; i <= n + 1; i++)
+                mpoly_init(R[i], n + 1, ctx);
 
             #if (DEBUG > 0)
             printf("  j = %ld\n", j);
@@ -184,7 +184,7 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
             }
 
             mpoly_clear(Q, ctx);
-            for (i = 0; i <= n; i++)
+            for (i = 0; i <= n + 1; i++)
                 mpoly_clear(R[i], ctx);
             free(R);
         }
@@ -203,7 +203,7 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
 
     /* Clean up */
 
-    k = ((n - 1) + (d - 1)) / d + 1;  /* k = ceil(n / d) + 1 */
+    k = (n + (d - 1)) / d + 1;  /* k = ceil(n / d) + 1 */
 
     for ( ; k <= u + 1; k++)
     {
@@ -223,7 +223,7 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
     free(B);
     free(iB);
 
-    for (i = 0; i < n; i++)
+    for (i = 0; i <= n; i++)
         mpoly_clear(dP[i], ctx);
     free(dP);
     mpoly_clear(dPdt, ctx);
