@@ -51,9 +51,9 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
 
     long i, j, k;
 
-    time_t  t0, t1;  /* time_t is defined in <time.h> and <sys/types.h> as long */
-    clock_t c0, c1;  /* clock_t is defined in <time.h> and <sys/types.h> as int */
-    long double cputime;    /* CPU time, total */
+time_t  t0, t1;  /* time_t is defined in <time.h> and <sys/types.h> as long */
+clock_t c0, c1;  /* clock_t is defined in <time.h> and <sys/types.h> as int */
+long double cputime;    /* CPU time, total */
 
     /* Init */
     padic_ctx_init(pctx, ctxF->pctx->p, NWork, PADIC_VAL_UNIT);
@@ -65,19 +65,19 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
     mat_init(C, b, b, ctxZpt);
     mat_init(Cinv, b, b, ctxZpt);
 
-    printf("Connection matrix:\n");
-    t0 = time(NULL);
-    c0 = clock();
+printf("Connection matrix:\n");
+t0 = time(NULL);
+c0 = clock();
 
     /* Compute Gauss--Manin connection */
     gmc_compute(M, &bR, &bC, P, ctxFracQt);
 
-    t1 = time(NULL);
-    c1 = clock();
-    cputime   = ((long double) (c1 - c0)) / ((long double) CLOCKS_PER_SEC);
-    
-    printf ("Elapsed wall clock time:  %ld\n", (long) (t1 - t0));
-    printf ("Elapsed CPU time:         %LG\n", cputime);
+t1 = time(NULL);
+c1 = clock();
+cputime   = ((long double) (c1 - c0)) / ((long double) CLOCKS_PER_SEC);
+
+printf ("Elapsed wall clock time:  %ld\n", (long) (t1 - t0));
+printf ("Elapsed CPU time:         %LG\n", cputime);
 
     /* Find F(0) */
     {
@@ -85,19 +85,18 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
 
         mpoly_diagonal_fibre(a, P, ctxFracQt);
 
-    printf("Diagfrob:\n");
-    t0 = time(NULL);
-    c0 = clock();
-
+printf("Diagfrob:\n");
+t0 = time(NULL);
+c0 = clock();
 
         diagfrob(F0, a, n, d, ctxZp);
 
-    t1 = time(NULL);
-    c1 = clock();
-    cputime   = ((long double) (c1 - c0)) / ((long double) CLOCKS_PER_SEC);
-    
-    printf ("Elapsed wall clock time:  %ld\n", (long) (t1 - t0));
-    printf ("Elapsed CPU time:         %LG\n", cputime);
+t1 = time(NULL);
+c1 = clock();
+cputime   = ((long double) (c1 - c0)) / ((long double) CLOCKS_PER_SEC);
+
+printf ("Elapsed wall clock time:  %ld\n", (long) (t1 - t0));
+printf ("Elapsed CPU time:         %LG\n", cputime);
 
         printf("Compute the diagonal fibre.\n");
         printf("a = {"), _fmpz_vec_print(a, n + 1), printf("}\n");
@@ -105,11 +104,11 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
         _fmpz_vec_clear(a, n + 1);
     }
 
-    printf("Solve:\n");
-    t0 = time(NULL);
-    c0 = clock();
+printf("Solve:\n");
+t0 = time(NULL);
+c0 = clock();
 
-    /* Solve for C and Cinv */
+    /* Solve for C and Cinv *//*
     {
         mat_t Mt;
 
@@ -124,7 +123,7 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
         for(i = 0; i < (K + p - 1) / p; i++)
             _padic_mat_init(Ainv + i, b, b);
 
-        /* Mt = - M^t */
+        /* Mt = - M^t *//*
         mat_init(Mt, b, b, ctxFracQt);
         mat_transpose(Mt, M, ctxFracQt);
         mat_neg(Mt, Mt, ctxFracQt);
@@ -142,17 +141,77 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
         free(Ainv);
         mat_clear(Mt, ctxFracQt);
     }
+*/
+    {
+        ctx_t ctxQt;
 
-    t1 = time(NULL);
-    c1 = clock();
-    cputime   = ((long double) (c1 - c0)) / ((long double) CLOCKS_PER_SEC);
-    
-    printf ("Elapsed wall clock time:  %ld\n", (long) (t1 - t0));
-    printf ("Elapsed CPU time:         %LG\n", cputime);
+        mat_t Mt;
+        mat_t B, Binv;
 
-    printf("C(t) F(0) C(t^p)^{-1}:\n");
-    t0 = time(NULL);
-    c0 = clock();
+        fmpq_mat_struct *A, *Ainv;
+
+        K = 4 * Kfinite + Kinfinite;
+
+        A    = malloc(K * sizeof(fmpq_mat_struct));
+        Ainv = malloc(((K + p - 1) / p) * sizeof(fmpq_mat_struct));
+        for(i = 0; i < K; i++)
+            fmpq_mat_init(A + i, b, b);
+        for(i = 0; i < (K + p - 1) / p; i++)
+            fmpq_mat_init(Ainv + i, b, b);
+
+        ctx_init_fmpq_poly(ctxQt);
+
+        mat_init(B, b, b, ctxQt);
+        mat_init(Binv, b, b, ctxQt);
+
+        /* Mt = - M^t */
+        mat_init(Mt, b, b, ctxFracQt);
+        mat_transpose(Mt, M, ctxFracQt);
+        mat_neg(Mt, Mt, ctxFracQt);
+
+        gmde_solve_fmpq(A, K, M, ctxFracQt);
+        gmde_solve_fmpq(Ainv, (K + p - 1) / p, Mt, ctxFracQt);
+        gmde_convert_soln_fmpq(B, ctxQt, A, K);
+        gmde_convert_soln_fmpq(Binv, ctxQt, Ainv, (K + p - 1) / p);
+        mat_transpose(Binv, Binv, ctxQt);
+
+        /* Push B and Binv into Zp[t] */
+        for (i = 0; i < b; i++)
+            for (j = 0; j < b; j++)
+            {
+                padic_poly_set_fmpq_poly(
+                    (padic_poly_struct *) mat_entry(C, i, j, ctxZpt), 
+                    (fmpq_poly_struct *) mat_entry(B, i, j, ctxQt), 
+                    pctx);
+                padic_poly_set_fmpq_poly(
+                    (padic_poly_struct *) mat_entry(Cinv, i, j, ctxZpt), 
+                    (fmpq_poly_struct *) mat_entry(Binv, i, j, ctxQt), 
+                    pctx);
+            }
+
+        for(i = 0; i < K; i++)
+            fmpq_mat_clear(A + i);
+        for(i = 0; i < (K + p - 1) / p; i++)
+            fmpq_mat_clear(Ainv + i);
+        free(A);
+        free(Ainv);
+        mat_clear(B, ctxQt);
+        mat_clear(Binv, ctxQt);
+        mat_clear(Mt, ctxFracQt);
+
+        ctx_clear(ctxQt);
+    }
+
+t1 = time(NULL);
+c1 = clock();
+cputime   = ((long double) (c1 - c0)) / ((long double) CLOCKS_PER_SEC);
+
+printf ("Elapsed wall clock time:  %ld\n", (long) (t1 - t0));
+printf ("Elapsed CPU time:         %LG\n", cputime);
+
+printf("C(t) F(0) C(t^p)^{-1}:\n");
+t0 = time(NULL);
+c0 = clock();
 
     /* Replace t by t^p in C^{-1} */
     for (i = 0; i < b; i++)
@@ -204,16 +263,16 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
         mat_clear(RHS, ctxZpt);
     }
 
-    t1 = time(NULL);
-    c1 = clock();
-    cputime   = ((long double) (c1 - c0)) / ((long double) CLOCKS_PER_SEC);
-    
-    printf ("Elapsed wall clock time:  %ld\n", (long) (t1 - t0));
-    printf ("Elapsed CPU time:         %LG\n", cputime);
+t1 = time(NULL);
+c1 = clock();
+cputime   = ((long double) (c1 - c0)) / ((long double) CLOCKS_PER_SEC);
 
-    printf("Rational function:\n");
-    t0 = time(NULL);
-    c0 = clock();
+printf ("Elapsed wall clock time:  %ld\n", (long) (t1 - t0));
+printf ("Elapsed CPU time:         %LG\n", cputime);
+
+printf("Rational function:\n");
+t0 = time(NULL);
+c0 = clock();
 
     /* Multiply F by r^{p prec(F) + 10%} */
 
@@ -258,14 +317,12 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
         _padic_poly_clear(s);
     }
 
+t1 = time(NULL);
+c1 = clock();
+cputime   = ((long double) (c1 - c0)) / ((long double) CLOCKS_PER_SEC);
 
-    t1 = time(NULL);
-    c1 = clock();
-    cputime   = ((long double) (c1 - c0)) / ((long double) CLOCKS_PER_SEC);
-    
-    printf ("Elapsed wall clock time:  %ld\n", (long) (t1 - t0));
-    printf ("Elapsed CPU time:         %LG\n", cputime);
-
+printf ("Elapsed wall clock time:  %ld\n", (long) (t1 - t0));
+printf ("Elapsed CPU time:         %LG\n", cputime);
 
     /* Clean up */
     free(bR);
