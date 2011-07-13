@@ -17,7 +17,7 @@ int main(int argc, const char* argv[])
     mpoly_t P;
     mat_t M;
     mon_t *rows, *cols;
-    long n;
+    long b, n;
 
     if (argc != 2)
     {
@@ -32,6 +32,8 @@ int main(int argc, const char* argv[])
     mpoly_init(P, n, ctx);
     mpoly_set_str(P, argv[1], ctx);
 
+    b = gmc_basis_size(n, mpoly_degree(P, -1, ctx));
+    mat_init(M, b, b, ctx);
     gmc_compute(M, &rows, &cols, P, ctx);
 
     {

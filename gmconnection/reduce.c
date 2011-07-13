@@ -1,31 +1,5 @@
 #include "gmconnection.h" 
 
-/*
-    Reduces the element $Q \Omega / P^k$ in de Rham cohomology.
-
-    Assumes that $Q$ is a polynomial of degree \f$kd - (n+1)\f$ that is to 
-    be reduced, where $k = 2, \dotsc, n, n+1$ is sufficiently large for 
-    this to make sense.  In fact, we assume $\ell \leq k \leq u+1$.
-
-    This method sets the elements array $R$ as $g_{\ell}, \dotsc, g_u$ 
-    such that $g_i$ is a basis element in $B_i$.  The entries of $R$ 
-    for $0, \dotsc, \ell-1$ are not touched.
-
-    Note that the polynomial \c Q is modified.
-
-    \param[out] R     Array of length \f$u+2\f$ for the reduction of the 
-                      element in de Rham cohomology
-    \param[in] Q      Numerator of the element in de Rham cohomology
-    \param[in] k      Pole order of the element in de Rham cohomology
-    \param[in] d      Degree of \f$P\f$
-    \param[in] dP     Array of partial derivatives of \f$P\f$
-    \param[in] AUX    Array of auxiliary matrices
-    \param[in] AUX_b  Temporary work space
-    \param[in] AUX_x  Temporary work space
-    \param[in] AUX_y  Temporary work space
-    \param[in] l      Lower bound \f$\ell\f$
-    \param[in] u      Upper bound \f$u\f$
- */
 void gmc_reduce(mpoly_t *R, 
                 const mpoly_t Q0, long k, long d, mpoly_t *dP, 
                 mat_csr_solve_t *s, 

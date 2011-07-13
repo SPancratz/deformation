@@ -62,6 +62,7 @@ int main(void)
 
     b = gmc_basis_size(n, mpoly_degree(P, -1, ctxM));
 
+    mat_init(M, b, b, ctxM);
     gmc_compute(M, &rows, &cols, P, ctxM);
     mat_print(M, ctxM);
     printf("\n");

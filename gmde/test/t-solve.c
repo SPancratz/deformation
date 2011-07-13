@@ -66,6 +66,7 @@ int main(void)
 
     b = gmc_basis_size(n, mpoly_degree(P, -1, ctxM));
 
+    mat_init(M, b, b, ctxM);
     mat_init(B, b, b, ctxZpt);
     mat_init(LHS, b, b, ctxZpt);
 

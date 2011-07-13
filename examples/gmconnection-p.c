@@ -22,7 +22,7 @@ int main(int argc, const char* argv[])
     mpoly_t P;
     mat_t M;
     mon_t *rows, *cols;
-    long i, n, N;
+    long b, i, n, N;
 
     time_t t0, t1;
     clock_t c0, c1;
@@ -40,6 +40,7 @@ int main(int argc, const char* argv[])
     n = atoi(argv[1]) - 1;
     mpoly_init(P, n, ctx);
     mpoly_set_str(P, argv[1], ctx);
+    b = gmc_basis_size(n, mpoly_degree(P, -1, ctx));
 
     N = atoi(argv[2]);
 
@@ -48,6 +49,7 @@ int main(int argc, const char* argv[])
 
     for (i = 0; i < N; i++)
     {
+        mat_init(M, b, b, ctx);
         gmc_compute(M, &rows, &cols, P, ctx);
 
         mat_clear(M, ctx);

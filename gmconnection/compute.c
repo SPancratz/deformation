@@ -106,9 +106,6 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
     fflush(stdout);
     #endif
     
-    /* Connection matrix init */
-    mat_init(M, lenB, lenB, ctx);
-
     /*
         Construct the auxiliary matrices
 

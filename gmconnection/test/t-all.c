@@ -83,6 +83,7 @@ main(void)
      */
     {
         mpoly_t P;
+        long b;
 
         mat_t M;
         mon_t *rows, *cols;
@@ -93,6 +94,8 @@ main(void)
         mpoly_init(P, 3, ctx);
         mpoly_set_str(P, "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]", ctx);
 
+        b = gmc_basis_size(2, mpoly_degree(P, -1, ctx));
+        mat_init(M, b, b, ctx);
         gmc_compute(M, &rows, &cols, P, ctx);
 
         printf("M = \n"), mat_print(M, ctx), printf("\n");
@@ -116,6 +119,7 @@ main(void)
     {
         mpoly_t P;
         char *str;
+        long b, n;
 
         mat_t M;
         mon_t *rows, *cols;
@@ -125,9 +129,12 @@ main(void)
 
         str = "5  [3 0 0 0 0] (2  -1 -1) [0 3 0 0 0] (1  -1) [0 0 3 0 0] (1  -1) [0 0 0 3 0] (1  -1) [0 0 0 0 3] (2  0 -1) [0 2 1 0 0] (2  0 -2) [0 2 0 1 0] (2  0 -5) [0 1 1 1 0] (2  0 -3) [0 0 2 1 0] (2  0 -3) [0 2 0 0 1] (2  0 -3) [0 1 1 0 1] (2  0 -6) [0 1 0 1 1] (2  0 -9) [0 0 1 1 1]";
 
-        mpoly_init(P, 5, ctx);
+        n = atoi(str) - 1;
+        mpoly_init(P, n, ctx);
         mpoly_set_str(P, str, ctx);
 
+        b = gmc_basis_size(n, mpoly_degree(P, -1, ctx));
+        mat_init(M, b, b, ctx);
         gmc_compute(M, &rows, &cols, P, ctx);
 
         printf("M = \n"), mat_print(M, ctx), printf("\n");
