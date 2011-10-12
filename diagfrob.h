@@ -54,58 +54,6 @@ void diagfrob(mat_t F, const fmpz *a, long n, long d, const ctx_t ctx);
 void diagfrob_revcharpoly(fmpz *poly, const char *f, long n, long b, 
                           const ctx_t ctx);
 
-static __inline__
-long fmpz_clog(const fmpz_t op, const fmpz_t b)
-{
-    assert((fmpz_cmp_ui(op, 1) >= 0) && (fmpz_cmp_ui(b, 2) >= 0));
-
-    if (fmpz_is_one(op))
-    {
-        return 0;
-    }
-    else
-    {
-        long n;
-        fmpz_t x;
-
-        fmpz_init(x);
-        fmpz_set(x, b);
-        for (n = 1; fmpz_cmp(x, op) < 0; n++)
-        {
-            fmpz_mul(x, x, b);
-        }
-        fmpz_clear(x);
-
-        return n;
-    }
-}
-
-static __inline__
-long fmpz_flog(const fmpz_t op, const fmpz_t b)
-{
-    assert((fmpz_cmp_ui(op, 1) >= 0) && (fmpz_cmp_ui(b, 2) >= 0));
-
-    if (fmpz_is_one(op))
-    {
-        return 0;
-    }
-    else
-    {
-        long n;
-        fmpz_t x;
-
-        fmpz_init(x);
-        fmpz_set(x, b);
-        for (n = 1; fmpz_cmp(x, op) <= 0; n++)
-        {
-            fmpz_mul(x, x, b);
-        }
-        fmpz_clear(x);
-
-        return n - 1;
-    }
-}
-
 /*
     Computes the precision to which one needs to compute the 
     bottom half of the coefficients.  We relax the bound from 
