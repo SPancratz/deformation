@@ -90,5 +90,12 @@ install: library
 %.o: %.c
 	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
 
-BUILD_DIRS = perm vec mat mat_coo mat_csr mon queue stack rbtree mpoly gmconnection diagfrob gmde deformation
+# The following modules have been removed from 
+# the build process as they are no longer used 
+# by the deformation code:
+# 
+#     mat_coo
+#     queue
+
+BUILD_DIRS = perm vec mat mat_csr mon stack rbtree mpoly gmconnection diagfrob gmde deformation
 
