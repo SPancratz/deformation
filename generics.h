@@ -517,7 +517,7 @@ static void __padic_div(const struct __ctx_struct * ctx, void *rop, const void *
 static int ___padic_print(const struct __ctx_struct * ctx, const void *op)
     { return padic_print(op, ctx->pctx); }
 static char * __padic_get_str(const struct __ctx_struct * ctx, const void *op)
-    { return padic_get_str(op, ctx->pctx); }
+    { return padic_get_str(NULL, op, ctx->pctx); }
 
 static void ctx_init_padic(ctx_t ctx, const padic_ctx_struct * pctx)
 {
