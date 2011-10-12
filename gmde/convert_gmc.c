@@ -48,7 +48,7 @@ gmde_convert_gmc(padic_mat_struct **numM, long *lenM, fmpz_poly_t denM,
 
             for (k = 0; k < fmpz_poly_length(poly); k++)
             {
-                fmpz_set(fmpz_mat_entry(*numM + k, i, j), 
+                fmpz_set(padic_mat_unit(*numM + k, i, j), 
                          fmpz_poly_get_coeff_ptr(poly, k));
             }
         }

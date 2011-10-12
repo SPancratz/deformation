@@ -41,7 +41,7 @@ void gmde_convert_soln(mat_t A, const ctx_t ctxA,
     padic_t t;
 
     assert(N > 0);
-    assert(A->m == C->r && A->n == C->c);
+    assert(A->m == padic_mat(C)->r && A->n == padic_mat(C)->c);
 
     _padic_init(t);
 
@@ -52,7 +52,7 @@ void gmde_convert_soln(mat_t A, const ctx_t ctxA,
 
             for (k = N - 1; k >= 0; k--)
             {
-                if (!fmpz_is_zero(fmpz_mat_entry(C + k, i, j)))
+                if (!fmpz_is_zero(padic_mat_unit(C + k, i, j)))
                 {
                     _padic_mat_get_entry_padic(t, C + k, i, j, ctxA->pctx);
                     padic_poly_set_coeff_padic(
