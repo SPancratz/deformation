@@ -36,17 +36,20 @@ int main(void)
     mat_t B, LHS;
     ctx_t ctxB;
 
+    printf("solve_fmpq... \n");
+    fflush(stdout);
+
     /* Example 3-1-1 */
-    /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]"; */
+    str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]";
 
     /* Example 3-3-2 */
     /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[2 1 0] (2  0 1)[0 2 1] (2  0 1)[1 0 2]";*/
 
     /* Example ... */
-    str = "4  [4 0 0 0] [0 4 0 0] [0 0 4 0] [0 0 0 4] (2  0 1)[1 1 1 1]";
+    /* str = "4  [4 0 0 0] [0 4 0 0] [0 0 4 0] [0 0 0 4] (2  0 1)[1 1 1 1]"; */
 
     n = atoi(str) - 1;
-    N = 5000;
+    N = 100;
 
     ctx_init_fmpz_poly_q(ctxM);
     ctx_init_fmpq_poly(ctxB);
@@ -63,10 +66,9 @@ int main(void)
     mat_init(LHS, b, b, ctxB);
 
     gmc_compute(M, &rows, &cols, P, ctxM);
-/*
+
     mat_print(M, ctxM);
     printf("\n");
- */
 
     C = malloc(N * sizeof(fmpq_mat_struct));
     for(i = 0; i < N; i++)
@@ -75,13 +77,10 @@ int main(void)
     gmde_solve_fmpq(C, N, M, ctxM);
     gmde_convert_soln_fmpq(B, ctxB, C, N);
 
-/*
     printf("B: \n");
     mat_print(B, ctxB);
     printf("\n");
- */
 
-/*
     for (i = 0; i < b; i++)
         for (j = 0; j < b; j++)
         {
@@ -118,7 +117,6 @@ int main(void)
     printf("(d/dt + M) * C (mod t^%d)\n", N);
     mat_print(LHS, ctxB);
     printf("\n");
- */
 
     mpoly_clear(P, ctxM);
     mat_clear(M, ctxM);

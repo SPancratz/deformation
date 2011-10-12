@@ -38,11 +38,14 @@ int main(void)
     fmpz_t p;
     padic_ctx_t pctx;
 
+    printf("valuations... \n");
+    fflush(stdout);
+
     /* Example 3-1-1 */
-    /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]"; */
+    str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]";
 
     /* Example 4-4-2 */
-    str = "4  [4 0 0 0] [0 4 0 0] [0 0 4 0] [0 0 0 4] (2  0 1)[3 1 0 0] (2  0 1)[1 0 1 2] (2  0 1)[0 1 0 3]";
+    /* str = "4  [4 0 0 0] [0 4 0 0] [0 0 4 0] [0 0 0 4] (2  0 1)[3 1 0 0] (2  0 1)[1 0 1 2] (2  0 1)[0 1 0 3]"; */
 
     /* Example 3-3-6 */
     /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 314)[2 1 0] (2  0 42)[0 2 1] (2  0 271)[1 0 2] (2  0 -23)[1 1 1]"; */
@@ -51,7 +54,7 @@ int main(void)
     /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[2 1 0] (2  0 1)[0 2 1] (2  0 1)[1 0 2]"; */
 
     n = atoi(str) - 1;
-    N = 200;
+    N = 500;
 
     ctx_init_fmpz_poly_q(ctxM);
 
@@ -69,7 +72,7 @@ int main(void)
 
     fmpz_init(p);
     fmpz_set_ui(p, 7);
-    padic_ctx_init(pctx, p, 40, PADIC_VAL_UNIT);
+    padic_ctx_init(pctx, p, 50, PADIC_VAL_UNIT);
 
     C = malloc(N * sizeof(padic_mat_struct));
     for(i = 0; i < N; i++)

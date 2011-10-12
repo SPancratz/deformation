@@ -18,7 +18,6 @@
 
 int main(void)
 {
-
     char *str;  /* String for the input polynomial P */
     mpoly_t P;  /* Input polynomial P */
     int n;      /* Number of variables minus one */
@@ -38,8 +37,11 @@ int main(void)
     mat_t B, LHS;
     ctx_t ctxZpt;
 
+    printf("solve... \n");
+    fflush(stdout);
+
     /* Example 3-1-1 */
-    /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]"; */
+    str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]";
 
     /* Example 3-3-2 */
     /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[2 1 0] (2  0 1)[0 2 1] (2  0 1)[1 0 2]"; */
@@ -48,14 +50,14 @@ int main(void)
     /* str = "4  [4 0 0 0] [0 4 0 0] [0 0 4 0] [0 0 0 4] (2  0 1)[3 1 0 0] (2  0 1)[1 0 1 2] (2  0 1)[0 1 0 3]"; */
 
     /* Example ... */
-    str = "4  [4 0 0 0] [0 4 0 0] [0 0 4 0] [0 0 0 4] (2  0 1)[1 1 1 1]";
+    /* str = "4  [4 0 0 0] [0 4 0 0] [0 0 4 0] [0 0 0 4] (2  0 1)[1 1 1 1]"; */
 
     n = atoi(str) - 1;
-    N = 800;
+    N = 100;
 
     fmpz_init(p);
     fmpz_set_ui(p, 3);
-    padic_ctx_init(pctx, p, 355, PADIC_VAL_UNIT);
+    padic_ctx_init(pctx, p, 350, PADIC_VAL_UNIT);
     ctx_init_padic_poly(ctxZpt, pctx);
     ctx_init_fmpz_poly_q(ctxM);
 
@@ -71,10 +73,9 @@ int main(void)
     mat_init(LHS, b, b, ctxZpt);
 
     gmc_compute(M, &rows, &cols, P, ctxM);
-/*
+
     mat_print(M, ctxM);
     printf("\n");
- */
 
     C = malloc(N * sizeof(padic_mat_struct));
     for(i = 0; i < N; i++)
@@ -83,11 +84,9 @@ int main(void)
     gmde_solve(C, N, pctx, M, ctxM);
     gmde_convert_soln(B, ctxZpt, C, N);
 
-/*
     printf("B: \n");
     mat_print(B, ctxZpt);
     printf("\n");
- */
 
     for (i = 0; i < b; i++)
         for (j = 0; j < b; j++)
@@ -129,11 +128,10 @@ int main(void)
                 fmpq_poly_clear(t2);
             }
         }
-/*
+
     printf("(d/dt + M) * C (mod t^%d)\n", N);
     mat_print(LHS, ctxZpt);
     printf("\n");
- */
 
     mpoly_clear(P, ctxM);
     mat_clear(M, ctxM);
