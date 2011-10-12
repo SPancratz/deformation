@@ -22,21 +22,31 @@ main(void)
 
     ctx_init_long(ctx);
     {
-        mpoly_t a;
-
-        printf("\n");
-        printf("mpoly_set_str: \"3  (3)[1 2 3]\"\n");
-        fflush(stdout);
+        mpoly_t a, b;
+        char *s;
 
         mpoly_init(a, 3, ctx);
-        mpoly_set_str(a, "3  (3)[1 2 3]", ctx);
+        mpoly_init(b, 3, ctx);
 
-        printf("a = "), mpoly_print(a, ctx), printf("\n");
+        mpoly_set_str(a, "3  (3)[1 2 3]", ctx);
+        s = mpoly_get_str(a, ctx);
+        mpoly_set_str(b, s, ctx);
+
+        result = mpoly_equal(a, b, ctx);
+        if (!result)
+        {
+            printf("FAIL:\n\n");
+            printf("a = "), mpoly_print(a, ctx), printf("\n");
+            printf("b = "), mpoly_print(b, ctx), printf("\n");
+            printf("s = %s\n", s);
+            abort();
+        }
+
         mpoly_clear(a, ctx);
+        mpoly_clear(b, ctx);
+        free(s);
     }
     ctx_clear(ctx);
-
-    printf("... ");
 
     flint_randclear(state);
     _fmpz_cleanup();
