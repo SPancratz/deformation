@@ -26,7 +26,7 @@ int main(void)
     printf("coefficient... ");
     fflush(stdout);
    
-    flint_randinit(state);
+    _randinit(state);
 
     for (i = 0; i < 500; i++)
     {
@@ -75,7 +75,7 @@ int main(void)
         mpq_clear(c);
     }
 
-    flint_randclear(state);
+    _randclear(state);
 
     printf("PASS\n");
     return EXIT_SUCCESS;

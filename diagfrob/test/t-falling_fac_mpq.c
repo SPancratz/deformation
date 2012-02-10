@@ -21,7 +21,7 @@ int main(void)
     printf("falling_fac_mpq... ");
     fflush(stdout);
    
-    flint_randinit(state);
+    _randinit(state);
 
     /* Verify (u)_r = (u + r - 1)! / (u - 1)! for positive u */
     for (i = 0; i < 10000; i++)
@@ -52,7 +52,7 @@ int main(void)
         mpq_clear(rhs);
     }
 
-    flint_randclear(state);
+    _randclear(state);
 
     printf("PASS\n");
     return EXIT_SUCCESS;

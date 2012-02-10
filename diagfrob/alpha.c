@@ -90,7 +90,7 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
         lhs = p * ui - vi;
         if (lhs % d != 0)
         {
-            padic_zero(rop, ctx0);
+            padic_zero(rop);
             return;
         }
     }
@@ -152,9 +152,10 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
         /* Power of Teichmuller lift */
         padic_set_fmpz(ai, a + i, ctx);
         padic_teichmuller(ai, ai, ctx);
-        fmpz_powm_ui(ai, ai, DIAGFROB_MOD(m - r, p - 1), ppow);
+        fmpz_powm_ui(padic_unit(ai), 
+                     padic_unit(ai), DIAGFROB_MOD(m - r, p - 1), ppow);
         
-        padic_zero(factor, ctx);
+        padic_zero(factor);
         e_factor = DIAGFROB_MOD(m - r, p - 1);
         
         /* Compute the pre-initial value of (u_i / d)_r */
@@ -196,21 +197,21 @@ diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d,
              */
             quot = fdiv_si(m % (p - 1) - r, p - 1);
 
-            fmpz_mul(summand, lambda, falling_fac1);
-            fmpz_mod(summand, summand, ppow);
-            summand[1] = 0;
+            fmpz_mul(padic_unit(summand), padic_unit(lambda), falling_fac1);
+            fmpz_mod(padic_unit(summand), padic_unit(summand), ppow);
+            padic_val(summand) = 0;
 
             if ((r + quot) % 2 != 0)
                 padic_neg(summand, summand, ctx);
             
-            summand[1] = lambda[1] + e_falling_fac + quot;
+            padic_val(summand) = padic_val(lambda) + e_falling_fac + quot;
             padic_reduce(summand, ctx);
             
             /* Now summand is the p-adic coefficient of pi^{rem} */
             padic_add(factor, factor, summand, ctx);
         }
 
-        fmpz_mul(factor, factor, ai);
+        fmpz_mul(padic_unit(factor), padic_unit(factor), padic_unit(ai));
         padic_reduce(factor, ctx);
         
         /* Set the product */

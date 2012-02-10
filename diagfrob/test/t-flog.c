@@ -22,7 +22,7 @@ main(void)
     printf("flog... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    _randinit(state);
 
     for (i = 0; i < 1000000; i++)
     {
@@ -75,7 +75,7 @@ main(void)
         fmpz_clear(d);
     }
 
-    flint_randclear(state);
+    _randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

@@ -34,7 +34,7 @@ int main(void)
     printf("coefficient_mpq... ");
     fflush(stdout);
    
-    flint_randinit(state);
+    _randinit(state);
 
     {
         long m, N = 10;
@@ -85,7 +85,7 @@ int main(void)
         free(d);
     }
 
-    flint_randclear(state);
+    _randclear(state);
 
     printf("PASS\n");
     return EXIT_SUCCESS;

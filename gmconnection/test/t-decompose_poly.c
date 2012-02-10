@@ -22,7 +22,7 @@ main(void)
     printf("decompose_poly... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    _randinit(state);
 
     ctx_init_mpq(ctx);
 
@@ -144,7 +144,7 @@ main(void)
 
     ctx_clear(ctx);
 
-    flint_randclear(state);
+    _randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

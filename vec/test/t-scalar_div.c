@@ -17,7 +17,7 @@ main(void)
     printf("scalar_div... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    _randinit(state);
 
     CTX = malloc(1 * sizeof(ctx_t));
     ctx_init_mpq(CTX[0]);
@@ -110,7 +110,7 @@ main(void)
     ctx_clear(CTX[0]);
     free(CTX);
 
-    flint_randclear(state);
+    _randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

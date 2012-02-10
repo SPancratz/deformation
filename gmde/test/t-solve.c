@@ -79,7 +79,7 @@ int main(void)
 
     C = malloc(N * sizeof(padic_mat_struct));
     for(i = 0; i < N; i++)
-        _padic_mat_init(C + i, b, b);
+        padic_mat_init(C + i, b, b);
 
     gmde_solve(C, N, pctx, M, ctxM);
     gmde_convert_soln(B, ctxZpt, C, N);
@@ -113,16 +113,16 @@ int main(void)
                 {
                     padic_poly_t temp;
 
-                    _padic_poly_init(temp);
+                    padic_poly_init(temp);
                     padic_poly_set_fmpq_poly(temp, t1, pctx);
-                    _padic_poly_mul(temp, temp, (padic_poly_struct *) mat_entry(B, k, j, ctxZpt));
-                    _padic_poly_add((padic_poly_struct *) mat_entry(LHS, i, j, ctxZpt), 
-                                    (padic_poly_struct *) mat_entry(LHS, i, j, ctxZpt), 
-                                    temp, pctx->p);
-                    _padic_poly_clear(temp);
+                    padic_poly_mul(temp, temp, (padic_poly_struct *) mat_entry(B, k, j, ctxZpt), pctx);
+                    padic_poly_add((padic_poly_struct *) mat_entry(LHS, i, j, ctxZpt), 
+                                   (padic_poly_struct *) mat_entry(LHS, i, j, ctxZpt), 
+                                   temp, pctx);
+                    padic_poly_clear(temp);
                 }
 
-                _padic_poly_truncate((padic_poly_struct *) mat_entry(LHS, i, j, ctxZpt), N, pctx->p);
+                padic_poly_truncate((padic_poly_struct *) mat_entry(LHS, i, j, ctxZpt), N, pctx);
 
                 fmpq_poly_clear(t1);
                 fmpq_poly_clear(t2);
@@ -142,7 +142,7 @@ int main(void)
     mat_clear(LHS, ctxZpt);
 
     for (i = 0; i < N; i++)
-        _padic_mat_clear(C + i);
+        padic_mat_clear(C + i);
     free(C);
 
     ctx_clear(ctxM);

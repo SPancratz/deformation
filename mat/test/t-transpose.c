@@ -13,7 +13,7 @@ main(void)
     printf("transpose... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    _randinit(state);
 
     /* Check aliasing */
 
@@ -102,7 +102,7 @@ main(void)
         ctx_clear(ctx);
     }
 
-    flint_randclear(state);
+    _randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

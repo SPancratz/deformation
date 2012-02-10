@@ -17,7 +17,7 @@ main(void)
     printf("zero... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    _randinit(state);
 
     CTX = malloc(2 * sizeof(ctx_t));
     ctx_init_long(CTX[0]);
@@ -53,7 +53,7 @@ main(void)
     ctx_clear(CTX[1]);
     free(CTX);
 
-    flint_randclear(state);
+    _randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

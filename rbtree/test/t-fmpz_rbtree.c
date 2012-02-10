@@ -3,6 +3,7 @@
 
 #include "rbtree.h"
 
+#include "generics.h"
 #include "flint.h"
 #include "fmpz.h"
 #include "long_extras.h"
@@ -30,7 +31,7 @@ int main(void)
 
     flint_rand_t state;
 
-    flint_randinit(state);
+    _randinit(state);
 
     printf("fmpz_rbtree... ");
     fflush(stdout);
@@ -204,7 +205,7 @@ int main(void)
     }
 
 
-    flint_randclear(state);
+    _randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

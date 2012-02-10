@@ -115,7 +115,7 @@ int main(void)
 
     printf("ell_curves... ");
     fflush(stdout);
-    flint_randinit(state);
+    _randinit(state);
 
     for (cases = 0; cases < 100; cases++)
     {
@@ -218,7 +218,7 @@ int main(void)
         ctx_clear(ctx);
     }
 
-    flint_randclear(state);
+    _randclear(state);
 
     printf("PASS\n");
     return EXIT_SUCCESS;

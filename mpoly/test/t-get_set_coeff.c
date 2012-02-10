@@ -18,7 +18,7 @@ main(void)
     printf("get_coeff/ set_coeff... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    _randinit(state);
 
     ctx_init_mpq(ctx);
 
@@ -65,7 +65,7 @@ main(void)
         free(y);
     }
 
-    flint_randclear(state);
+    _randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

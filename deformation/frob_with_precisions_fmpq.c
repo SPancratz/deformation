@@ -133,7 +133,7 @@ void frob_with_precisions_fmpq(mat_t F, const ctx_t ctxF,
     for (i = 0; i < b; i++)
         for (j = 0; j < b; j++)
         {    
-            _padic_poly_compose_pow(
+            padic_poly_compose_pow(
                 (padic_poly_struct *) mat_entry(Cinv, i, j, ctxZpt), 
                 (padic_poly_struct *) mat_entry(Cinv, i, j, ctxZpt), p, pctx);
         }
@@ -148,7 +148,7 @@ void frob_with_precisions_fmpq(mat_t F, const ctx_t ctxF,
         {
             /* Find the unique k s.t. F0(i,k) is non-zero */
             for (k = 0; k < b; k++) 
-                if (!_padic_is_zero((long *) mat_entry(F0, i, k, ctxZp)))
+                if (!_padic_is_zero((padic_struct *) mat_entry(F0, i, k, ctxZp)))
                     break;
 
             if (k == b)
@@ -159,10 +159,10 @@ void frob_with_precisions_fmpq(mat_t F, const ctx_t ctxF,
 
             for (j = 0; j < b; j++)
             {
-                _padic_poly_scalar_mul_padic(
+                padic_poly_scalar_mul_padic(
                     (padic_poly_struct *) mat_entry(RHS, i, j, ctxZpt), 
                     (padic_poly_struct *) mat_entry(Cinv, k, j, ctxZpt), 
-                    (long *) mat_entry(F0, i, k, ctxZp));
+                    (padic_struct *) mat_entry(F0, i, k, ctxZp), pctx);
             }
         }
 
@@ -173,7 +173,7 @@ void frob_with_precisions_fmpq(mat_t F, const ctx_t ctxF,
             {
                 padic_poly_truncate(
                     (padic_poly_struct *) mat_entry(F, i, j, ctxZpt), 
-                    K, ctxF->pctx);
+                    K, pctx->p);
             }
 
         mat_clear(RHS, ctxZpt);
@@ -187,7 +187,7 @@ void frob_with_precisions_fmpq(mat_t F, const ctx_t ctxF,
 
         fmpz_poly_init(r);
         fmpz_poly_init(t);
-        _padic_poly_init(s);
+        padic_poly_init(s);
 
         fmpz_poly_set_ui(r, 1);
         for (i = 0; i < M->m; i++)
@@ -202,7 +202,7 @@ void frob_with_precisions_fmpq(mat_t F, const ctx_t ctxF,
         fmpz_poly_print_pretty(r, "t");
         printf("\n");
 
-        _padic_poly_set_fmpz_poly(s, r, pctx->p);
+        padic_poly_set_fmpz_poly(s, r, pctx);
         padic_poly_pow(s, s, ((p * ctxF->pctx->N) * 11) / 10, pctx);
 
         for (i = 0; i < b; i++)
@@ -213,13 +213,13 @@ void frob_with_precisions_fmpq(mat_t F, const ctx_t ctxF,
                     (padic_poly_struct *) mat_entry(F, i, j, ctxF), 
                     s, ctxF->pctx);
 
-                _padic_poly_truncate(
+                padic_poly_truncate(
                     (padic_poly_struct *) mat_entry(F, i, j, ctxF), K, pctx->p);
             }
 
         fmpz_poly_clear(r);
         fmpz_poly_clear(t);
-        _padic_poly_clear(s);
+        padic_poly_clear(s);
     }
 
     /* Clean up */

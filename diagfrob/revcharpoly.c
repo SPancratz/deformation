@@ -34,17 +34,19 @@ void diagfrob_revcharpoly(fmpz *a, const char *f, long n, long b,
 
         for (i = 0; i <= (b + 2) / 2; i++)
         {
-            if (padic_val((long *) _vec_entry(f, i, ctx)) < 0)
+            if (padic_val((padic_struct *) _vec_entry(f, i, ctx)) < 0)
             {
                 printf("ERROR (diagfrob_revcharpoly).\n");
                 printf("  Entry f[%ld] = ", i);
                 ctx->print(ctx, _vec_entry(f, i, ctx));
                 printf(" is not an integer.\n");
-                printf("  Valuation ord_p(f[%ld]) = %ld.\n", i, padic_val((long *) _vec_entry(f, i, ctx)));
+                printf("  Valuation ord_p(f[%ld]) = %ld.\n", 
+                    i, padic_val((padic_struct *) _vec_entry(f, i, ctx)));
                 abort();
             }
 
-            padic_get_fmpz(a + i, (void *) _vec_entry(f, i, ctx), ctx->pctx);
+            padic_get_fmpz(a + i, 
+                (padic_struct *) _vec_entry(f, i, ctx), ctx->pctx);
             fmpz_mod(a + i, a + i, B);
             if (fmpz_cmp(a + i, u) >= 0)
                 fmpz_sub(a + i, a + i, B);
@@ -70,13 +72,14 @@ void diagfrob_revcharpoly(fmpz *a, const char *f, long n, long b,
         fmpz_add(u, l, B);
         fmpz_pow_ui(pow, p, (r * (n - 1) * b) / 2);
 
-        if (padic_val((long *) _vec_entry(f, b, ctx)) < 0)
+        if (padic_val((padic_struct *) _vec_entry(f, b, ctx)) < 0)
         {
             printf("ERROR (diagfrob_revcharpoly).\n");
             printf("  Entry f[%ld] = ", b);
             ctx->print(ctx, _vec_entry(f, b, ctx));
             printf(" is not an integer.\n");
-            printf("  Valuation ord_p(f[%ld]) = %ld.\n", b, padic_val((long *) _vec_entry(f, b, ctx)));
+            printf("  Valuation ord_p(f[%ld]) = %ld.\n", 
+                b, padic_val((padic_struct *) _vec_entry(f, b, ctx)));
             abort();
         }
 

@@ -1,14 +1,14 @@
-DEFORMATION_MPIR_LIB_DIR=/home/suser/MPIR/mpir-2.1.1//.libs
-DEFORMATION_MPIR_INCLUDE_DIR=/home/suser/MPIR/mpir-2.1.1/
-DEFORMATION_MPFR_LIB_DIR=/home/suser/MPFR/mpfr-3.0.0//.libs
-DEFORMATION_MPFR_INCLUDE_DIR=/home/suser/MPFR/mpfr-3.0.0/
-DEFORMATION_FLINT_LIB_DIR=/home/suser/FLINT/flint2-seb
-DEFORMATION_FLINT_INCLUDE_DIR=/home/suser/FLINT/flint2-seb
+DEFORMATION_MPIR_LIB_DIR=/usr/local/lib
+DEFORMATION_MPIR_INCLUDE_DIR=/usr/local/include
+DEFORMATION_MPFR_LIB_DIR=/usr/local/lib
+DEFORMATION_MPFR_INCLUDE_DIR=/usr/local/include
+DEFORMATION_FLINT_LIB_DIR=/home/user/FLINT/flint-2
+DEFORMATION_FLINT_INCLUDE_DIR=/home/user/FLINT/flint-2
 
 DEFORMATION_LIB=libdeformation.so
 CC=gcc
 CFLAGS=-O2 -g -ansi -pedantic -Wall -funroll-loops -Wno-unused
-PREFIX=~/DEFORMATION/
+PREFIX=/usr/local
 
 LIBS=-L$(CURDIR) -L$(DEFORMATION_MPIR_LIB_DIR) -L$(DEFORMATION_MPFR_LIB_DIR) -L$(DEFORMATION_FLINT_LIB_DIR) -ldeformation -lflint -lmpir -lmpfr -lm
 LIBS2=-L$(DEFORMATION_MPIR_LIB_DIR) -L$(DEFORMATION_MPFR_LIB_DIR) -L$(DEFORMATION_FLINT_LIB_DIR) -lflint -lmpir -lmpfr -lm

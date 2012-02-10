@@ -76,7 +76,7 @@ int main(void)
 
     C = malloc(N * sizeof(padic_mat_struct));
     for(i = 0; i < N; i++)
-        _padic_mat_init(C + i, b, b);
+        padic_mat_init(C + i, b, b);
 
     gmde_solve(C, N, pctx, M, ctxM);
 
@@ -98,7 +98,7 @@ int main(void)
     mpoly_clear(P, ctxM);
     mat_clear(M, ctxM);
     for (i = 0; i < N; i++)
-        _padic_mat_clear(C + i);
+        padic_mat_clear(C + i);
     free(C);
     ctx_clear(ctxM);
 

@@ -38,7 +38,7 @@ diagfrob_entry(padic_t rop, const fmpz *a, long n, long d,
         
         if ((p * mon_get_exp(up1, i) - mon_get_exp(vp1, i)) % d != 0)
         {
-            padic_zero(rop, ctx);
+            padic_zero(rop);
             mon_clear(up1);
             mon_clear(vp1);
             return;
@@ -70,15 +70,16 @@ diagfrob_entry(padic_t rop, const fmpz *a, long n, long d,
     /* Set rop to alpha_{u+1,v+1}^{-1} */
     diagfrob_alpha(rop, a, n, d, up1, vp1, ctx2);
 
-    _padic_inv(rop, rop, ctx->p, N1 + rop[1]);
-    e -= rop[1];
-    rop[1] = 0;
+    _padic_inv(padic_unit(rop), 
+               padic_unit(rop), ctx->p, N1 + padic_val(rop));
+    e -= padic_val(rop);
+    padic_val(rop) = 0;
 
     /* Compute final product */
     {
         _padic_inv(fmpq_denref(x), fmpq_denref(x), ctx->p, N - e);
-        fmpz_mul(rop, rop, fmpq_numref(x));
-        fmpz_mul(rop, rop, fmpq_denref(x));
+        fmpz_mul(padic_unit(rop), padic_unit(rop), fmpq_numref(x));
+        fmpz_mul(padic_unit(rop), padic_unit(rop), fmpq_denref(x));
         padic_shift(rop, rop, e, ctx);
     }
 

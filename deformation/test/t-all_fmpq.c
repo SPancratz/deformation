@@ -27,7 +27,7 @@ main(void)
     printf("all_fmpq... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    _randinit(state);
 
     /*
         Consider the example 
@@ -66,7 +66,7 @@ main(void)
         ctx_clear(ctxFracQt);
     }
 
-    flint_randclear(state);
+    _randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

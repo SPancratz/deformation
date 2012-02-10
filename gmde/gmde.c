@@ -54,7 +54,7 @@ void gmde_convert_soln(mat_t A, const ctx_t ctxA,
             {
                 if (!fmpz_is_zero(padic_mat_unit(C + k, i, j)))
                 {
-                    _padic_mat_get_entry_padic(t, C + k, i, j, ctxA->pctx);
+                    padic_mat_get_entry_padic(t, C + k, i, j, ctxA->pctx);
                     padic_poly_set_coeff_padic(
                         (padic_poly_struct *) mat_entry(A, i, j, ctxA), k, t, 
                         ctxA->pctx);

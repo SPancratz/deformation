@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "mon.h"
+#include "generics.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
 
@@ -14,7 +15,7 @@ main(void)
     printf("div/ divides... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    _randinit(state);
 
     /* Check aliasing of a and c */
     for (i = 0; i < 100; i++)
@@ -152,7 +153,7 @@ main(void)
         mon_clear(d);
     }
 
-    flint_randclear(state);
+    _randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

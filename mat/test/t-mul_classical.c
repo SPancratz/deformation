@@ -13,7 +13,7 @@ main(void)
     printf("mul_classical... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    _randinit(state);
 
     /* Check that the identity matrix does what it's supposed to do */
 
@@ -213,7 +213,7 @@ main(void)
         ctx_clear(ctx);
     }
 
-    flint_randclear(state);
+    _randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

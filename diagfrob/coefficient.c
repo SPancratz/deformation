@@ -40,7 +40,7 @@ void diagfrob_coefficient(padic_t rop, long m, const padic_ctx_t ctx)
         fmpz_pow_ui(t, prime, e);
         fmpz_mul(r, r, t);
         fmpz_mod(r, r, ppow);
-        fmpz_set(rop, r);
+        fmpz_set(padic_unit(rop), r);
 
         for (n = m - (p - 1), k = 1; n >= low; n -= (p - 1), k++)
         {
@@ -60,11 +60,11 @@ void diagfrob_coefficient(padic_t rop, long m, const padic_ctx_t ctx)
             fmpz_mul(r, r, t);
             fmpz_mod(r, r, ppow);
             
-            fmpz_add(rop, rop, r);               /* Update sum */
-            fmpz_mod(rop, rop, ppow);
+            fmpz_add(padic_unit(rop), padic_unit(rop), r);  /* Update sum */
+            fmpz_mod(padic_unit(rop), padic_unit(rop), ppow);
         }
 
-        rop[1] = 0;
+        padic_val(rop) = 0;
         padic_reduce(rop, ctx);
 
         if ((m / (p - 1)) & 1L)

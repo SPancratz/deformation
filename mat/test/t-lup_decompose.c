@@ -13,7 +13,7 @@ main(void)
     printf("lup_decompose... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    _randinit(state);
 
     /* Check that P * A == L * U */
 
@@ -79,7 +79,7 @@ main(void)
         ctx_clear(ctx);
     }
 
-    flint_randclear(state);
+    _randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

@@ -16,6 +16,8 @@
 #include "padic.h"
 #include "padic_poly.h"
 
+/* Layout of the generic structure *******************************************/
+
 typedef struct __ctx_struct 
 {
     size_t size;
@@ -54,6 +56,19 @@ typedef struct __ctx_struct
 } __ctx_struct;
 
 typedef __ctx_struct ctx_t[1];
+
+/* Randomisation *************************************************************/
+
+static __inline__ void _randinit(flint_rand_t state)
+{
+    flint_randinit(state);
+    _flint_rand_init_gmp(state);
+}
+
+static __inline__ void _randclear(flint_rand_t state)
+{
+    flint_randclear(state);
+}
 
 /* Predefined contexts *******************************************************/
 
@@ -489,9 +504,9 @@ static void __padic_set(const struct __ctx_struct * ctx, void *rop, const void *
 static void __padic_set_si(const struct __ctx_struct * ctx, void *rop, long op)
     { padic_set_si(rop, op, ctx->pctx); }
 static void __padic_swap(const struct __ctx_struct * ctx, void *op1, void *op2)
-    { padic_swap(op1, op2, ctx->pctx); }
+    { padic_swap(op1, op2); }
 static void __padic_zero(const struct __ctx_struct * ctx, void *rop)
-    { padic_zero(rop, ctx->pctx); }
+    { padic_zero(rop); }
 static void __padic_one(const struct __ctx_struct * ctx, void *rop)
     { padic_one(rop, ctx->pctx); }
 static void __padic_randtest(const struct __ctx_struct * ctx, void *rop, flint_rand_t state)
@@ -551,17 +566,17 @@ static void ctx_init_padic(ctx_t ctx, const padic_ctx_struct * pctx)
 /* padic_poly_t **************************************************************/
 
 static void __padic_poly_init(const struct __ctx_struct * ctx, void *op)
-    { _padic_poly_init(op); }
+    { padic_poly_init(op); }
 static void __padic_poly_clear(const struct __ctx_struct * ctx, void *op)
-    { _padic_poly_clear(op); }
+    { padic_poly_clear(op); }
 static void __padic_poly_set(const struct __ctx_struct * ctx, void *rop, const void *op)
-    { padic_poly_set(rop, op, ctx->pctx); }
+    { padic_poly_set(rop, op); }
 static void __padic_poly_set_si(const struct __ctx_struct * ctx, void *rop, long op)
     { padic_poly_set_si(rop, op, ctx->pctx); }
 static void __padic_poly_swap(const struct __ctx_struct * ctx, void *op1, void *op2)
-    { _padic_poly_swap(op1, op2); }
+    { padic_poly_swap(op1, op2); }
 static void __padic_poly_zero(const struct __ctx_struct * ctx, void *rop)
-    { padic_poly_zero(rop, ctx->pctx); }
+    { padic_poly_zero(rop); }
 static void __padic_poly_one(const struct __ctx_struct * ctx, void *rop)
     { padic_poly_one(rop, ctx->pctx); }
 static void __padic_poly_randtest(const struct __ctx_struct * ctx, void *rop, flint_rand_t state)
@@ -569,9 +584,9 @@ static void __padic_poly_randtest(const struct __ctx_struct * ctx, void *rop, fl
 static void __padic_poly_randtest_not_zero(const struct __ctx_struct * ctx, void *rop, flint_rand_t state)
     { padic_poly_randtest_not_zero(rop, state, n_randint(state, 49) + 1, ctx->pctx); }
 static int __padic_poly_equal(const struct __ctx_struct * ctx, const void *op1, const void *op2)
-    { return padic_poly_equal(op1, op2, ctx->pctx); }
+    { return padic_poly_equal(op1, op2); }
 static int __padic_poly_is_zero(const struct __ctx_struct * ctx, const void *op)
-    { return padic_poly_is_zero(op, ctx->pctx); }
+    { return padic_poly_is_zero(op); }
 static int __padic_poly_is_one(const struct __ctx_struct * ctx, const void *op)
     { return padic_poly_is_one(op, ctx->pctx); }
 static void __padic_poly_neg(const struct __ctx_struct * ctx, void *rop, const void *op)
@@ -588,11 +603,11 @@ static void __padic_poly_div(const struct __ctx_struct * ctx, void *rop, const v
     abort();
 }
 static void __padic_poly_derivative(const struct __ctx_struct * ctx, void *rop, const void *op)
-    { padic_poly_derivative(rop, op, ctx->pctx); }
+    { /* padic_poly_derivative(rop, op, ctx->pctx); */ } /* TODO !!! */
 static int __padic_poly_print(const struct __ctx_struct * ctx, const void *op)
     { return padic_poly_print(op, ctx->pctx); }
 static char * __padic_poly_get_str(const struct __ctx_struct * ctx, const void *op)
-    { return padic_poly_get_str(op, ctx->pctx); }
+    { return NULL; /* return padic_poly_get_str(op, ctx->pctx); */ }
 
 static void ctx_init_padic_poly(ctx_t ctx, const padic_ctx_struct * pctx)
 {

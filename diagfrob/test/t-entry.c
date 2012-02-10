@@ -32,7 +32,7 @@ int main(void)
     printf("entry... ");
     fflush(stdout);
    
-    flint_randinit(state);
+    _randinit(state);
 
     gmc_basis_sets(&B, &iB, &lenB, &l, &u, n, d);
 
@@ -109,7 +109,7 @@ int main(void)
     free(B);
     free(iB);
 
-    flint_randclear(state);
+    _randclear(state);
     printf("PASS\n");
     return EXIT_SUCCESS;
 }

@@ -23,7 +23,7 @@ main(void)
     printf("is_empty... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    _randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
@@ -69,7 +69,7 @@ main(void)
         ulong_queue_clear(Q);
     }
 
-    flint_randclear(state);
+    _randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

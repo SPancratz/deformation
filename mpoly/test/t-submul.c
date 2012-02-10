@@ -18,7 +18,7 @@ main(void)
     printf("submul... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    _randinit(state);
 
     ctx_init_mpq(ctx);
 
@@ -92,7 +92,7 @@ main(void)
         mpoly_clear(c, ctx);
     }
 
-    flint_randclear(state);
+    _randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

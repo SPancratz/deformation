@@ -39,7 +39,7 @@ gmde_convert_gmc(padic_mat_struct **numM, long *lenM, fmpz_poly_t denM,
     }
 
     for (i = 0; i < *lenM; i++)
-        _padic_mat_init(*numM + i, n, n);
+        padic_mat_init(*numM + i, n, n);
     
     for (i = 0; i < n; i++)
         for (j = 0; j < n; j++)
