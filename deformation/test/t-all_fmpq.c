@@ -52,7 +52,7 @@ main(void)
         b = gmc_basis_size(n, mpoly_degree(P, -1, ctxFracQt));
         mat_init(F, b, b, ctxF);
 
-        frob_with_precisions_fmpq(F, ctxF, P, ctxFracQt, 30, 2000);
+        frob_with_precisions_fmpq(F, ctxF, P, ctxFracQt, 20, 150);
 
         printf("Matrix F:\n");
         mat_print(F, ctxF);

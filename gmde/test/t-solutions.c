@@ -18,7 +18,6 @@
 
 int main(void)
 {
-
     char *str;  /* String for the input polynomial P */
     mpoly_t P;  /* Input polynomial P */
     long n;     /* Number of variables minus one */
@@ -35,6 +34,9 @@ int main(void)
 
     mat_t A, B, Binv;
     ctx_t ctxB;
+
+    printf("solutions... \n");
+    fflush(stdout);
 
     /* Example 3-1-1 */
     /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]"; */
@@ -62,6 +64,7 @@ int main(void)
     mat_init(Binv, b, b, ctxB);
 
     gmc_compute(M, &rows, &cols, P, ctxM);
+    printf("Gauss--Manin connection matrix M:\n");
     mat_print(M, ctxM);
     printf("\n");
 
@@ -84,8 +87,13 @@ int main(void)
     mat_transpose(Binv, Binv, ctxB);
 
     mat_mul(A, B, Binv, ctxB);
+    for (i = 0; i < A->m; i++)
+        for (j = 0; j < A->n; j++)
+            fmpq_poly_truncate((fmpq_poly_struct *) mat_entry(A, i, j, ctxB), N);
 
-    printf("A = B * Binv: \n");
+    printf("Solution to (d/dt + M) B = 0:\n");
+    printf("Inverse B^{-1} as solution to the dual equation:\n");
+    printf("A = B * B^{-1} mod t^{%ld}:\n", N);
     mat_print(A, ctxB);
     printf("\n");
 

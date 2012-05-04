@@ -31,21 +31,16 @@ main(void)
 
     _randinit(state);
 
-    /*
-        Consider the example 
-
-            X^3 + Y^3 + Z^3 + t X Y Z.
-     */
     {
-        /* const char *str = "4  [4 0 0 0] [0 4 0 0] [0 0 4 0] [0 0 0 4] (2  0 1)[1 1 1 1]"; */
-        const char *str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]";
+        const char *str = "4  [4 0 0 0] [0 4 0 0] [0 0 4 0] [0 0 0 4] (2  0 1)[1 1 1 1]";
+        /* const char *str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]"; */
         const long n = atoi(str) - 1;
         long b;
 
         fmpz_init(p);
         fmpz_set_ui(p, 7);
 
-        padic_ctx_init(pctx, p, 3, PADIC_VAL_UNIT);
+        padic_ctx_init(pctx, p, 20, PADIC_VAL_UNIT);
         ctx_init_fmpz_poly_q(ctxFracQt);
         ctx_init_padic_poly(ctxF, pctx);
 
@@ -56,7 +51,7 @@ main(void)
         b = gmc_basis_size(n, mpoly_degree(P, -1, ctxFracQt));
         mat_init(F, b, b, ctxF);
 
-        frob_with_precisions(F, ctxF, P, ctxFracQt, 9, 21, 0);
+        frob_with_precisions(F, ctxF, P, ctxFracQt, 20, 70, 0);
 
         printf("Matrix r(t)^{3*21} F(t):\n");
         mat_print(F, ctxF);

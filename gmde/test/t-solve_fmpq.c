@@ -16,6 +16,18 @@
 #include "fmpq_poly.h"
 #include "fmpz_poly_q.h"
 
+static int 
+__fmpz_poly_q_print_pretty(const struct __ctx_struct * ctx, const void *op)
+{
+    return fmpz_poly_q_print_pretty(op, "t");
+}
+
+static int 
+__fmpq_poly_print_pretty(const struct __ctx_struct * ctx, const void *op)
+{
+    return fmpq_poly_print_pretty(op, "t");
+}
+
 int main(void)
 {
 
@@ -53,6 +65,9 @@ int main(void)
 
     ctx_init_fmpz_poly_q(ctxM);
     ctx_init_fmpq_poly(ctxB);
+
+    ctxM->print = &__fmpz_poly_q_print_pretty;
+    ctxB->print = &__fmpq_poly_print_pretty;
 
     mpoly_init(P, n + 1, ctxM);
     mpoly_set_str(P, str, ctxM);
@@ -107,14 +122,14 @@ int main(void)
                     (fmpq_poly_struct *) mat_entry(LHS, i, j, ctxB), t1, 
                     (fmpq_poly_struct *) mat_entry(B, k, j, ctxB));
                 fmpq_poly_truncate(
-                    (fmpq_poly_struct *) mat_entry(LHS, i, j, ctxB), N);
+                    (fmpq_poly_struct *) mat_entry(LHS, i, j, ctxB), N - 1);
 
                 fmpq_poly_clear(t1);
                 fmpq_poly_clear(t2);
             }
         }
 
-    printf("(d/dt + M) * C (mod t^%d)\n", N);
+    printf("(d/dt + M) * C (mod t^%d)\n", N - 1);
     mat_print(LHS, ctxB);
     printf("\n");
 

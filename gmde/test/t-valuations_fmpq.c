@@ -44,7 +44,6 @@ static long fmpq_mat_ord_p(const fmpq_mat_t M, const fmpz_t p)
 
 int main(void)
 {
-
     char *str;  /* String for the input polynomial P */
     mpoly_t P;  /* Input polynomial P */
     long n;     /* Number of variables minus one */
@@ -63,7 +62,7 @@ int main(void)
     fflush(stdout);
 
     /* Example 3-1-1 */
-    str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]";
+    /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]"; */
 
     /* Example 4-4-2 */
     /* str = "4  [4 0 0 0] [0 4 0 0] [0 0 4 0] [0 0 0 4] (2  0 1)[3 1 0 0] (2  0 1)[1 0 1 2] (2  0 1)[0 1 0 3]"; */
@@ -73,6 +72,8 @@ int main(void)
 
     /* Example 3-3-2 */
     /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[2 1 0] (2  0 1)[0 2 1] (2  0 1)[1 0 2]"; */
+
+    str = "4  [4 0 0 0] [0 4 0 0] [0 0 4 0] [0 0 0 4] (2  0 1)[1 1 1 1]";
 
     n = atoi(str) - 1;
     N = 500;
@@ -98,7 +99,7 @@ int main(void)
     gmde_solve_fmpq(C, N, M, ctxM);
 
     fmpz_init(p);
-    fmpz_set_ui(p, 7);
+    fmpz_set_ui(p, 3);
 
     printf("Valuations\n");
 

@@ -10,6 +10,8 @@
 
 #include "deformation.h"
 
+#define DEBUG 1
+
 /*
     Computes $F(0)$ to precision \code{pF0}, $C(t)$ to 
     precisions \code{pC} and \code{tC}, and $C^{-1}(t)$ 
@@ -39,6 +41,7 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
     mon_t *bR, *bC;
 
     mat_t M, F0, C, Cinv;
+    fmpz_poly_t r;
 
     padic_ctx_t pctx;
     ctx_t ctxZp;
@@ -55,9 +58,38 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
     mat_init(F0, b, b, ctxZp);
     mat_init(C, b, b, ctxZpt);
     mat_init(Cinv, b, b, ctxZpt);
+    fmpz_poly_init(r);
 
     /* Compute Gauss--Manin connection */
     gmc_compute(M, &bR, &bC, P, ctxFracQt);
+
+#if(DEBUG == 1)
+    printf("Gauss--Manin connection M:\n");
+    mat_print(M, ctxFracQt);
+    printf("\n"); fflush(stdout);
+#endif
+
+    /* Extract the denominator */
+    {
+        fmpz_poly_t t;
+
+        fmpz_poly_init(t);
+        fmpz_poly_set_ui(r, 1);
+        for (i = 0; i < M->m; i++)
+            for (j = 0; j < M->n; j++)
+            {
+                fmpz_poly_lcm(t, r, fmpz_poly_q_denref(
+                    (fmpz_poly_q_struct *) mat_entry(M, i, j, ctxFracQt)));
+                fmpz_poly_swap(r, t);
+            }
+        fmpz_poly_clear(t);
+
+#if(DEBUG == 1)
+    printf("r = ");
+    fmpz_poly_print_pretty(r, "t");
+    printf("\n"); fflush(stdout);
+#endif
+    }
 
     /* Find F(0) */
     {
@@ -67,8 +99,12 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
 
         diagfrob(F0, a, n, d, ctxZp);
 
-        printf("Compute the diagonal fibre.\n");
-        printf("a = {"), _fmpz_vec_print(a, n + 1), printf("}\n");
+#if(DEBUG == 1)
+    printf("Diagonal fibre F(0):\n");
+    printf("a = {"), _fmpz_vec_print(a, n + 1), printf("}\n");
+    mat_print(F0, ctxZp);
+    printf("\n"); fflush(stdout);
+#endif
 
         _fmpz_vec_clear(a, n + 1);
     }
@@ -79,7 +115,7 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
 
         padic_mat_struct *A, *Ainv;
 
-        K = 3 * Kfinite + Kinfinite;
+        K = fmpz_poly_degree(r) * Kfinite + Kinfinite;
 
         A    = malloc(K * sizeof(padic_mat_struct));
         Ainv = malloc(((K + p - 1) / p) * sizeof(padic_mat_struct));
@@ -107,6 +143,7 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
         mat_clear(Mt, ctxFracQt);
     }
 
+if (0)
     {
         ctx_t ctxQt;
 
@@ -220,25 +257,11 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
     /* Multiply F by r^{p prec(F) + 10%} */
 
     {
-        fmpz_poly_t r, t;
+        fmpz_poly_t t;
         padic_poly_t s;
 
-        fmpz_poly_init(r);
         fmpz_poly_init(t);
         padic_poly_init(s);
-
-        fmpz_poly_set_ui(r, 1);
-        for (i = 0; i < M->m; i++)
-            for (j = 0; j < M->n; j++)
-            {
-                fmpz_poly_lcm(t, r, fmpz_poly_q_denref(
-                    (fmpz_poly_q_struct *) mat_entry(M, i, j, ctxFracQt)));
-                fmpz_poly_swap(r, t);
-            }
-
-        printf("r = ");
-        fmpz_poly_print_pretty(r, "t");
-        printf("\n");
 
         padic_poly_set_fmpz_poly(s, r, pctx);
         padic_poly_pow(s, s, Kfinite, pctx);
@@ -255,7 +278,6 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
                     (padic_poly_struct *) mat_entry(F, i, j, ctxF), K, pctx->p);
             }
 
-        fmpz_poly_clear(r);
         fmpz_poly_clear(t);
         padic_poly_clear(s);
     }
@@ -268,6 +290,7 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
     mat_clear(F0, ctxZp);
     mat_clear(C, ctxZpt);
     mat_clear(Cinv, ctxZpt);
+    fmpz_poly_clear(r);
 
     padic_ctx_clear(pctx);
     ctx_clear(ctxZpt);
