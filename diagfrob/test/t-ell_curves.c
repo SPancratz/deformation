@@ -91,7 +91,6 @@ long points(const fmpz_t A, const fmpz_t B, const fmpz_t C, const fmpz_t p)
     return N;
 }
 
-
 int main(void)
 {
     int cases, result;
@@ -160,7 +159,7 @@ int main(void)
         ctx_init_padic(ctx, pctx2);
 
         mat_init(F, lenB, lenB, ctx);
-        diagfrob(F, a, n, d, ctx);
+        diagfrob(F, a, n, d, ctx, 0);
 
         f = _vec_init(lenB + 1, ctx);
         poly = _fmpz_vec_init(lenB + 1);

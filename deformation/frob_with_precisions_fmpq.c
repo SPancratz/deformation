@@ -62,7 +62,7 @@ void frob_with_precisions_fmpq(mat_t F, const ctx_t ctxF,
 
         mpoly_diagonal_fibre(a, P, ctxFracQt);
 
-        diagfrob(F0, a, n, d, ctxZp);
+        diagfrob(F0, a, n, d, ctxZp, 0);
 
         printf("Compute the diagonal fibre.\n");
         printf("a = {"), _fmpz_vec_print(a, n + 1), printf("}\n");

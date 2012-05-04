@@ -97,7 +97,7 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
 
         mpoly_diagonal_fibre(a, P, ctxFracQt);
 
-        diagfrob(F0, a, n, d, ctxZp);
+        diagfrob(F0, a, n, d, ctxZp, 0);
 
 #if(DEBUG == 1)
     printf("Diagonal fibre F(0):\n");

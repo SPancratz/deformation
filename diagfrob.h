@@ -1,6 +1,6 @@
 /******************************************************************************
 
-    Copyright (C) 2010, 2011 Sebastian Pancratz
+    Copyright (C) 2010, 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -18,41 +18,6 @@
 #include "gmconnection.h"
 #include "mat.h"
 #include "mon.h"
-
-#define DIAGFROB_MOD(x, m)  (((x) % (m) >= 0) ? (x) % (m) : (x) % (m) + (m))
-
-static __inline__ 
-long fdiv_si(long n, long d)
-{
-    return ((n < 0) && (n % d) ? n / d - 1 : n / d);
-}
-
-void diagfrob_falling_fac_mpq(mpq_t rop, long u, long d, long r);
-
-void diagfrob_coefficient_mpq(mpq_t rop, long m, long p);
-
-void diagfrob_coefficient(padic_t rop, long m, const padic_ctx_t ctx);
-
-void diagfrob_alpha_mpq(mpq_t rop, const fmpz *a, long n, long d, 
-                        const mon_t u, const mon_t v, 
-                        const padic_ctx_t ctx);
-
-void diagfrob_alpha(padic_t rop, const fmpz *a, long n, long d, 
-                    const mon_t u, const mon_t v, 
-                    const padic_ctx_t ctx);
-
-void diagfrob_entry_mpq(mpq_t rop, const fmpz *a, long n, long d, 
-                        const mon_t u, const mon_t v, long bound, 
-                        const padic_ctx_t ctx);
-
-void diagfrob_entry(padic_t rop, const fmpz *a, long n, long d, 
-                    const mon_t u, const mon_t v, long bound, 
-                    const padic_ctx_t ctx);
-
-void diagfrob(mat_t F, const fmpz *a, long n, long d, const ctx_t ctx);
-
-void diagfrob_revcharpoly(fmpz *poly, const char *f, long n, long b, 
-                          const ctx_t ctx);
 
 /*
     Computes the precision to which one needs to compute the 
@@ -110,6 +75,12 @@ void diagfrob_matrix_prec(long *r, long *s, long n, const fmpz_t p)
 
     fmpz_clear(x);
 }
+
+void diagfrob(mat_t F, const fmpz *a, long n, long d, const ctx_t ctx, 
+              int verbose);
+
+void diagfrob_revcharpoly(fmpz *poly, const char *f, long n, long b, 
+                          const ctx_t ctx);
 
 #endif
 

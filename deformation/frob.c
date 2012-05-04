@@ -156,7 +156,7 @@ printf("\n");
         fmpz *t = _fmpz_vec_init(n + 1);
 
         mpoly_diagonal_fibre(t, P, ctxFracQt);
-        diagfrob(F0, t, n, d, ctxZp_F0);
+        diagfrob(F0, t, n, d, ctxZp_F0, 0);
 
 #if(DEBUG == 1)
 printf("Diagonal fibre F(0):\n");
