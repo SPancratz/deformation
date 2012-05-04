@@ -9,10 +9,15 @@
     \mu_m = 
         \sum_{k=0}^{\floor{m/2}} 2^{\floor{3m/4}-\nu_m-k} \frac{1}{(m-2k)! k!}
     \]
-    modulo $p^N$.
+    modulo $p^N$ in the case that $p = 2$.
 
-    Assuming that $p > 2$ is an odd prime.  This restriction is crucial 
-    as otherwise the expression is not $p$-adically integral.
+    Assumptions:
+
+        * $m \geq 0$
+        * $3 m$ fits into a signed long
+        * The computation does fit into the MPIR model; 
+          in particular $m!$ and $2^{\floor{3m/4}}$ have 
+          to fit into a signed int
  */
 
 void mu_2(fmpz_t rop, long m, long N)
@@ -107,10 +112,15 @@ void mu_2(fmpz_t rop, long m, long N)
     \[
     \mu_m = \sum_{k=0}^{\floor{m/p}} p^{\floor{m/p} - k} \frac{1}{(m-pk)! k!}
     \]
-    modulo $p^N$.
+    modulo $p^N$ in the case that $p > 2$ is an odd prime.
 
-    Assuming that $p > 2$ is an odd prime.  This restriction is crucial 
-    as otherwise the expression is not $p$-adically integral.
+    The restriction that $p > 2$ is crucial as otherwise 
+    the expression is not $p$-adically integral.
+
+    Assumptions:
+
+        * $m \geq 0$
+        * The computation does fit into the MPIR model
  */
 
 void mu_p(fmpz_t rop, long m, long p, long N)
@@ -205,14 +215,15 @@ void precompute_mu(fmpz *list, long M, long p, long N)
 
 /*
     Let $R = \floor{M/p}$.  This functions computes the list of 
-    powers of inverses $(1/d)^r$ for $r = 0, \dotsc, R$.
+    powers of inverses $(1/d)^r$ modulo $p^N$ for $r = 0, \dotsc, R$.
 
     Assumptions:
 
-      * $p \nmid d$
-      * $p$ prime
-      * $N \geq 1$
-      * $M \geq 0$
+        * $p$ prime
+        * $p \nmid d$
+        * $N \geq 1$
+        * $M \geq 0$
+        * The list has to be allocated to (at least) the correct length
  */
 
 void precompute_dinv_2(fmpz *list, long M, long d, long N)
@@ -277,8 +288,19 @@ void precompute_dinv(fmpz *list, long M, long d, long p, long N)
     Computes the double sum involved in the expression for 
     $\alpha_{u+1, v+1}$ when $p = 2$, namely
     \[
-    \sum_{m,r} \Bigl(\frac{u_i + 1}{d}\Bigr)_r 2^{- \floor{(m+1)/4} + \nu} \mu_m.
+    \sum_{m,r} 
+        \Bigl(\frac{u_i + 1}{d}\Bigr)_r 2^{- \floor{(m+1)/4} + \nu} \mu_m.
     \]
+
+    Assumptions:
+
+        * $p d$ fits into a signed long
+        * $With $u = u_i + 1$, u (u + d) \dotsm (u + 4d)$ fits into 
+          a signed long, which is guaranteed whenever $(5d)^5$ fits into 
+          a signed long
+        * With $u = u_i + 1$, $(u + (M - 1) d) (u + M d)$ fits into 
+          a signed long, which is guaranteed whenever $((M + 1)d)^2$ 
+          fits into a signed long
  */
 
 void dsum_2(
@@ -351,6 +373,11 @@ void dsum_2(
     \[
     \sum_{m,r} \Bigl(\frac{u_i + 1}{d}\Bigr)_r p^{r - \floor{m/p}} \mu_m.
     \]
+
+    Assumptions:
+
+        * $p d$ fits into a signed long
+        * $\floor{M/p} * d$ fits into a signed long
  */
 
 void dsum_p(
