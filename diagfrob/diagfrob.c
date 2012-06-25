@@ -56,43 +56,34 @@ void mu_2(fmpz_t rop, long m, long N)
     }
     else
     {
-        fmpz_t f, g, s, t;
+        fmpz_t f, s, t;
         long k, v;
 
         fmpz_init(f);
-        fmpz_init(g);
         fmpz_init(s);
         fmpz_init(t);
 
-        fmpz_one(f);
-        fmpz_fac_ui(g, m / 2);
-        fmpz_setbit(t, (3 * m) / 4);
-        fmpz_mul(s, t, g);
-        fmpz_set(t, s);
+        fmpz_fac_ui(f, m);
+        fmpz_one(s);
+        fmpz_one(t);
 
         for (k = 0; k < m / 2; k++)
         {
-            ulong h = (m - 2 * k - 1) * (m - 2 * k);
+            ulong h = ((m - 2 * k - 1) * (m - 2 * k)) / 2;
 
-            fmpz_mul_ui(f, f, h);
             fmpz_mul_ui(t, t, h);
-            fmpz_divexact_si(t, t, 2 * (k + 1));
+            fmpz_divexact_si(t, t, (k + 1));
             fmpz_add(s, s, t);
         }
 
         /*
             Now we have that 
                 f = m!
-                g = \floor{m/p}!
                 s = \sum_{k=0}^{\floor{m/2}} 
-                        2^{\floor{3m/4}-k} \frac{m!}{(m-pk)!} \frac{\floor{m/p}!}{k!}
-                t = ?
+                        2^{-k} \frac{m!}{(m-pk)! k!}
          */
 
-        fmpz_mul(t, f, g);
-
-        v  = - fmpz_remove(t, t, P);
-        v += fmpz_remove(s, s, P);
+        v  = fmpz_remove(s, s, P) - fmpz_remove(f, f, P) + (3*m)/4;
 
         if (v >= N)
         {
@@ -100,14 +91,13 @@ void mu_2(fmpz_t rop, long m, long N)
         }
         else
         {
-            _padic_inv(t, t, P, N - v);
-            fmpz_mul(rop, t, s);
+            _padic_inv(f, f, P, N - v);
+            fmpz_mul(rop, f, s);
             fmpz_fdiv_r_2exp(rop, rop, N - v);
             fmpz_mul_2exp(rop, rop, v);
         }
 
         fmpz_clear(f);
-        fmpz_clear(g);
         fmpz_clear(s);
         fmpz_clear(t);
     }
@@ -131,51 +121,38 @@ void mu_2(fmpz_t rop, long m, long N)
 
 void mu_p(fmpz_t rop, long m, long p, long N)
 {
-    fmpz_t f, g, h, s, t, P;
+    fmpz_t f, s, t, P;
     long k, v;
 
     fmpz_init(f);
-    fmpz_init(g);
-    fmpz_init(h);
     fmpz_init(s);
     fmpz_init(t);
     fmpz_init(P);
 
     fmpz_set_si(P, p);
 
-    fmpz_one(f);
-    fmpz_fac_ui(g, m / p);
     fmpz_pow_ui(t, P, m / p);
-    fmpz_mul(s, t, g);
-    fmpz_set(t, s);
+    fmpz_set(s, t);
 
     for (k = 0; k < m / p; k++)
     {
-        fmpz_rfac_uiui(h, m - p*k - (p-1), p);
-        fmpz_mul(f, f, h);
-        fmpz_mul(t, t, h);
+        fmpz_rfac_uiui(f, m - p*k - (p-1), p);
+        fmpz_mul(t, t, f);
         fmpz_divexact_si(t, t, p * (k + 1));
         fmpz_add(s, s, t);
     }
 
-    fmpz_fac_ui(h, m - (m / p) * p);
-    fmpz_mul(f, f, h);
+    fmpz_fac_ui(f, m);
 
     /*
         Now we have that 
             f = m!
-            g = \floor{m/p}!
-            h = ?
             s = \sum_{k=0}^{\floor{m/p}} 
-                    p^{\floor{m/p}-k} \frac{m!}{(m-pk)!} \frac{\floor{m/p}!}{k!}
-            t = ?
+                    p^{\floor{m/p}-k} \frac{m!}{(m-pk)! k!}
             P = p
      */
 
-    fmpz_mul(h, f, g);
-
-    v  = - fmpz_remove(h, h, P);
-    v += fmpz_remove(s, s, P);
+    v = fmpz_remove(s, s, P) - fmpz_remove(f, f, P);
 
     if (v >= N)
     {
@@ -183,17 +160,15 @@ void mu_p(fmpz_t rop, long m, long p, long N)
     }
     else
     {
-        _padic_inv(h, h, P, N - v);
+        _padic_inv(f, f, P, N - v);
         fmpz_pow_ui(t, P, N - v);
-        fmpz_mul(rop, h, s);
+        fmpz_mul(rop, f, s);
         fmpz_mod(rop, rop, t);
         fmpz_pow_ui(t, P, v);
         fmpz_mul(rop, rop, t);
     }
 
     fmpz_clear(f);
-    fmpz_clear(g);
-    fmpz_clear(h);
     fmpz_clear(s);
     fmpz_clear(t);
     fmpz_clear(P);
@@ -301,7 +276,7 @@ void precompute_dinv(fmpz *list, long M, long d, long p, long N)
     Assumptions:
 
         * $p d$ fits into a signed long
-        * $With $u = u_i + 1$, u (u + d) \dotsm (u + 4d)$ fits into 
+        * With $u = u_i + 1$, u (u + d) \dotsm (u + 4d)$ fits into 
           a signed long, which is guaranteed whenever $(5d)^5$ fits into 
           a signed long
         * With $u = u_i + 1$, $(u + (M - 1) d) (u + M d)$ fits into 
