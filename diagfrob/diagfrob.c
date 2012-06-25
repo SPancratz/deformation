@@ -131,8 +131,8 @@ void mu_p(fmpz_t rop, long m, long p, long N)
 
     fmpz_set_si(P, p);
 
-    fmpz_pow_ui(t, P, m / p);
-    fmpz_set(s, t);
+    fmpz_one(s);
+    fmpz_one(t);
 
     for (k = 0; k < m / p; k++)
     {
@@ -148,11 +148,11 @@ void mu_p(fmpz_t rop, long m, long p, long N)
         Now we have that 
             f = m!
             s = \sum_{k=0}^{\floor{m/p}} 
-                    p^{\floor{m/p}-k} \frac{m!}{(m-pk)! k!}
+                    p^{-k} \frac{m!}{(m-pk)! k!}
             P = p
      */
 
-    v = fmpz_remove(s, s, P) - fmpz_remove(f, f, P);
+    v = fmpz_remove(s, s, P) - fmpz_remove(f, f, P) + m / p;
 
     if (v >= N)
     {
