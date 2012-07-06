@@ -375,7 +375,7 @@ static void __fmpq_poly_derivative(const struct __ctx_struct * ctx, void *rop, c
     { fmpq_poly_derivative(rop, op); }
 
 static int __fmpq_poly_print(const struct __ctx_struct * ctx, const void *op)
-    { return fmpq_poly_print(op); }
+    { return fmpq_poly_print_pretty(op, "t"); }
 static char * __fmpq_poly_get_str(const struct __ctx_struct * ctx, const void *op)
     { return fmpq_poly_get_str(op); }
 static int __fmpq_poly_set_str(const struct __ctx_struct * ctx, void *rop, const char *str)
@@ -460,7 +460,7 @@ static void _fmpz_poly_q_derivative(const struct __ctx_struct * ctx, void *rop, 
     { fmpz_poly_q_derivative(rop, op); }
 
 static int _fmpz_poly_q_print(const struct __ctx_struct * ctx, const void *op)
-    { return fmpz_poly_q_print(op); }
+    { return fmpz_poly_q_print_pretty(op, "t"); }
 static char * _fmpz_poly_q_get_str(const struct __ctx_struct * ctx, const void *op)
     { return fmpz_poly_q_get_str(op); }
 static int _fmpz_poly_q_set_str(const struct __ctx_struct * ctx, void *rop, const char *str)
@@ -605,7 +605,7 @@ static void __padic_poly_div(const struct __ctx_struct * ctx, void *rop, const v
 static void __padic_poly_derivative(const struct __ctx_struct * ctx, void *rop, const void *op)
     { /* padic_poly_derivative(rop, op, ctx->pctx); */ } /* TODO !!! */
 static int __padic_poly_print(const struct __ctx_struct * ctx, const void *op)
-    { return padic_poly_print(op, ctx->pctx); }
+    { return padic_poly_print_pretty(op, "t", ctx->pctx); }
 static char * __padic_poly_get_str(const struct __ctx_struct * ctx, const void *op)
     { return NULL; /* return padic_poly_get_str(op, ctx->pctx); */ }
 

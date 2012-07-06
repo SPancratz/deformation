@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <mpir.h>
+#include <limits.h>
 
 #include "gmconnection.h"
 #include "diagfrob.h"
@@ -7,10 +8,26 @@
 
 #include "flint.h"
 #include "fmpq_mat.h"
+#include "fmpz_mod_poly.h"
 
 #include "deformation.h"
 
 #define DEBUG 1
+
+static void mat_print_sage(const mat_t mat, const ctx_t ctx)
+{
+    long i, j;
+
+    printf("[");
+    for (i = 0; i < mat->m; i++)
+        for (j = 0; j < mat->n; j++)
+        {
+            ctx->print(ctx, mat_entry(mat, i, j, ctx));
+            if (!(i == mat->m - 1 && j == mat->n - 1))
+                printf(", ");
+        }
+    printf("]");
+}
 
 /*
     Step 1.
@@ -47,8 +64,8 @@
 
     Step 6.
 
-    Evaluate this at $\hat{z}_1$, the Teichmuller lift of $z_1$ 
-    by computing $F(1) = r(\hat{z}_1)^{-m} G(\hat{z}_1)$ all 
+    Evaluate this at $\hat{t}_1$, the Teichmuller lift of $t_1$ 
+    by computing $F(1) = r(\hat{t}_1)^{-m} G(\hat{t}_1)$,  all 
     modulo $p^{N_1}$.
 
     Assumptions:
@@ -57,13 +74,13 @@
         - p is a word-sized prime
  */
 
-void frob(const mpoly_t P, const ctx_t ctxFracQt, const fmpz_t p)
+void frob(const mpoly_t P, const fmpz_t t1, const ctx_t ctxFracQt, const fmpz_t p)
 {
     const long n  = P->n - 1;
     const long d  = mpoly_degree(P, -1, ctxFracQt);
     const long b  = gmc_basis_size(n, d);
 
-    long N0, N1, N2, N3, K, m;
+    prec_struct prec = {0};
 
     /* Diagonal fibre */
     padic_ctx_t pctx_F0;
@@ -84,6 +101,14 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt, const fmpz_t p)
     padic_ctx_t pctx_F;
     ctx_t ctxZpt_F;
     mat_t F;
+
+#if(DEBUG == 1)
+printf("Input:\n");
+printf("P  = "), mpoly_print(P, ctxFracQt), printf("\n");
+printf("p  = "), fmpz_print(p), printf("\n");
+printf("t1 = "), fmpz_print(t1), printf("\n");
+printf("\n");
+#endif
 
     /* Step 1 {M, r} *********************************************************/
 
@@ -111,42 +136,42 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt, const fmpz_t p)
 #if(DEBUG == 1)
 printf("Gauss--Manin connection M:\n");
 mat_print(M, ctxFracQt);
-printf("\n");
-printf("r = ");
+printf("\n\n");
+printf("Denominator r:\n");
 fmpz_poly_print_pretty(r, "t");
-printf("\n");
+printf("\n\n");
 #endif
 
     /* Precisions ************************************************************/
 
-    N0 = deformation_prec_zeta_function(p, 1, n, d);
-    N1 = deformation_prec_frob(p, n, N0);
-    m  = deformation_prec_pole_order(p, N1);
-    K  = deformation_prec_tadic(p, 4, N1);
-    N2 = deformation_prec_local_solution(p, n, N1, K);
-    N3 = deformation_prec_diagfrob(p, n, N1, K);
+    deformation_precisions(&prec, p, 1, n, d, fmpz_poly_degree(r));
 
-    printf("Precisions:\n");
-    printf("N0 = %ld\n", N0);
-    printf("N1 = %ld\n", N1);
-    printf("N2 = %ld\n", N2);
-    printf("N3 = %ld\n", N3);
-    printf("m  = %ld\n", m);
-    printf("K  = %ld\n", K);
+#if(DEBUG == 1)
+printf("Precisions:\n");
+printf("N0 = %ld\n", prec.N0);
+printf("N1 = %ld\n", prec.N1);
+printf("N2 = %ld\n", prec.N2);
+printf("N3 = %ld\n", prec.N3);
+printf("m  = %ld\n", prec.m);
+printf("K  = %ld\n", prec.K);
+printf("r  = %ld\n", prec.r);
+printf("s  = %ld\n", prec.s);
+printf("\n");
+#endif
 
     /* Initialisation ********************************************************/
 
-    padic_ctx_init(pctx_F0, p, N3, PADIC_VAL_UNIT);
+    padic_ctx_init(pctx_F0, p, prec.N3, PADIC_VAL_UNIT);
     ctx_init_padic(ctxZp_F0, pctx_F0);
     mat_init(F0, b, b, ctxZp_F0);
 
-    padic_ctx_init(pctx_C, p, N2, PADIC_VAL_UNIT);
+    padic_ctx_init(pctx_C, p, prec.N2, PADIC_VAL_UNIT);
     ctx_init_padic_poly(ctxZpt_C, pctx_C);
 
     mat_init(C, b, b, ctxZpt_C);
     mat_init(Cinv, b, b, ctxZpt_C);
 
-    padic_ctx_init(pctx_F, p, N1, PADIC_VAL_UNIT);
+    padic_ctx_init(pctx_F, p, prec.N1, PADIC_VAL_UNIT);
     ctx_init_padic_poly(ctxZpt_F, pctx_F);
     mat_init(F, b, b, ctxZpt_F);
 
@@ -158,11 +183,14 @@ printf("\n");
         mpoly_diagonal_fibre(t, P, ctxFracQt);
         diagfrob(F0, t, n, d, ctxZp_F0, 0);
 
+        mat_transpose(F0, F0, ctxZp_F0);
+
 #if(DEBUG == 1)
-printf("Diagonal fibre F(0):\n");
-printf("{"), _fmpz_vec_print(t, n + 1), printf("}\n");
+printf("Diagonal fibre:\n");
+printf("P(0) = {"), _fmpz_vec_print(t, n + 1), printf("}\n");
+printf("Matrix F(0):\n");
 mat_print(F0, ctxZp_F0);
-printf("\n");
+printf("\n\n");
 #endif
 
         _fmpz_vec_clear(t, n + 1);
@@ -176,7 +204,7 @@ printf("\n");
      */
 
     {
-        long i;
+        long i, K = prec.K;
         mat_t Mt;
         padic_mat_struct *A, *Ainv;
 
@@ -194,6 +222,22 @@ printf("\n");
         gmde_solve(Ainv, (K + (*p) - 1) / (*p), pctx_C, Mt, ctxFracQt);
         gmde_convert_soln(C, ctxZpt_C, A, K);
         gmde_convert_soln(Cinv, ctxZpt_C, Ainv, (K + (*p) - 1) / (*p));
+
+#if(DEBUG == 1)
+printf("Local solution C(t):\n");
+mat_print_sage(C, ctxZpt_C);
+printf("\n\n");
+printf("Matrix C(t)^{-1}:\n");
+mat_print_sage(Cinv, ctxZpt_C);
+printf("\n\n");
+printf("Check ((d/dt + M) C(t)):\n");
+gmde_check_soln(C, ctxZpt_C, prec.K, M, ctxFracQt);
+printf("\n");
+printf("Check ((d/dt - M^t) C(t)^{-1}):\n");
+gmde_check_soln(Cinv, ctxZpt_C, (prec.K + (*p) - 1) / (*p), Mt, ctxFracQt);
+printf("\n");
+#endif
+
         mat_transpose(Cinv, Cinv, ctxZpt_C);
 
         for(i = 0; i < K; i++)
@@ -205,23 +249,20 @@ printf("\n");
         mat_clear(Mt, ctxFracQt);
     }
 
-
     {
         long i, j;
 
         /* Replace t by t^p in C^{-1} */
         for (i = 0; i < b; i++)
             for (j = 0; j < b; j++)
-            {    
                 padic_poly_compose_pow(
                     (padic_poly_struct *) mat_entry(Cinv, i, j, ctxZpt_C), 
-                    (padic_poly_struct *) mat_entry(Cinv, i, j, ctxZpt_C), fmpz_get_si(p), pctx_C);
-            }
+                    (padic_poly_struct *) mat_entry(Cinv, i, j, ctxZpt_C), 
+                    fmpz_get_si(p), pctx_C);
     }
 
-    /* Step 4 {F} ************************************************************/
+    /* Step 4 {F(t) := C(t) F(0) C(t^p)^{-1}} ********************************/
 
-    /* Form the product C(t) F(0) C(t^p)^{-1} */
     {
         long i, j, k;
         mat_t RHS;
@@ -256,7 +297,7 @@ printf("\n");
             for (j = 0; j < b; j++)
             {
                 padic_poly_truncate(
-                    (padic_poly_struct *) mat_entry(F, i, j, ctxZpt_F), K, p);
+                    (padic_poly_struct *) mat_entry(F, i, j, ctxZpt_F), prec.K, p);
                 padic_poly_reduce(
                     (padic_poly_struct *) mat_entry(F, i, j, ctxZpt_F), pctx_F);
             }
@@ -264,7 +305,13 @@ printf("\n");
         mat_clear(RHS, ctxZpt_C);
     }
 
-    /* Step 5 {G = r(t)^m F(t) ***********************************************/
+#if(DEBUG == 1)
+printf("Matrix Fp(t):\n");
+mat_print_sage(F, ctxZpt_F);
+printf("\n\n");
+#endif
+
+    /* Step 5 {G = r(t)^m F(t)} **********************************************/
 
     {
         long i, j;
@@ -273,7 +320,7 @@ printf("\n");
         padic_poly_init(t);
 
         padic_poly_set_fmpz_poly(t, r, pctx_F);
-        padic_poly_pow(t, t, m, pctx_F);
+        padic_poly_pow(t, t, prec.m, pctx_F);
 
         for (i = 0; i < b; i++)
             for (j = 0; j < b; j++)
@@ -284,11 +331,93 @@ printf("\n");
                     t, pctx_F);
 
                 padic_poly_truncate(
-                    (padic_poly_struct *) mat_entry(F, i, j, ctxZpt_F), K, p);
+                    (padic_poly_struct *) mat_entry(F, i, j, ctxZpt_F), prec.K, p);
             }
 
         padic_poly_clear(t);
     }
+
+    /* Step 6 {F(1) = r(t_1)^{-m} G(t_1)} ************************************/
+
+    {
+        long i, j, minv = LONG_MAX, N;
+        fmpz_t f, g, s, t, pN;
+        padic_mat_t F1;
+
+        fmpz_init(f);
+        fmpz_init(g);
+        fmpz_init(s);
+        fmpz_init(t);
+        fmpz_init(pN);
+        padic_mat_init(F1, b, b);
+
+        /* minv := ord_p(G) */
+        for (i = 0; i < b; i++)
+            for (j = 0; j < b; j++)
+            {
+                const padic_poly_struct *poly = 
+                    (padic_poly_struct *) mat_entry(F, i, j, ctxZpt_F);
+                if (!padic_poly_is_zero(poly) && padic_poly_val(poly) < minv)
+                    minv = padic_poly_val(poly);
+            }
+        if (minv == LONG_MAX)
+        {
+            printf("ERROR.\n");
+            printf("Minimum valuation of the matrix G is LONG_MAX.\n");
+            abort();
+        }
+
+        N = prec.N1 - minv;
+        fmpz_pow_ui(pN, p, N);
+
+        /* f := \hat{t_1}, g := r(\hat{t_1})^{-m} */
+        _padic_teichmuller(f, t1, p, N);
+        _fmpz_mod_poly_evaluate_fmpz(s, r->coeffs, r->length, f, pN);
+        _padic_inv(t, s, p, N);
+        fmpz_powm_ui(g, t, prec.m, pN);
+
+        /* F1 := g G(\hat{t_1}) */
+        for (i = 0; i < b; i++)
+            for (j = 0; j < b; j++)
+            {
+                const padic_poly_struct *poly = 
+                    (padic_poly_struct *) mat_entry(F, i, j, ctxZpt_F);
+                const long len = poly->length;
+                const long v   = poly->val;
+
+                if (len == 0)
+                {
+                    fmpz_zero(padic_mat_unit(F1, i, j));
+                }
+                else
+                {
+                    fmpz_pow_ui(s, p, v - minv);
+                    _fmpz_mod_poly_evaluate_fmpz(t, poly->coeffs, len, f, pN);
+                    fmpz_mul(padic_mat_unit(F1, i, j), s, t);
+                    fmpz_mul(padic_mat_unit(F1, i, j), padic_mat_unit(F1, i, j), g);
+                    fmpz_mod(padic_mat_unit(F1, i, j), padic_mat_unit(F1, i, j), pN);
+                }
+            }
+        padic_mat_val(F1) = minv;
+        _padic_mat_canonicalise(F1, pctx_F);
+
+#if(DEBUG == 1)
+printf("Matrix Fp(1):\n");
+padic_mat_print_pretty(F1, pctx_F);
+printf("\n");
+#endif
+
+        fmpz_clear(f);
+        fmpz_clear(g);
+        fmpz_clear(s);
+        fmpz_clear(t);
+        fmpz_clear(pN);
+        padic_mat_clear(F1);
+    }
+
+    /* Step 7 {Norm} *********************************************************/
+
+    /* Step 8 {Reverse characteristic polynomial} ****************************/
 
     /* Clean up **************************************************************/
 
