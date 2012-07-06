@@ -46,7 +46,7 @@ int main(void)
     padic_ctx_t pctx;
     fmpz_t p;
 
-    mat_t B, LHS;
+    mat_t B;
     ctx_t ctxZpt;
 
     printf("solve... \n");
@@ -85,7 +85,6 @@ int main(void)
 
     mat_init(M, b, b, ctxM);
     mat_init(B, b, b, ctxZpt);
-    mat_init(LHS, b, b, ctxZpt);
 
     gmc_compute(M, &rows, &cols, P, ctxM);
 
@@ -103,49 +102,7 @@ int main(void)
     mat_print(B, ctxZpt);
     printf("\n");
 
-    for (i = 0; i < b; i++)
-        for (j = 0; j < b; j++)
-        {
-            padic_poly_derivative((padic_poly_struct *) mat_entry(LHS, i, j, ctxZpt), 
-                                  (padic_poly_struct *) mat_entry(B, i, j, ctxZpt), pctx);
-
-            for (k = 0; k < b; k++)
-            {
-                fmpq_poly_t t1, t2;
-                padic_poly_t t;
-
-                fmpq_poly_init(t1);
-                fmpq_poly_init(t2);
-                padic_poly_init(t);
-
-                fmpq_poly_set_fmpz_poly(t1, fmpz_poly_q_numref(
-                    (fmpz_poly_q_struct *) mat_entry(M, i, k, ctxM)));
-                fmpq_poly_set_fmpz_poly(t2, fmpz_poly_q_denref(
-                    (fmpz_poly_q_struct *) mat_entry(M, i, k, ctxM)));
-
-                fmpq_poly_inv_series(t2, t2, N);
-                fmpq_poly_mul(t1, t1, t2);
-
-                padic_poly_set_fmpq_poly(t, t1, pctx);
-                padic_poly_mul(t, t, 
-                    (padic_poly_struct *) mat_entry(B, k, j, ctxZpt), pctx);
-                padic_poly_add((padic_poly_struct *) mat_entry(LHS, i, j, ctxZpt), 
-                               (padic_poly_struct *) mat_entry(LHS, i, j, ctxZpt), 
-                               t, pctx);
-
-                padic_poly_truncate(
-                    (padic_poly_struct *) mat_entry(LHS, i, j, ctxZpt), N - 1, 
-                    pctx->p);
-
-                fmpq_poly_clear(t1);
-                fmpq_poly_clear(t2);
-                padic_poly_clear(t);
-            }
-        }
-
-    printf("(d/dt + M) * C (mod t^%d)\n", N - 1);
-    mat_print(LHS, ctxZpt);
-    printf("\n");
+    gmde_check_soln(B, ctxZpt, N, M, ctxM);
 
     mpoly_clear(P, ctxM);
     mat_clear(M, ctxM);
@@ -153,7 +110,6 @@ int main(void)
     free(cols);
 
     mat_clear(B, ctxZpt);
-    mat_clear(LHS, ctxZpt);
 
     for (i = 0; i < N; i++)
         padic_mat_clear(C + i);

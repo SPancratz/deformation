@@ -32,5 +32,11 @@ void gmde_convert_soln_fmpq(mat_t A, const ctx_t ctxA,
 void gmde_convert_soln(mat_t A, const ctx_t ctxA, 
                        const padic_mat_struct *C, long N);
 
+
+/* Checks ********************************************************************/
+
+void gmde_check_soln(const mat_t C, const ctx_t Zpt, long K, 
+                     const mat_t M, const ctx_t FracZt);
+
 #endif
 
