@@ -148,24 +148,28 @@ printf("\n\n");
 
 #if(DEBUG == 1)
 printf("Precisions:\n");
-printf("N0 = %ld\n", prec.N0);
-printf("N1 = %ld\n", prec.N1);
-printf("N2 = %ld\n", prec.N2);
-printf("N3 = %ld\n", prec.N3);
-printf("m  = %ld\n", prec.m);
-printf("K  = %ld\n", prec.K);
-printf("r  = %ld\n", prec.r);
-printf("s  = %ld\n", prec.s);
+printf("N0   = %ld\n", prec.N0);
+printf("N1   = %ld\n", prec.N1);
+printf("N2   = %ld\n", prec.N2);
+printf("N3   = %ld\n", prec.N3);
+printf("N3i  = %ld\n", prec.N3i);
+printf("N3w  = %ld\n", prec.N3w);
+printf("N3iw = %ld\n", prec.N3iw);
+printf("N4   = %ld\n", prec.N4);
+printf("m    = %ld\n", prec.m);
+printf("K    = %ld\n", prec.K);
+printf("r    = %ld\n", prec.r);
+printf("s    = %ld\n", prec.s);
 printf("\n");
 #endif
 
     /* Initialisation ********************************************************/
 
-    padic_ctx_init(pctx_F0, p, prec.N3, PADIC_VAL_UNIT);
+    padic_ctx_init(pctx_F0, p, prec.N4, PADIC_VAL_UNIT);
     ctx_init_padic(ctxZp_F0, pctx_F0);
     mat_init(F0, b, b, ctxZp_F0);
 
-    padic_ctx_init(pctx_C, p, prec.N2, PADIC_VAL_UNIT);
+    padic_ctx_init(pctx_C, p, prec.N3, PADIC_VAL_UNIT);
     ctx_init_padic_poly(ctxZpt_C, pctx_C);
 
     mat_init(C, b, b, ctxZpt_C);

@@ -16,6 +16,10 @@ typedef struct {
     long N1;
     long N2;
     long N3;
+    long N3i;
+    long N3w;
+    long N3iw;
+    long N4;
     long K;
     long m;
     long r, s;
