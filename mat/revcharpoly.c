@@ -36,7 +36,7 @@ void mat_revcharpoly(char *poly, mat_t mat, const ctx_t ctx)
     {
         for (i = 0; i <= t; i++)
         {
-            ctx->set(ctx, _vec_entry(a, 0 * (n - 1) + i, ctx), 
+            ctx->set(ctx, _vec_entry(a, 0 * n + i, ctx), 
                           mat_entry(mat, i, t, ctx));
         }
 
@@ -50,20 +50,20 @@ void mat_revcharpoly(char *poly, mat_t mat, const ctx_t ctx)
                 for (j = 0; j <= t; j++)
                 {
                     ctx->mul(ctx, r, mat_entry(mat, i, j, ctx), 
-                                     _vec_entry(a, (k - 1) * (n - 1) + j, ctx));
+                                     _vec_entry(a, (k - 1) * n + j, ctx));
                     ctx->add(ctx, s, s, r);
                 }
-                ctx->set(ctx, _vec_entry(a, k * (n - 1) + i, ctx), s);
+                ctx->set(ctx, _vec_entry(a, k * n + i, ctx), s);
             }
 
-            ctx->set(ctx, _vec_entry(A, k, ctx), _vec_entry(a, k * (n - 1) + t, ctx));
+            ctx->set(ctx, _vec_entry(A, k, ctx), _vec_entry(a, k * n + t, ctx));
         }
 
         ctx->zero(ctx, s);
         for (j = 0; j <= t; j++)
         {
             ctx->mul(ctx, r, mat_entry(mat, t, j, ctx), 
-                             _vec_entry(a, (t - 1) * (n - 1) + j, ctx));
+                             _vec_entry(a, (t - 1) * n + j, ctx));
             ctx->add(ctx, s, s, r);
         }
         ctx->set(ctx, _vec_entry(A, t, ctx), s);
