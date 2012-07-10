@@ -6,6 +6,8 @@
 
 #include "generics.h"
 #include "fmpz.h"
+#include "fmpz_poly.h"
+#include "padic_mat.h"
 #include "mpoly.h"
 #include "mat.h"
 
@@ -94,6 +96,9 @@ void frob_with_precisions(mat_t F, const ctx_t ctxF,
 void frob_with_precisions_fmpq(mat_t F, const ctx_t ctxF, 
                                const mpoly_t P, const ctx_t ctxFracQt, 
                                long NWork, long K);
+
+void deformation_revcharpoly(fmpz_poly_t rop, const padic_mat_t op, long n, 
+                             const fmpz_t p, long a, long N0, long r, long s);
 
 #endif
 

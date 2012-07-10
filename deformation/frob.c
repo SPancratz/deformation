@@ -79,6 +79,7 @@ void frob(const mpoly_t P, const fmpz_t t1, const ctx_t ctxFracQt, const fmpz_t 
     const long n  = P->n - 1;
     const long d  = mpoly_degree(P, -1, ctxFracQt);
     const long b  = gmc_basis_size(n, d);
+    const long a = 1;
 
     prec_struct prec = {0};
 
@@ -101,6 +102,10 @@ void frob(const mpoly_t P, const fmpz_t t1, const ctx_t ctxFracQt, const fmpz_t 
     padic_ctx_t pctx_F;
     ctx_t ctxZpt_F;
     mat_t F;
+
+    padic_mat_t F1;
+
+    fmpz_poly_t cp;
 
 #if(DEBUG == 1)
 printf("Input:\n");
@@ -179,6 +184,9 @@ printf("\n");
     ctx_init_padic_poly(ctxZpt_F, pctx_F);
     mat_init(F, b, b, ctxZpt_F);
 
+    padic_mat_init(F1, b, b);
+    fmpz_poly_init(cp);
+
     /* Step 2 {F0} ***********************************************************/
 
     {
@@ -203,8 +211,8 @@ printf("\n\n");
     /* Step 3 {C, Cinv} ******************************************************/
     /*
         Compute C as a matrix over Z_p[[t]].  A is the same but as a series 
-        of matrices over Z_p.  Mt is the matrix -M^t, and C^{-1} is the 
-        local solution of the differential equation replacing M by Mt.
+        of matrices over Z_p.  Mt is the matrix -M^t, and Cinv is C^{-1}^t, 
+        the local solution of the differential equation replacing M by Mt.
      */
 
     {
@@ -266,6 +274,12 @@ printf("\n");
     }
 
     /* Step 4 {F(t) := C(t) F(0) C(t^p)^{-1}} ********************************/
+
+    /*
+        Computes the product C(t) F(0) C(t^p)^{-1} modulo (p^{N_2}, t^K). 
+        This is done by first computing the unit part of the product 
+        exactly over the integers modulo t^K.
+     */
 
     {
         long i, j, k;
@@ -346,14 +360,12 @@ printf("\n\n");
     {
         long i, j, minv = LONG_MAX, N;
         fmpz_t f, g, s, t, pN;
-        padic_mat_t F1;
 
         fmpz_init(f);
         fmpz_init(g);
         fmpz_init(s);
         fmpz_init(t);
         fmpz_init(pN);
-        padic_mat_init(F1, b, b);
 
         /* minv := ord_p(G) */
         for (i = 0; i < b; i++)
@@ -408,7 +420,7 @@ printf("\n\n");
 #if(DEBUG == 1)
 printf("Matrix Fp(1):\n");
 padic_mat_print_pretty(F1, pctx_F);
-printf("\n");
+printf("\n\n");
 #endif
 
         fmpz_clear(f);
@@ -416,12 +428,19 @@ printf("\n");
         fmpz_clear(s);
         fmpz_clear(t);
         fmpz_clear(pN);
-        padic_mat_clear(F1);
     }
 
     /* Step 7 {Norm} *********************************************************/
 
     /* Step 8 {Reverse characteristic polynomial} ****************************/
+
+    deformation_revcharpoly(cp, F1, n, p, a, prec.N0, prec.r, prec.s);
+
+    #if(DEBUG == 1)
+    printf("Reverse characteristic polynomial:\n");
+    fmpz_poly_print_pretty(cp, "T");
+    printf("\n\n");
+    #endif
 
     /* Clean up **************************************************************/
 
@@ -442,5 +461,8 @@ printf("\n");
     mat_clear(F, ctxZpt_F);
     ctx_clear(ctxZpt_F);
     padic_ctx_clear(pctx_F);
+
+    padic_mat_clear(F1);
+    fmpz_poly_clear(cp);
 }
 
