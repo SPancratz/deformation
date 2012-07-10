@@ -1,11 +1,10 @@
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <assert.h>
 
 #include "gmde.h"
 
