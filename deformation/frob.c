@@ -8,6 +8,7 @@
 
 #include "flint.h"
 #include "fmpq_mat.h"
+#include "padic_mat.h"
 #include "fmpz_mod_poly.h"
 
 #include "deformation.h"
@@ -85,8 +86,7 @@ void frob(const mpoly_t P, const fmpz_t t1, const ctx_t ctxFracQt, const fmpz_t 
 
     /* Diagonal fibre */
     padic_ctx_t pctx_F0;
-    ctx_t ctxZp_F0;
-    mat_t F0;
+    padic_mat_t F0;
 
     /* Gauss--Manin Connection */
     mat_t M;
@@ -171,8 +171,7 @@ printf("\n");
     /* Initialisation ********************************************************/
 
     padic_ctx_init(pctx_F0, p, prec.N4, PADIC_VAL_UNIT);
-    ctx_init_padic(ctxZp_F0, pctx_F0);
-    mat_init(F0, b, b, ctxZp_F0);
+    padic_mat_init(F0, b, b);
 
     padic_ctx_init(pctx_C, p, prec.N3, PADIC_VAL_UNIT);
     ctx_init_padic_poly(ctxZpt_C, pctx_C);
@@ -193,15 +192,15 @@ printf("\n");
         fmpz *t = _fmpz_vec_init(n + 1);
 
         mpoly_diagonal_fibre(t, P, ctxFracQt);
-        diagfrob(F0, t, n, d, ctxZp_F0, 0);
+        diagfrob(F0, t, n, d, pctx_F0, 0);
 
-        mat_transpose(F0, F0, ctxZp_F0);
+        padic_mat_transpose(F0, F0);
 
 #if(DEBUG == 1)
 printf("Diagonal fibre:\n");
 printf("P(0) = {"), _fmpz_vec_print(t, n + 1), printf("}\n");
 printf("Matrix F(0):\n");
-mat_print(F0, ctxZp_F0);
+padic_mat_print_pretty(F0, pctx_F0);
 printf("\n\n");
 #endif
 
@@ -291,7 +290,7 @@ printf("\n");
         {
             /* Find the unique k s.t. F0(i,k) is non-zero */
             for (k = 0; k < b; k++) 
-                if (!_padic_is_zero((padic_struct *) mat_entry(F0, i, k, ctxZp_F0)))
+                if (!fmpz_is_zero(padic_mat_unit(F0, i, k)))
                     break;
 
             if (k == b)
@@ -302,10 +301,18 @@ printf("\n");
 
             for (j = 0; j < b; j++)
             {
+                padic_t xxx;
+                _padic_init(xxx);
+                padic_val(xxx) = padic_mat_val(F0);
+                fmpz_set(padic_unit(xxx), padic_mat_unit(F0, i, k));
+                _padic_canonicalise(xxx, pctx_F0);
+
                 padic_poly_scalar_mul_padic(
                     (padic_poly_struct *) mat_entry(RHS, i, j, ctxZpt_C), 
                     (padic_poly_struct *) mat_entry(Cinv, k, j, ctxZpt_C), 
-                    (padic_struct *) mat_entry(F0, i, k, ctxZp_F0), pctx_C);
+                    xxx, pctx_C);
+
+                _padic_clear(xxx);
             }
         }
 
@@ -444,9 +451,8 @@ printf("\n\n");
 
     /* Clean up **************************************************************/
 
-    mat_clear(F0, ctxZp_F0);
-    ctx_clear(ctxZp_F0);
     padic_ctx_clear(pctx_F0);
+    padic_mat_clear(F0);
 
     mat_clear(M, ctxFracQt);
     free(bR);

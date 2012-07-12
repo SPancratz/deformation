@@ -13,6 +13,7 @@
 
 #include "flint.h"
 #include "padic.h"
+#include "padic_mat.h"
 
 #include "generics.h"
 #include "gmconnection.h"
@@ -76,8 +77,8 @@ void diagfrob_matrix_prec(long *r, long *s, long n, const fmpz_t p)
     fmpz_clear(x);
 }
 
-void diagfrob(mat_t F, const fmpz *a, long n, long d, const ctx_t ctx, 
-              int verbose);
+void diagfrob(padic_mat_t F, const fmpz *a, long n, long d, 
+              const padic_ctx_t ctx, int verbose);
 
 void diagfrob_revcharpoly(fmpz *poly, const char *f, long n, long b, 
                           const ctx_t ctx);

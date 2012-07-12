@@ -517,7 +517,7 @@ void alpha(fmpz_t rop, const long *u, const long *v,
         alpha_p(rop, u, v, a, dinv, mu, M, n, d, p, N);
 }
 
-void entry(padic_t rop, const long *u, const long *v, 
+void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v, 
     const fmpz *a, const fmpz *dinv, const fmpz *mu, long M, long C, 
     long n, long d, long p, long N)
 {
@@ -563,19 +563,20 @@ void entry(padic_t rop, const long *u, const long *v,
         Set rop to the product of $f$ and $g^{-1}$.
      */
 
-    padic_val(rop) = fmpz_remove(f, f, P) - fmpz_remove(g, g, P);
+    *rop_v = fmpz_remove(f, f, P) - fmpz_remove(g, g, P);
 
-    if (padic_val(rop) >= N)
+    if (*rop_v >= N)
     {
-        padic_zero(rop);
+        fmpz_zero(rop_u);
+        *rop_v = 0;
     }
     else
     {
-        _padic_inv(g, g, P, N - padic_val(rop));
+        _padic_inv(g, g, P, N - *rop_v);
 
-        fmpz_mul(padic_unit(rop), f, g);
-        fmpz_pow_ui(h, P, N - padic_val(rop));
-        fmpz_mod(padic_unit(rop), padic_unit(rop), h);
+        fmpz_mul(rop_u, f, g);
+        fmpz_pow_ui(h, P, N - *rop_v);
+        fmpz_mod(rop_u, rop_u, h);
     }
 
     fmpz_clear(f);
@@ -584,18 +585,20 @@ void entry(padic_t rop, const long *u, const long *v,
     fmpz_clear(P);
 }
 
-void diagfrob(mat_t F, const fmpz *a, long n, long d, const ctx_t ctx, 
-              int verbose)
+void diagfrob(padic_mat_t F, const fmpz *a, long n, long d, 
+              const padic_ctx_t ctx, int verbose)
 {
-    const fmpz *P = ctx->pctx->p;
+    const fmpz *P = ctx->p;
     const long p  = fmpz_get_si(P);
-    const long N  = ctx->pctx->N;
+    const long r  = padic_val_fac_ui(n - 1, P);
+    const long s  = (n + 1) * n_flog(n - 1, p);
+    const long N  = ctx->N;
 
     /*
         $C$ is such that $\ord_p((u'-1)! \alpha_{u+1,v+1}) \leq C$.
      */
 
-    const long C  = n + 2 * padic_val_fac_ui(n - 1, P) + (n + 1) * n_flog(n - 1, p);
+    const long C  = n + 2 * r + s;
     const long N2 = N - n + 2 * C;
     const long M  =  (p * p * N2) / (p-1) + p * p * n_flog(N2 / (p-1) + 2, p) 
                      + p * p * 4;
@@ -603,11 +606,9 @@ void diagfrob(mat_t F, const fmpz *a, long n, long d, const ctx_t ctx,
     mon_t *B;
     long *iB, lenB, lo, hi;
 
-    long i, j;
+    long i, j, *u, *v;
 
     fmpz *alift, *dinv, *mu;
-
-    long *u, *v;
 
     clock_t t0, t1;
     double t;
@@ -619,7 +620,7 @@ if (verbose)
     printf("Frobenius on the diagonal fibre\n");
     printf("N  = %ld\n", N);
     printf("N2 = %ld\n", N2);
-    printf("M  = %ld\n",  M);
+    printf("M  = %ld\n", M);
 }
 
 if (verbose)
@@ -684,10 +685,6 @@ if (verbose)
     printf("T = %f\n", t);
 }
 
-    mat_clear(F, ctx);
-    mat_init(F, lenB, lenB, ctx);
-    mat_zero(F, ctx);
-
 if (verbose)
 {
     printf("Matrix F\n");
@@ -695,7 +692,6 @@ if (verbose)
 }
 
     for (i = 0; i < lenB; i++)
-    {
         for (j = 0; j < lenB; j++)
         {
             long k;
@@ -712,15 +708,29 @@ if (verbose)
 
             if (k <= n)
             {
-                padic_zero((void *) mat_entry(F, i, j, ctx));
+                fmpz_zero(padic_mat_unit(F, i, j));
             }
             else
             {
-                entry((void *) mat_entry(F, i, j, ctx), 
-                    u, v, alift, dinv, mu, M, C, n, d, p, N);
+                long o;
+
+                entry(padic_mat_unit(F, i, j), &o, 
+                      u, v, alift, dinv, mu, M, C, n, d, p, N);
+
+                if (o != - (r + s))
+                {
+                    fmpz_t w;
+                    fmpz_init(w);
+                    fmpz_pow_ui(w, P, o + (r + s));
+                    fmpz_mul(padic_mat_unit(F, i, j), 
+                             padic_mat_unit(F, i, j), w);
+                    fmpz_clear(w);
+                }
             }
         }
-    }
+
+    padic_mat_val(F) = - (r + s);
+    _padic_mat_canonicalise(F, ctx);
 
 if (verbose)
 {
