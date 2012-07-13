@@ -9,6 +9,7 @@
 #include "flint.h"
 #include "fmpq_mat.h"
 #include "padic_mat.h"
+#include "fmpz_poly_mat.h"
 #include "fmpz_mod_poly.h"
 
 #include "deformation.h"
@@ -82,6 +83,8 @@ void frob(const mpoly_t P, const fmpz_t t1, const ctx_t ctxFracQt, const fmpz_t 
     const long b  = gmc_basis_size(n, d);
     const long a = 1;
 
+    long i, j, k;
+
     prec_struct prec = {0};
 
     /* Diagonal fibre */
@@ -97,11 +100,12 @@ void frob(const mpoly_t P, const fmpz_t t1, const ctx_t ctxFracQt, const fmpz_t 
     padic_ctx_t pctx_C;
     ctx_t ctxZpt_C;
     mat_t C, Cinv;
+    fmpz_poly_mat_t D, Dinv;
+    long vD, vDinv;
 
     /* Frobenius */
-    padic_ctx_t pctx_F;
-    ctx_t ctxZpt_F;
-    mat_t F;
+    fmpz_poly_mat_t F;
+    long vF;
 
     padic_mat_t F1;
 
@@ -123,7 +127,6 @@ printf("\n");
     gmc_compute(M, &bR, &bC, P, ctxFracQt);
 
     {
-        long i, j;
         fmpz_poly_t t;
 
         fmpz_poly_init(t);
@@ -179,9 +182,8 @@ printf("\n");
     mat_init(C, b, b, ctxZpt_C);
     mat_init(Cinv, b, b, ctxZpt_C);
 
-    padic_ctx_init(pctx_F, p, prec.N1, PADIC_VAL_UNIT);
-    ctx_init_padic_poly(ctxZpt_F, pctx_F);
-    mat_init(F, b, b, ctxZpt_F);
+    fmpz_poly_mat_init(F, b, b);
+    vF = 0;
 
     padic_mat_init(F1, b, b);
     fmpz_poly_init(cp);
@@ -215,7 +217,7 @@ printf("\n\n");
      */
 
     {
-        long i, K = prec.K;
+        long K = prec.K;
         mat_t Mt;
         padic_mat_struct *A, *Ainv;
 
@@ -261,8 +263,6 @@ printf("\n");
     }
 
     {
-        long i, j;
-
         /* Replace t by t^p in C^{-1} */
         for (i = 0; i < b; i++)
             for (j = 0; j < b; j++)
@@ -271,6 +271,73 @@ printf("\n");
                     (padic_poly_struct *) mat_entry(Cinv, i, j, ctxZpt_C), 
                     fmpz_get_si(p), pctx_C);
     }
+
+{
+fmpz_poly_mat_init(D, b, b);
+fmpz_poly_mat_init(Dinv, b, b);
+
+vD = LONG_MAX;
+for (i = 0; i < b; i++)
+    for (j = 0; j < b; j++)
+        vD = FLINT_MIN(vD, padic_poly_val((padic_poly_struct *) mat_entry(C, i, j, ctxZpt_C)));
+vDinv = LONG_MAX;
+for (i = 0; i < b; i++)
+    for (j = 0; j < b; j++)
+        vDinv = FLINT_MIN(vDinv, padic_poly_val((padic_poly_struct *) mat_entry(Cinv, i, j, ctxZpt_C)));
+
+for (i = 0; i < b; i++)
+    for (j = 0; j < b; j++)
+    {
+        const padic_poly_struct *poly1 = 
+            (padic_poly_struct *) mat_entry(C, i, j, ctxZpt_C);
+
+        if (!padic_poly_is_zero(poly1))
+        {
+            fmpz_poly_struct *poly2 = fmpz_poly_mat_entry(D, i, j);
+
+            fmpz_poly_fit_length(poly2, poly1->length);
+            _fmpz_vec_set(poly2->coeffs, poly1->coeffs, poly1->length);
+            _fmpz_poly_set_length(poly2, poly1->length);
+
+            if (padic_poly_val(poly1) > vD)
+            {
+                fmpz_t t;
+
+                fmpz_init(t);
+                fmpz_pow_ui(t, p, padic_poly_val(poly1) - vD);
+                _fmpz_vec_scalar_mul_fmpz(poly2->coeffs, 
+                                          poly2->coeffs, poly2->length, t);
+                fmpz_clear(t);
+            }
+        }
+    }
+for (i = 0; i < b; i++)
+    for (j = 0; j < b; j++)
+    {
+        const padic_poly_struct *poly1 = 
+            (padic_poly_struct *) mat_entry(Cinv, i, j, ctxZpt_C);
+
+        if (!padic_poly_is_zero(poly1))
+        {
+            fmpz_poly_struct *poly2 = fmpz_poly_mat_entry(Dinv, i, j);
+
+            fmpz_poly_fit_length(poly2, poly1->length);
+            _fmpz_vec_set(poly2->coeffs, poly1->coeffs, poly1->length);
+            _fmpz_poly_set_length(poly2, poly1->length);
+
+            if (padic_poly_val(poly1) > vDinv)
+            {
+                fmpz_t t;
+
+                fmpz_init(t);
+                fmpz_pow_ui(t, p, padic_poly_val(poly1) - vDinv);
+                _fmpz_vec_scalar_mul_fmpz(poly2->coeffs, 
+                                          poly2->coeffs, poly2->length, t);
+                fmpz_clear(t);
+            }
+        }
+    }
+}
 
     /* Step 4 {F(t) := C(t) F(0) C(t^p)^{-1}} ********************************/
 
@@ -281,10 +348,11 @@ printf("\n");
      */
 
     {
-        long i, j, k;
-        mat_t RHS;
+        fmpz_t pN;
+        fmpz_poly_mat_t T;
 
-        mat_init(RHS, b, b, ctxZpt_C);
+        fmpz_init(pN);
+        fmpz_poly_mat_init(T, b, b);
 
         for (i = 0; i < b; i++)
         {
@@ -292,121 +360,110 @@ printf("\n");
             for (k = 0; k < b; k++) 
                 if (!fmpz_is_zero(padic_mat_unit(F0, i, k)))
                     break;
-
             if (k == b)
             {
-                printf("Exception (frob). Bad F0.\n\n");
+                printf("Exception (frob). F0 is singular.\n\n");
                 abort();
             }
 
             for (j = 0; j < b; j++)
             {
-                padic_t xxx;
-                _padic_init(xxx);
-                padic_val(xxx) = padic_mat_val(F0);
-                fmpz_set(padic_unit(xxx), padic_mat_unit(F0, i, k));
-                _padic_canonicalise(xxx, pctx_F0);
-
-                padic_poly_scalar_mul_padic(
-                    (padic_poly_struct *) mat_entry(RHS, i, j, ctxZpt_C), 
-                    (padic_poly_struct *) mat_entry(Cinv, k, j, ctxZpt_C), 
-                    xxx, pctx_C);
-
-                _padic_clear(xxx);
+                fmpz_poly_scalar_mul_fmpz(fmpz_poly_mat_entry(T, i, j), 
+                                          fmpz_poly_mat_entry(Dinv, k, j), 
+                                          padic_mat_unit(F0, i, k));
             }
         }
 
-        mat_mul(F, C, RHS, ctxZpt_C);
+        fmpz_poly_mat_mul(F, D, T);
+        vF = vD + padic_mat_val(F0) + vDinv;
+
+        fmpz_pow_ui(pN, p, prec.N2 - vF);
 
         for (i = 0; i < b; i++)
             for (j = 0; j < b; j++)
             {
-                padic_poly_truncate(
-                    (padic_poly_struct *) mat_entry(F, i, j, ctxZpt_F), prec.K, p);
-                padic_poly_reduce(
-                    (padic_poly_struct *) mat_entry(F, i, j, ctxZpt_F), pctx_F);
+                fmpz_poly_struct *poly = fmpz_poly_mat_entry(F, i, j);
+                long len = poly->length;
+
+                fmpz_poly_truncate(poly, prec.K);
+                if (len != 0)
+                {
+                    _fmpz_vec_scalar_mod_fmpz(poly->coeffs, poly->coeffs, len, pN);
+                    _fmpz_poly_normalise(poly);
+                }
             }
 
-        mat_clear(RHS, ctxZpt_C);
+        fmpz_clear(pN);
+        fmpz_poly_mat_clear(T);
     }
 
 #if(DEBUG == 1)
 printf("Matrix Fp(t):\n");
-mat_print_sage(F, ctxZpt_F);
-printf("\n\n");
+fmpz_poly_mat_print(F, "t");
+printf("and a factor p^%ld, not necessarily the valuation.\n\n", vF);
 #endif
 
     /* Step 5 {G = r(t)^m F(t)} **********************************************/
 
     {
-        long i, j;
-        padic_poly_t t;
+        fmpz_t pN;
+        fmpz_poly_t t;
 
-        padic_poly_init(t);
+        fmpz_init(pN);
+        fmpz_poly_init(t);
 
-        padic_poly_set_fmpz_poly(t, r, pctx_F);
-        padic_poly_pow(t, t, prec.m, pctx_F);
+        fmpz_pow_ui(pN, p, prec.N2 - vF);
+
+        /* TODO: Could reduce this mod p^{N2-vF} */
+        fmpz_poly_pow(t, r, prec.m);
+
+        fmpz_poly_mat_scalar_mul_fmpz_poly(F, F, t);
 
         for (i = 0; i < b; i++)
             for (j = 0; j < b; j++)
             {
-                padic_poly_mul(
-                    (padic_poly_struct *) mat_entry(F, i, j, ctxZpt_F), 
-                    (padic_poly_struct *) mat_entry(F, i, j, ctxZpt_F), 
-                    t, pctx_F);
+                fmpz_poly_struct *poly = fmpz_poly_mat_entry(F, i, j);
+                long len = poly->length;
 
-                padic_poly_truncate(
-                    (padic_poly_struct *) mat_entry(F, i, j, ctxZpt_F), prec.K, p);
+                fmpz_poly_truncate(poly, prec.K);
+                if (len != 0)
+                {
+                    _fmpz_vec_scalar_mod_fmpz(poly->coeffs, 
+                                              poly->coeffs, len, pN);
+                    _fmpz_poly_normalise(poly);
+                }
             }
 
-        padic_poly_clear(t);
+        fmpz_clear(pN);
+        fmpz_poly_clear(t);
     }
 
     /* Step 6 {F(1) = r(t_1)^{-m} G(t_1)} ************************************/
 
     {
-        long i, j, minv = LONG_MAX, N;
-        fmpz_t f, g, s, t, pN;
+        long N;
+        fmpz_t f, g, t, pN;
 
         fmpz_init(f);
         fmpz_init(g);
-        fmpz_init(s);
         fmpz_init(t);
         fmpz_init(pN);
 
-        /* minv := ord_p(G) */
-        for (i = 0; i < b; i++)
-            for (j = 0; j < b; j++)
-            {
-                const padic_poly_struct *poly = 
-                    (padic_poly_struct *) mat_entry(F, i, j, ctxZpt_F);
-                if (!padic_poly_is_zero(poly) && padic_poly_val(poly) < minv)
-                    minv = padic_poly_val(poly);
-            }
-        if (minv == LONG_MAX)
-        {
-            printf("ERROR.\n");
-            printf("Minimum valuation of the matrix G is LONG_MAX.\n");
-            abort();
-        }
-
-        N = prec.N1 - minv;
+        N = prec.N2 - vF;
         fmpz_pow_ui(pN, p, N);
 
         /* f := \hat{t_1}, g := r(\hat{t_1})^{-m} */
         _padic_teichmuller(f, t1, p, N);
-        _fmpz_mod_poly_evaluate_fmpz(s, r->coeffs, r->length, f, pN);
-        _padic_inv(t, s, p, N);
+        _fmpz_mod_poly_evaluate_fmpz(t, r->coeffs, r->length, f, pN);
+        _padic_inv(t, t, p, N);
         fmpz_powm_ui(g, t, prec.m, pN);
 
         /* F1 := g G(\hat{t_1}) */
         for (i = 0; i < b; i++)
             for (j = 0; j < b; j++)
             {
-                const padic_poly_struct *poly = 
-                    (padic_poly_struct *) mat_entry(F, i, j, ctxZpt_F);
-                const long len = poly->length;
-                const long v   = poly->val;
+                const fmpz_poly_struct *poly = fmpz_poly_mat_entry(F, i, j);
+                const long len               = poly->length;
 
                 if (len == 0)
                 {
@@ -414,25 +471,22 @@ printf("\n\n");
                 }
                 else
                 {
-                    fmpz_pow_ui(s, p, v - minv);
                     _fmpz_mod_poly_evaluate_fmpz(t, poly->coeffs, len, f, pN);
-                    fmpz_mul(padic_mat_unit(F1, i, j), s, t);
-                    fmpz_mul(padic_mat_unit(F1, i, j), padic_mat_unit(F1, i, j), g);
+                    fmpz_mul(padic_mat_unit(F1, i, j), g, t);
                     fmpz_mod(padic_mat_unit(F1, i, j), padic_mat_unit(F1, i, j), pN);
                 }
             }
-        padic_mat_val(F1) = minv;
-        _padic_mat_canonicalise(F1, pctx_F);
+        padic_mat_val(F1) = vF;
+        _padic_mat_canonicalise(F1, pctx_F0);
 
 #if(DEBUG == 1)
 printf("Matrix Fp(1):\n");
-padic_mat_print_pretty(F1, pctx_F);
+padic_mat_print_pretty(F1, pctx_F0);
 printf("\n\n");
 #endif
 
         fmpz_clear(f);
         fmpz_clear(g);
-        fmpz_clear(s);
         fmpz_clear(t);
         fmpz_clear(pN);
     }
@@ -461,12 +515,12 @@ printf("\n\n");
 
     mat_clear(C, ctxZpt_C);
     mat_clear(Cinv, ctxZpt_C);
+    fmpz_poly_mat_clear(D);
+    fmpz_poly_mat_clear(Dinv);
     ctx_clear(ctxZpt_C);
     padic_ctx_clear(pctx_C);
 
-    mat_clear(F, ctxZpt_F);
-    ctx_clear(ctxZpt_F);
-    padic_ctx_clear(pctx_F);
+    fmpz_poly_mat_clear(F);
 
     padic_mat_clear(F1);
     fmpz_poly_clear(cp);
