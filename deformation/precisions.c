@@ -117,7 +117,7 @@ void deformation_precisions(prec_struct *prec,
 {
     long f;
 
-    prec->N0 = _zeta_function(p, a, n, d);
+    prec->N0 = 10 * _zeta_function(p, a, n, d);
     prec->N1 = _frobq(&(prec->r), &(prec->s), p, n, prec->N0);
     prec->N2 = _frobp(a, prec->N1, prec->r, prec->s);
 

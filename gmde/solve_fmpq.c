@@ -1,6 +1,6 @@
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -9,7 +9,7 @@
 
 #include "gmde.h"
 
-void gmde_solve_fmpq(fmpq_mat_struct *C, long N, 
+void gmde_solve_fmpq(fmpq_mat_struct *C, long K, 
                      const mat_t M, const ctx_t ctxM)
 {
     const long n = M->m;
@@ -42,7 +42,7 @@ void gmde_solve_fmpq(fmpq_mat_struct *C, long N,
 
         fmpq_mat_one(C + 0);
 
-        for (i = 0; i < N - 1; i++)
+        for (i = 0; i < K - 1; i++)
         {
             fmpq_mat_zero(C + (i + 1));
 

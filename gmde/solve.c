@@ -8,10 +8,12 @@
 
 #include "gmde.h"
 
-void gmde_solve(padic_mat_struct *C, long N, const padic_ctx_t pctx, 
+void gmde_solve(padic_mat_struct *C, long K, const fmpz_t p, long N, long Nw, 
                 const mat_t M, const ctx_t ctxM)
 {
     const long n = M->m;
+
+    padic_ctx_t pctx, pctxW;
 
     padic_mat_struct *B;
     long lenB;
@@ -24,9 +26,11 @@ void gmde_solve(padic_mat_struct *C, long N, const padic_ctx_t pctx,
 
     /* Initialisation */
     fmpz_poly_init(r);
+    padic_ctx_init(pctx,  p,  N, PADIC_SERIES);
+    padic_ctx_init(pctxW, p, Nw, PADIC_SERIES);
 
     /* Express M as B / r */
-    gmde_convert_gmc(&B, &lenB, r, pctx, M, ctxM);
+    gmde_convert_gmc(&B, &lenB, r, pctxW, M, ctxM);
 
     r0   = fmpz_poly_get_coeff_ptr(r, 0);
     lenR = fmpz_poly_length(r);
@@ -41,7 +45,7 @@ void gmde_solve(padic_mat_struct *C, long N, const padic_ctx_t pctx,
 
         _padic_mat_one(C + 0);
 
-        for (i = 0; i < N - 1; i++)
+        for (i = 0; i < K - 1; i++)
         {
             padic_mat_zero(C + (i + 1));
 
@@ -49,9 +53,8 @@ void gmde_solve(padic_mat_struct *C, long N, const padic_ctx_t pctx,
             for ( ; j <= i; j++)
             {
                 /* C[i+1] = C[i+1] + b[i-j] * C[j]; */
-                padic_mat_mul(mat, B + (i - j), C + j, pctx);
-                padic_mat_reduce(mat, pctx);
-                padic_mat_add(C + (i + 1), C + (i + 1), mat, pctx);
+                _padic_mat_mul(mat, B + (i - j), C + j, pctxW);
+                _padic_mat_add(C + (i + 1), C + (i + 1), mat, pctxW);
             }
 
             j = FLINT_MAX(0, i - lenR + 1) + 1;
@@ -59,16 +62,21 @@ void gmde_solve(padic_mat_struct *C, long N, const padic_ctx_t pctx,
             {
                 /* C[i+1] = C[i+1] + r[i-j+1] * j * C[j]; */
                 fmpz_mul_ui(coeff, fmpz_poly_get_coeff_ptr(r, i - j + 1), j);
-                padic_mat_scalar_mul_fmpz(mat, C + j, coeff, pctx);
-                padic_mat_add(C + (i + 1), C + (i + 1), mat, pctx);
+                _padic_mat_scalar_mul_fmpz(mat, C + j, coeff, pctxW);
+                _padic_mat_add(C + (i + 1), C + (i + 1), mat, pctxW);
             }
 
             fmpz_mul_si(coeff, r0, -(i + 1));
-            padic_mat_scalar_div_fmpz(C + (i + 1), C + (i + 1), coeff, pctx);
+            padic_mat_scalar_div_fmpz(C + (i + 1), C + (i + 1), coeff, pctxW);
         }
 
         padic_mat_clear(mat);
         fmpz_clear(coeff);
+    }
+
+    for (i = 0; i < K; i++)
+    {
+        padic_mat_reduce(C + i, pctx);
     }
 
     /* Clean-up */
@@ -77,5 +85,7 @@ void gmde_solve(padic_mat_struct *C, long N, const padic_ctx_t pctx,
     free(B);
 
     fmpz_poly_clear(r);
+    padic_ctx_clear(pctx);
+    padic_ctx_clear(pctxW);
 }
 

@@ -1,11 +1,12 @@
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include <stdlib.h>
 #include <assert.h>
+#include <limits.h>
 
 #include "gmde.h"
 
@@ -34,34 +35,51 @@ void gmde_convert_soln_fmpq(mat_t A, const ctx_t ctxA,
         }
 }
 
-void gmde_convert_soln(mat_t A, const ctx_t ctxA, 
-                       const padic_mat_struct *C, long N)
+void gmde_convert_soln(fmpz_poly_mat_t A, long *vA, 
+                       const padic_mat_struct *C, long N, const fmpz_t p)
 {
     long i, j, k;
-    padic_t t;
+    fmpz_t s, t;
 
     assert(N > 0);
-    assert(A->m == padic_mat(C)->r && A->n == padic_mat(C)->c);
+    assert(A->r == padic_mat(C)->r && A->c == padic_mat(C)->c);
 
-    _padic_init(t);
+    fmpz_init(s);
+    fmpz_init(t);
 
-    for (i = 0; i < A->m; i++)
-        for (j = 0; j < A->n; j++)
+    /* Find valuation */
+    *vA = LONG_MAX;
+    for (k = 0; k < N; k++)
+        *vA = FLINT_MIN(*vA, padic_mat_val(C + k));
+
+    fmpz_poly_mat_zero(A);
+
+    for (k = N - 1; k >= 0; k--)
+    {
+        if (padic_mat_val(C + k) == *vA)
         {
-            ctxA->zero(ctxA, mat_entry(A, i, j, ctxA));
-
-            for (k = N - 1; k >= 0; k--)
-            {
-                if (!fmpz_is_zero(padic_mat_unit(C + k, i, j)))
-                {
-                    padic_mat_get_entry_padic(t, C + k, i, j, ctxA->pctx);
-                    padic_poly_set_coeff_padic(
-                        (padic_poly_struct *) mat_entry(A, i, j, ctxA), k, t, 
-                        ctxA->pctx);
-                }
-            }
+            for (i = 0; i < A->r; i++)
+                for (j = 0; j < A->c; j++)
+                    if (!fmpz_is_zero(padic_mat_unit(C + k, i, j)))
+                        fmpz_poly_set_coeff_fmpz(fmpz_poly_mat_entry(A, i, j), k, 
+                                                 padic_mat_unit(C + k, i, j));
         }
+        else
+        {
+            fmpz_pow_ui(s, p, padic_mat_val(C + k) - *vA);
 
-    _padic_clear(t);
+            for (i = 0; i < A->r; i++)
+                for (j = 0; j < A->c; j++)
+                    if (!fmpz_is_zero(padic_mat_unit(C + k, i, j)))
+                    {
+                        fmpz_mul(t, s, padic_mat_unit(C + k, i, j));
+                        fmpz_poly_set_coeff_fmpz(fmpz_poly_mat_entry(A, i, j), 
+                                                 k, t);
+                    }
+        }
+    }
+
+    fmpz_clear(s);
+    fmpz_clear(t);
 }
 

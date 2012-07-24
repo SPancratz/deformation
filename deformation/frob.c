@@ -31,6 +31,69 @@ static void mat_print_sage(const mat_t mat, const ctx_t ctx)
     printf("]");
 }
 
+static 
+void _fmpz_poly_compose_pow(fmpz *rop, const fmpz *op, long len, long k)
+{
+    if (k == 1)
+    {
+        if (rop != op)
+        {
+            _fmpz_vec_set(rop, op, len);
+        }
+    }
+    else if (len == 1)
+    {
+        fmpz_set(rop, op);
+    }
+    else
+    {
+        long i, j, h;
+
+        for (i = len - 1, j = (len - 1) * k ; i >= 0; i--, j -= k)
+        {
+            fmpz_set(rop + j, op + i);
+            if (i != 0)
+                for (h = 1; h < k; h++)
+                    fmpz_zero(rop + (j - h));
+        }
+    }
+}
+
+static 
+void fmpz_poly_compose_pow(fmpz_poly_t rop, const fmpz_poly_t op, long k)
+{
+    const long len  = op->length;
+    const long lenr = (len - 1) * k + 1;
+
+    if (len == 0)
+    {
+        fmpz_poly_zero(rop);
+    }
+    else
+    {
+        fmpz_poly_fit_length(rop, lenr);
+        _fmpz_poly_compose_pow(rop->coeffs, op->coeffs, len, k);
+        _fmpz_poly_set_length(rop, lenr);
+    }
+}
+
+static 
+void fmpz_poly_mat_compose_pow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, long k)
+{
+    long i, j;
+
+    if (!(A->r == B->r && A->c == B->c))
+    {
+        printf("Exception (fmpz_poly_mat_compose_pow).  Incompatible dimensions.\n");
+        abort();
+    }
+
+    for (i = 0; i < B->r; i++)
+        for (j = 0; j < B->c; j++)
+            fmpz_poly_compose_pow(fmpz_poly_mat_entry(B, i, j), 
+                                  fmpz_poly_mat_entry(A, i, j), k);
+}
+
 /*
     Step 1.
 
@@ -98,10 +161,8 @@ void frob(const mpoly_t P, const fmpz_t t1, const ctx_t ctxFracQt, const fmpz_t 
 
     /* Local solution */
     padic_ctx_t pctx_C;
-    ctx_t ctxZpt_C;
-    mat_t C, Cinv;
-    fmpz_poly_mat_t D, Dinv;
-    long vD, vDinv;
+    fmpz_poly_mat_t C, Cinv;
+    long vC, vCinv;
 
     /* Frobenius */
     fmpz_poly_mat_t F;
@@ -177,10 +238,9 @@ printf("\n");
     padic_mat_init(F0, b, b);
 
     padic_ctx_init(pctx_C, p, prec.N3, PADIC_VAL_UNIT);
-    ctx_init_padic_poly(ctxZpt_C, pctx_C);
 
-    mat_init(C, b, b, ctxZpt_C);
-    mat_init(Cinv, b, b, ctxZpt_C);
+    fmpz_poly_mat_init(C, b, b);
+    fmpz_poly_mat_init(Cinv, b, b);
 
     fmpz_poly_mat_init(F, b, b);
     vF = 0;
@@ -231,27 +291,22 @@ printf("\n\n");
         mat_init(Mt, b, b, ctxFracQt);
         mat_transpose(Mt, M, ctxFracQt);
         mat_neg(Mt, Mt, ctxFracQt);
-        gmde_solve(A, K, pctx_C, M, ctxFracQt);
-        gmde_solve(Ainv, (K + (*p) - 1) / (*p), pctx_C, Mt, ctxFracQt);
-        gmde_convert_soln(C, ctxZpt_C, A, K);
-        gmde_convert_soln(Cinv, ctxZpt_C, Ainv, (K + (*p) - 1) / (*p));
+        gmde_solve(A, K, p, prec.N3, prec.N3w, M, ctxFracQt);
+        gmde_solve(Ainv, (K + (*p) - 1) / (*p), p, prec.N3i, prec.N3iw, Mt, ctxFracQt);
+        gmde_convert_soln(C, &vC, A, K, p);
+        gmde_convert_soln(Cinv, &vCinv, Ainv, (K + (*p) - 1) / (*p), p);
 
 #if(DEBUG == 1)
 printf("Local solution C(t):\n");
-mat_print_sage(C, ctxZpt_C);
-printf("\n\n");
-printf("Matrix C(t)^{-1}:\n");
-mat_print_sage(Cinv, ctxZpt_C);
-printf("\n\n");
-printf("Check ((d/dt + M) C(t)):\n");
-gmde_check_soln(C, ctxZpt_C, prec.K, M, ctxFracQt);
+fmpz_poly_mat_print(C, "t");
 printf("\n");
-printf("Check ((d/dt - M^t) C(t)^{-1}):\n");
-gmde_check_soln(Cinv, ctxZpt_C, (prec.K + (*p) - 1) / (*p), Mt, ctxFracQt);
+printf("Matrix C(t)^{-1}:\n");
+fmpz_poly_mat_print(Cinv, "t");
 printf("\n");
 #endif
 
-        mat_transpose(Cinv, Cinv, ctxZpt_C);
+        fmpz_poly_mat_transpose(Cinv, Cinv);
+        fmpz_poly_mat_compose_pow(Cinv, Cinv, *p);
 
         for(i = 0; i < K; i++)
             padic_mat_clear(A + i);
@@ -261,83 +316,6 @@ printf("\n");
         free(Ainv);
         mat_clear(Mt, ctxFracQt);
     }
-
-    {
-        /* Replace t by t^p in C^{-1} */
-        for (i = 0; i < b; i++)
-            for (j = 0; j < b; j++)
-                padic_poly_compose_pow(
-                    (padic_poly_struct *) mat_entry(Cinv, i, j, ctxZpt_C), 
-                    (padic_poly_struct *) mat_entry(Cinv, i, j, ctxZpt_C), 
-                    fmpz_get_si(p), pctx_C);
-    }
-
-{
-fmpz_poly_mat_init(D, b, b);
-fmpz_poly_mat_init(Dinv, b, b);
-
-vD = LONG_MAX;
-for (i = 0; i < b; i++)
-    for (j = 0; j < b; j++)
-        vD = FLINT_MIN(vD, padic_poly_val((padic_poly_struct *) mat_entry(C, i, j, ctxZpt_C)));
-vDinv = LONG_MAX;
-for (i = 0; i < b; i++)
-    for (j = 0; j < b; j++)
-        vDinv = FLINT_MIN(vDinv, padic_poly_val((padic_poly_struct *) mat_entry(Cinv, i, j, ctxZpt_C)));
-
-for (i = 0; i < b; i++)
-    for (j = 0; j < b; j++)
-    {
-        const padic_poly_struct *poly1 = 
-            (padic_poly_struct *) mat_entry(C, i, j, ctxZpt_C);
-
-        if (!padic_poly_is_zero(poly1))
-        {
-            fmpz_poly_struct *poly2 = fmpz_poly_mat_entry(D, i, j);
-
-            fmpz_poly_fit_length(poly2, poly1->length);
-            _fmpz_vec_set(poly2->coeffs, poly1->coeffs, poly1->length);
-            _fmpz_poly_set_length(poly2, poly1->length);
-
-            if (padic_poly_val(poly1) > vD)
-            {
-                fmpz_t t;
-
-                fmpz_init(t);
-                fmpz_pow_ui(t, p, padic_poly_val(poly1) - vD);
-                _fmpz_vec_scalar_mul_fmpz(poly2->coeffs, 
-                                          poly2->coeffs, poly2->length, t);
-                fmpz_clear(t);
-            }
-        }
-    }
-for (i = 0; i < b; i++)
-    for (j = 0; j < b; j++)
-    {
-        const padic_poly_struct *poly1 = 
-            (padic_poly_struct *) mat_entry(Cinv, i, j, ctxZpt_C);
-
-        if (!padic_poly_is_zero(poly1))
-        {
-            fmpz_poly_struct *poly2 = fmpz_poly_mat_entry(Dinv, i, j);
-
-            fmpz_poly_fit_length(poly2, poly1->length);
-            _fmpz_vec_set(poly2->coeffs, poly1->coeffs, poly1->length);
-            _fmpz_poly_set_length(poly2, poly1->length);
-
-            if (padic_poly_val(poly1) > vDinv)
-            {
-                fmpz_t t;
-
-                fmpz_init(t);
-                fmpz_pow_ui(t, p, padic_poly_val(poly1) - vDinv);
-                _fmpz_vec_scalar_mul_fmpz(poly2->coeffs, 
-                                          poly2->coeffs, poly2->length, t);
-                fmpz_clear(t);
-            }
-        }
-    }
-}
 
     /* Step 4 {F(t) := C(t) F(0) C(t^p)^{-1}} ********************************/
 
@@ -369,13 +347,13 @@ for (i = 0; i < b; i++)
             for (j = 0; j < b; j++)
             {
                 fmpz_poly_scalar_mul_fmpz(fmpz_poly_mat_entry(T, i, j), 
-                                          fmpz_poly_mat_entry(Dinv, k, j), 
+                                          fmpz_poly_mat_entry(Cinv, k, j), 
                                           padic_mat_unit(F0, i, k));
             }
         }
 
-        fmpz_poly_mat_mul(F, D, T);
-        vF = vD + padic_mat_val(F0) + vDinv;
+        fmpz_poly_mat_mul(F, C, T);
+        vF = vC + padic_mat_val(F0) + vCinv;
 
         fmpz_pow_ui(pN, p, prec.N2 - vF);
 
@@ -513,15 +491,12 @@ printf("\n\n");
     free(bC);
     fmpz_poly_clear(r);
 
-    mat_clear(C, ctxZpt_C);
-    mat_clear(Cinv, ctxZpt_C);
-    fmpz_poly_mat_clear(D);
-    fmpz_poly_mat_clear(Dinv);
-    ctx_clear(ctxZpt_C);
     padic_ctx_clear(pctx_C);
 
-    fmpz_poly_mat_clear(F);
+    fmpz_poly_mat_clear(C);
+    fmpz_poly_mat_clear(Cinv);
 
+    fmpz_poly_mat_clear(F);
     padic_mat_clear(F1);
     fmpz_poly_clear(cp);
 }
