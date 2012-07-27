@@ -1,6 +1,7 @@
 #include <stdlib.h>
-#include <mpir.h>
 #include <limits.h>
+#include <time.h>
+#include <mpir.h>
 
 #include "gmconnection.h"
 #include "diagfrob.h"
@@ -132,14 +133,12 @@ void fmpz_poly_mat_compose_pow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, long 
     Evaluate this at $\hat{t}_1$, the Teichmuller lift of $t_1$ 
     by computing $F(1) = r(\hat{t}_1)^{-m} G(\hat{t}_1)$,  all 
     modulo $p^{N_1}$.
-
-    Assumptions:
-
-        - F is a matrix over $\mathbf{Q}_p[t]$
-        - p is a word-sized prime
  */
 
-void frob(const mpoly_t P, const fmpz_t t1, const ctx_t ctxFracQt, const fmpz_t p)
+void frob(const mpoly_t P, const ctx_t ctxFracQt, 
+          const fmpz_t t1, const fmpz_t p, 
+          prec_t *prec, const prec_t *prec_in, 
+          int verbose)
 {
     const long n  = P->n - 1;
     const long d  = mpoly_degree(P, -1, ctxFracQt);
@@ -147,8 +146,6 @@ void frob(const mpoly_t P, const fmpz_t t1, const ctx_t ctxFracQt, const fmpz_t 
     const long a = 1;
 
     long i, j, k;
-
-    prec_struct prec = {0};
 
     /* Diagonal fibre */
     padic_ctx_t pctx_F0;
@@ -160,7 +157,6 @@ void frob(const mpoly_t P, const fmpz_t t1, const ctx_t ctxFracQt, const fmpz_t 
     fmpz_poly_t r;
 
     /* Local solution */
-    padic_ctx_t pctx_C;
     fmpz_poly_mat_t C, Cinv;
     long vC, vCinv;
 
@@ -172,15 +168,21 @@ void frob(const mpoly_t P, const fmpz_t t1, const ctx_t ctxFracQt, const fmpz_t 
 
     fmpz_poly_t cp;
 
-#if(DEBUG == 1)
-printf("Input:\n");
-printf("P  = "), mpoly_print(P, ctxFracQt), printf("\n");
-printf("p  = "), fmpz_print(p), printf("\n");
-printf("t1 = "), fmpz_print(t1), printf("\n");
-printf("\n");
-#endif
+    clock_t c0, c1;
+    double c;
+
+    if (verbose)
+    {
+        printf("Input:\n");
+        printf("  P  = "), mpoly_print(P, ctxFracQt), printf("\n");
+        printf("  p  = "), fmpz_print(p), printf("\n");
+        printf("  t1 = "), fmpz_print(t1), printf("\n");
+        printf("\n");
+    }
 
     /* Step 1 {M, r} *********************************************************/
+
+    c0 = clock();
 
     mat_init(M, b, b, ctxFracQt);
     fmpz_poly_init(r);
@@ -202,42 +204,50 @@ printf("\n");
         fmpz_poly_clear(t);
     }
 
-#if(DEBUG == 1)
-printf("Gauss--Manin connection M:\n");
-mat_print(M, ctxFracQt);
-printf("\n\n");
-printf("Denominator r:\n");
-fmpz_poly_print_pretty(r, "t");
-printf("\n\n");
-#endif
+    c1 = clock();
+    c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
+
+    if (verbose)
+    {
+        printf("Gauss-Manin connection:\n");
+        printf("  r(t) = "), fmpz_poly_print_pretty(r, "t"), printf("\n");
+        printf("  Time = %f\n", c);
+        printf("\n");
+    }
 
     /* Precisions ************************************************************/
 
-    deformation_precisions(&prec, p, 1, n, d, fmpz_poly_degree(r));
+    if (prec_in != NULL)
+    {
+        *prec = *prec_in;
+    }
+    else
+    {
+        deformation_precisions(prec, p, 1, n, d, fmpz_poly_degree(r));
+    }
 
-#if(DEBUG == 1)
-printf("Precisions:\n");
-printf("N0   = %ld\n", prec.N0);
-printf("N1   = %ld\n", prec.N1);
-printf("N2   = %ld\n", prec.N2);
-printf("N3   = %ld\n", prec.N3);
-printf("N3i  = %ld\n", prec.N3i);
-printf("N3w  = %ld\n", prec.N3w);
-printf("N3iw = %ld\n", prec.N3iw);
-printf("N4   = %ld\n", prec.N4);
-printf("m    = %ld\n", prec.m);
-printf("K    = %ld\n", prec.K);
-printf("r    = %ld\n", prec.r);
-printf("s    = %ld\n", prec.s);
-printf("\n");
-#endif
+    if (verbose)
+    {
+        printf("Precisions:\n");
+        printf("  N0   = %ld\n", prec->N0);
+        printf("  N1   = %ld\n", prec->N1);
+        printf("  N2   = %ld\n", prec->N2);
+        printf("  N3   = %ld\n", prec->N3);
+        printf("  N3i  = %ld\n", prec->N3i);
+        printf("  N3w  = %ld\n", prec->N3w);
+        printf("  N3iw = %ld\n", prec->N3iw);
+        printf("  N4   = %ld\n", prec->N4);
+        printf("  m    = %ld\n", prec->m);
+        printf("  K    = %ld\n", prec->K);
+        printf("  r    = %ld\n", prec->r);
+        printf("  s    = %ld\n", prec->s);
+        printf("\n");
+    }
 
     /* Initialisation ********************************************************/
 
-    padic_ctx_init(pctx_F0, p, prec.N4, PADIC_VAL_UNIT);
+    padic_ctx_init(pctx_F0, p, prec->N4, PADIC_VAL_UNIT);
     padic_mat_init(F0, b, b);
-
-    padic_ctx_init(pctx_C, p, prec.N3, PADIC_VAL_UNIT);
 
     fmpz_poly_mat_init(C, b, b);
     fmpz_poly_mat_init(Cinv, b, b);
@@ -253,18 +263,22 @@ printf("\n");
     {
         fmpz *t = _fmpz_vec_init(n + 1);
 
+        c0 = clock();
+
         mpoly_diagonal_fibre(t, P, ctxFracQt);
         diagfrob(F0, t, n, d, pctx_F0, 0);
-
         padic_mat_transpose(F0, F0);
 
-#if(DEBUG == 1)
-printf("Diagonal fibre:\n");
-printf("P(0) = {"), _fmpz_vec_print(t, n + 1), printf("}\n");
-printf("Matrix F(0):\n");
-padic_mat_print_pretty(F0, pctx_F0);
-printf("\n\n");
-#endif
+        c1 = clock();
+        c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
+
+        if (verbose)
+        {
+            printf("Diagonal fibre:\n");
+            printf("  P(0) = {"), _fmpz_vec_print(t, n + 1), printf("}\n");
+            printf("  Time = %f\n", c);
+            printf("\n");
+        }
 
         _fmpz_vec_clear(t, n + 1);
     }
@@ -276,55 +290,70 @@ printf("\n\n");
         the local solution of the differential equation replacing M by Mt.
      */
 
+    c0 = clock();
     {
-        long K = prec.K;
-        mat_t Mt;
-        padic_mat_struct *A, *Ainv;
+        const long K = prec->K;
+        padic_mat_struct *A;
 
         A    = malloc(K * sizeof(padic_mat_struct));
-        Ainv = malloc(((K + (*p) - 1) / (*p)) * sizeof(padic_mat_struct));
         for(i = 0; i < K; i++)
             padic_mat_init(A + i, b, b);
-        for(i = 0; i < (K + (*p) - 1) / (*p); i++)
+
+        gmde_solve(A, K, p, prec->N3, prec->N3w, M, ctxFracQt);
+        gmde_convert_soln(C, &vC, A, K, p);
+
+        for(i = 0; i < K; i++)
+            padic_mat_clear(A + i);
+        free(A);
+    }
+    c1 = clock();
+    c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
+    if (verbose)
+    {
+        printf("Local solution:\n");
+        printf("  Time for C      = %f\n", c);
+    }
+
+    c0 = clock();
+    {
+        const long K = (prec->K + (*p) - 1) / (*p);
+        mat_t Mt;
+        padic_mat_struct *Ainv;
+
+        Ainv = malloc(K * sizeof(padic_mat_struct));
+        for(i = 0; i < K; i++)
             padic_mat_init(Ainv + i, b, b);
 
         mat_init(Mt, b, b, ctxFracQt);
         mat_transpose(Mt, M, ctxFracQt);
         mat_neg(Mt, Mt, ctxFracQt);
-        gmde_solve(A, K, p, prec.N3, prec.N3w, M, ctxFracQt);
-        gmde_solve(Ainv, (K + (*p) - 1) / (*p), p, prec.N3i, prec.N3iw, Mt, ctxFracQt);
-        gmde_convert_soln(C, &vC, A, K, p);
-        gmde_convert_soln(Cinv, &vCinv, Ainv, (K + (*p) - 1) / (*p), p);
-
-#if(DEBUG == 1)
-printf("Local solution C(t):\n");
-fmpz_poly_mat_print(C, "t");
-printf("\n");
-printf("Matrix C(t)^{-1}:\n");
-fmpz_poly_mat_print(Cinv, "t");
-printf("\n");
-#endif
+        gmde_solve(Ainv, K, p, prec->N3i, prec->N3iw, Mt, ctxFracQt);
+        gmde_convert_soln(Cinv, &vCinv, Ainv, K, p);
 
         fmpz_poly_mat_transpose(Cinv, Cinv);
         fmpz_poly_mat_compose_pow(Cinv, Cinv, *p);
 
         for(i = 0; i < K; i++)
-            padic_mat_clear(A + i);
-        for(i = 0; i < (K + (*p) - 1) / (*p); i++)
             padic_mat_clear(Ainv + i);
-        free(A);
         free(Ainv);
         mat_clear(Mt, ctxFracQt);
     }
+    c1 = clock();
+    c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
+    if (verbose)
+    {
+        printf("  Time for C^{-1} = %f\n", c);
+        printf("\n");
+    }
 
     /* Step 4 {F(t) := C(t) F(0) C(t^p)^{-1}} ********************************/
-
     /*
         Computes the product C(t) F(0) C(t^p)^{-1} modulo (p^{N_2}, t^K). 
         This is done by first computing the unit part of the product 
         exactly over the integers modulo t^K.
      */
 
+    c0 = clock();
     {
         fmpz_t pN;
         fmpz_poly_mat_t T;
@@ -355,7 +384,7 @@ printf("\n");
         fmpz_poly_mat_mul(F, C, T);
         vF = vC + padic_mat_val(F0) + vCinv;
 
-        fmpz_pow_ui(pN, p, prec.N2 - vF);
+        fmpz_pow_ui(pN, p, prec->N2 - vF);
 
         for (i = 0; i < b; i++)
             for (j = 0; j < b; j++)
@@ -363,7 +392,7 @@ printf("\n");
                 fmpz_poly_struct *poly = fmpz_poly_mat_entry(F, i, j);
                 long len = poly->length;
 
-                fmpz_poly_truncate(poly, prec.K);
+                fmpz_poly_truncate(poly, prec->K);
                 if (len != 0)
                 {
                     _fmpz_vec_scalar_mod_fmpz(poly->coeffs, poly->coeffs, len, pN);
@@ -374,15 +403,18 @@ printf("\n");
         fmpz_clear(pN);
         fmpz_poly_mat_clear(T);
     }
-
-#if(DEBUG == 1)
-printf("Matrix Fp(t):\n");
-fmpz_poly_mat_print(F, "t");
-printf("and a factor p^%ld, not necessarily the valuation.\n\n", vF);
-#endif
+    c1 = clock();
+    c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
+    if (verbose)
+    {
+        printf("Matrix for F(t):\n");
+        printf("  Time = %f\n", c);
+        printf("\n");
+    }
 
     /* Step 5 {G = r(t)^m F(t)} **********************************************/
 
+    c0 = clock();
     {
         fmpz_t pN;
         fmpz_poly_t t;
@@ -390,10 +422,10 @@ printf("and a factor p^%ld, not necessarily the valuation.\n\n", vF);
         fmpz_init(pN);
         fmpz_poly_init(t);
 
-        fmpz_pow_ui(pN, p, prec.N2 - vF);
+        fmpz_pow_ui(pN, p, prec->N2 - vF);
 
         /* TODO: Could reduce this mod p^{N2-vF} */
-        fmpz_poly_pow(t, r, prec.m);
+        fmpz_poly_pow(t, r, prec->m);
 
         fmpz_poly_mat_scalar_mul_fmpz_poly(F, F, t);
 
@@ -403,7 +435,7 @@ printf("and a factor p^%ld, not necessarily the valuation.\n\n", vF);
                 fmpz_poly_struct *poly = fmpz_poly_mat_entry(F, i, j);
                 long len = poly->length;
 
-                fmpz_poly_truncate(poly, prec.K);
+                fmpz_poly_truncate(poly, prec->K);
                 if (len != 0)
                 {
                     _fmpz_vec_scalar_mod_fmpz(poly->coeffs, 
@@ -415,9 +447,18 @@ printf("and a factor p^%ld, not necessarily the valuation.\n\n", vF);
         fmpz_clear(pN);
         fmpz_poly_clear(t);
     }
+    c1 = clock();
+    c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
+    if (verbose)
+    {
+        printf("Analytic continuation:\n");
+        printf("  Time = %f\n", c);
+        printf("\n");
+    }
 
     /* Step 6 {F(1) = r(t_1)^{-m} G(t_1)} ************************************/
 
+    c0 = clock();
     {
         long N;
         fmpz_t f, g, t, pN;
@@ -427,14 +468,14 @@ printf("and a factor p^%ld, not necessarily the valuation.\n\n", vF);
         fmpz_init(t);
         fmpz_init(pN);
 
-        N = prec.N2 - vF;
+        N = prec->N2 - vF;
         fmpz_pow_ui(pN, p, N);
 
         /* f := \hat{t_1}, g := r(\hat{t_1})^{-m} */
         _padic_teichmuller(f, t1, p, N);
         _fmpz_mod_poly_evaluate_fmpz(t, r->coeffs, r->length, f, pN);
         _padic_inv(t, t, p, N);
-        fmpz_powm_ui(g, t, prec.m, pN);
+        fmpz_powm_ui(g, t, prec->m, pN);
 
         /* F1 := g G(\hat{t_1}) */
         for (i = 0; i < b; i++)
@@ -457,29 +498,37 @@ printf("and a factor p^%ld, not necessarily the valuation.\n\n", vF);
         padic_mat_val(F1) = vF;
         _padic_mat_canonicalise(F1, pctx_F0);
 
-#if(DEBUG == 1)
-printf("Matrix Fp(1):\n");
-padic_mat_print_pretty(F1, pctx_F0);
-printf("\n\n");
-#endif
-
         fmpz_clear(f);
         fmpz_clear(g);
         fmpz_clear(t);
         fmpz_clear(pN);
+    }
+    c1 = clock();
+    c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
+    if (verbose)
+    {
+        printf("Evaluation:\n");
+        printf("  Time = %f\n", c);
+        printf("\n");
     }
 
     /* Step 7 {Norm} *********************************************************/
 
     /* Step 8 {Reverse characteristic polynomial} ****************************/
 
-    deformation_revcharpoly(cp, F1, n, p, a, prec.N0, prec.r, prec.s);
+    c0 = clock();
 
-    #if(DEBUG == 1)
-    printf("Reverse characteristic polynomial:\n");
-    fmpz_poly_print_pretty(cp, "T");
-    printf("\n\n");
-    #endif
+    deformation_revcharpoly(cp, F1, n, p, a, prec->N0, prec->r, prec->s);
+
+    c1 = clock();
+    c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
+    if (verbose)
+    {
+        printf("Reverse characteristic polynomial:\n");
+        printf("  p(T) = "), fmpz_poly_print_pretty(cp, "T"), printf("\n");
+        printf("  Time = %f\n", c);
+        printf("\n");
+    }
 
     /* Clean up **************************************************************/
 
@@ -490,8 +539,6 @@ printf("\n\n");
     free(bR);
     free(bC);
     fmpz_poly_clear(r);
-
-    padic_ctx_clear(pctx_C);
 
     fmpz_poly_mat_clear(C);
     fmpz_poly_mat_clear(Cinv);

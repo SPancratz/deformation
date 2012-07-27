@@ -25,7 +25,7 @@ typedef struct {
     long K;
     long m;
     long r, s;
-} prec_struct;
+} prec_t;
 
 /*
     Extracts diagonal fibre from the multivariate polynomial $P$, 
@@ -83,22 +83,16 @@ void mpoly_diagonal_fibre(fmpz *a, const mpoly_t P, const ctx_t ctx)
     mpq_clear(y);
 }
 
-void deformation_precisions(prec_struct *prec, 
+void deformation_precisions(prec_t *prec, 
                             const fmpz_t p, long a, long n, long d, long degR);
-
-void frob(const mpoly_t P, const fmpz_t t1, 
-          const ctx_t ctxFracQt, const fmpz_t p);
-
-void frob_with_precisions(mat_t F, const ctx_t ctxF, 
-                          const mpoly_t P, const ctx_t ctxFracQt, 
-                          long NWork, long Kfinite, long Kinfinite);
-
-void frob_with_precisions_fmpq(mat_t F, const ctx_t ctxF, 
-                               const mpoly_t P, const ctx_t ctxFracQt, 
-                               long NWork, long K);
 
 void deformation_revcharpoly(fmpz_poly_t rop, const padic_mat_t op, long n, 
                              const fmpz_t p, long a, long N0, long r, long s);
+
+void frob(const mpoly_t P, const ctx_t ctxFracQt, 
+          const fmpz_t t1, const fmpz_t p, 
+          prec_t *prec, const prec_t *prec_in,
+          int verbose);
 
 #endif
 
