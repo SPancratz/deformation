@@ -60,9 +60,9 @@ long _zeta_function(const fmpz_t p, long a,
 
         if (N == 0)
         {
-            fmpz_t t = {6L};
+            fmpz_t t = {6L};  /* 2 b / (b // 2) <= 6 */
 
-            N = fmpz_flog(t, p) + 1 + ((b / 2) * (n - 1) * a + 1) / 2;
+            N = fmpz_clog(t, p) + (a * (b / 2) * (n - 1) + 1) / 2 + 1;
         }
     }
     else
@@ -84,7 +84,7 @@ long _zeta_function(const fmpz_t p, long a,
 
         if (N == 0)
         {
-            N = 1 + (b * (n - 1) * a) / 2 + 1;
+            N = 1 + (a * b * (n - 1) + 1) / 2 + 1;
         }
     }
 
@@ -121,8 +121,8 @@ void deformation_precisions(prec_t *prec,
     prec->N1 = _frobq(&(prec->r), &(prec->s), p, n, prec->N0);
     prec->N2 = _frobp(a, prec->N1, prec->r, prec->s);
 
-    prec->m = (long) (1.10 * (*p * prec->N1));
-    prec->K = (long) (1.10 * (*p * prec->N1 * (degR + 1)));
+    prec->m = (long) (1.1 * (*p * prec->N1));
+    prec->K = (degR + 1) * prec->m;
 
     f = 2 * (prec->r + prec->s) + (n - 1);
 

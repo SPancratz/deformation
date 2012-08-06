@@ -5,11 +5,13 @@
 #include <mpir.h>
 
 #include "generics.h"
+#include "mat.h"
+#include "mpoly.h"
+
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "padic_mat.h"
-#include "mpoly.h"
-#include "mat.h"
+#include "qadic.h"
 
 #include "gmconnection.h"
 
@@ -86,11 +88,11 @@ void mpoly_diagonal_fibre(fmpz *a, const mpoly_t P, const ctx_t ctx)
 void deformation_precisions(prec_t *prec, 
                             const fmpz_t p, long a, long n, long d, long degR);
 
-void deformation_revcharpoly(fmpz_poly_t rop, const padic_mat_t op, long n, 
-                             const fmpz_t p, long a, long N0, long r, long s);
+void deformation_revcharpoly(fmpz_poly_t rop, const fmpz_poly_mat_t op, long v, long n, 
+                             long N0, long r, long s, const qadic_ctx_t Qq);
 
 void frob(const mpoly_t P, const ctx_t ctxFracQt, 
-          const fmpz_t t1, const fmpz_t p, 
+          const fmpz *t1, const qadic_ctx_t Qq, 
           prec_t *prec, const prec_t *prec_in,
           int verbose);
 
