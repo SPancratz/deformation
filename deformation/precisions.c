@@ -37,56 +37,44 @@ long _zeta_function(const fmpz_t p, long a,
     long n, long d)
 {
     const long b = gmc_basis_size(n, d);
-    long N = 0;
+    long i, N;
+
+    fmpz_t f, g, max;
+
+    fmpz_init(f);
+    fmpz_init(g);
 
     if (b % 2L == 0)
     {
-        if (n == 2 && a == 1)
-        {
-            if (*p == 2L && d <= 5)
-            {
-                if (d == 3) 
-                    N = 2 + 1;
-                else if (d == 4) 
-                    N = 4 + 1;
-                else  /* d == 5 */
-                    N = 5 + 1;
-            }
-            else if (*p == 3L && d == 3)
-            {
-                N = 1 + 1;
-            }
-        }
+        fmpz_bin_uiui(f, b, b / 2);
+        fmpz_pow_ui(g, p, (a * (b / 2) * (n - 1) + 1) / 2);
+        fmpz_mul(f, f, g);
+        fmpz_mul_ui(f, f, 2);
 
-        if (N == 0)
-        {
-            fmpz_t t = {6L};  /* 2 b / (b // 2) <= 6 */
-
-            N = fmpz_clog(t, p) + (a * (b / 2) * (n - 1) + 1) / 2 + 1;
-        }
+        N = fmpz_flog(f, p) + 1;
     }
     else
     {
-        if (n == 2 && a == 1)
+        fmpz_init(max);
+
+        for (i = b / 2; i <= b; i++)
         {
-            if (*p == 2L)
-            {
-                if (d == 3)
-                    N = 2 + 1;
-                else if (d == 4)
-                    N = 5 + 1;
-            }
-            else if (*p == 3L && d == 3)
-            {
-                N = 1 + 1;
-            }
+            fmpz_bin_uiui(f, b, i);
+            fmpz_pow_ui(g, p, (a * i * (n - 1) + 1) / 2);
+            fmpz_mul(f, f, g);
+            fmpz_mul_ui(f, f, 2);
+
+            if (fmpz_cmp(max, f) < 0)
+                fmpz_swap(max, f);
         }
 
-        if (N == 0)
-        {
-            N = 1 + (a * b * (n - 1) + 1) / 2 + 1;
-        }
+        N = fmpz_flog(max, p) + 1;
+
+        fmpz_clear(max);
     }
+
+    fmpz_clear(f);
+    fmpz_clear(g);
 
     return N;
 }
