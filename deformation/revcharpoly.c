@@ -11,6 +11,11 @@
 #include "padic_mat.h"
 #include "qadic.h"
 
+/*
+    Computes the reverse characteristic polynomial (cp, n+1) 
+    of the n-by-n matrix mat.
+ */
+
 static 
 void _fmpz_poly_mat_revcharpoly(fmpz_poly_struct *cp, 
                                 const fmpz_poly_mat_t mat)
@@ -112,7 +117,7 @@ void _deformation_revcharpoly(fmpz *rop, const fmpz_poly_mat_t op, long v, long 
 {
     const long a  = qadic_ctx_degree(Qq);
     const long b  = op->r;
-    const long hi = (b % 2L == 0) ? (b / 2) + 1 : b;
+    const long hi = (b % 2L == 0) ? (b / 2) : b;
     const fmpz *p = (&Qq->pctx)->p;
 
     long i, j;
@@ -137,7 +142,7 @@ void _deformation_revcharpoly(fmpz *rop, const fmpz_poly_mat_t op, long v, long 
     fmpz_poly_mat_scalar_mul_fmpz(mat, op, t);
     _fmpz_poly_mat_revcharpoly(cp, mat);
 
-    for (i = 0; i <= b; i++)
+    for (i = 0; i <= hi; i++)
     {
         _fmpz_mod_poly_reduce((cp + i)->coeffs, (cp + i)->length, 
                               Qq->a, Qq->j, Qq->len, pN);
@@ -151,8 +156,15 @@ void _deformation_revcharpoly(fmpz *rop, const fmpz_poly_mat_t op, long v, long 
     fmpz_fdiv_q_ui(t, pN, 2);
     fmpz_sub(t, pN, t);
 
-    for (i = 0; i < hi; i++)
+    for (i = 0; i <= hi; i++)
     {
+        if (fmpz_poly_length(cp + i) > 1)
+        {
+            printf("Exception (deformation_revcharpoly).\n");
+            printf("The coefficient of T^{%ld} is not constant modulo %ld^%ld, \n", i, *p, N0);
+            printf("it is equal to {"), fmpz_poly_print_pretty(cp + i, "X"), printf(".\n");
+            abort();
+        }
 
         fmpz_poly_get_coeff_fmpz(rop + i, cp + i, 0);
         fmpz_mod(rop + i, rop + i, pN);
@@ -168,7 +180,7 @@ void _deformation_revcharpoly(fmpz *rop, const fmpz_poly_mat_t op, long v, long 
 
         /* Step 3.  Use a{i} = sgn * a{b-i} q^{(n-1 i - (n-1) b / 2} *********/
 
-        for (i = hi; i <= b; i++)
+        for (i = hi + 1; i <= b; i++)
         {
             fmpz_pow_ui(t, q, (n - 1) * i - ((n - 1) * b) / 2);
             fmpz_mul(rop + i, rop + (b - i), t);
