@@ -807,7 +807,7 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
 
         c0 = clock();
         {
-            const long N = prec->N1 + a * (prec->r + prec->s);
+            const long N = prec->N1 - a * vF1;
 
             fmpz_t pN;
             fmpz_poly_mat_t T;
