@@ -138,16 +138,55 @@ void _deformation_revcharpoly(fmpz *rop, const fmpz_poly_mat_t op, long v, long 
 
     /* Step 1.  Compute exact reverse charpoly *******************************/
 
-    fmpz_pow_ui(t, p, v);
-    fmpz_poly_mat_scalar_mul_fmpz(mat, op, t);
-    _fmpz_poly_mat_revcharpoly(cp, mat);
-
-    for (i = 0; i <= hi; i++)
+    if (v >= 0)
     {
-        _fmpz_mod_poly_reduce((cp + i)->coeffs, (cp + i)->length, 
-                              Qq->a, Qq->j, Qq->len, pN);
-        _fmpz_poly_set_length(cp + i, FLINT_MIN((cp + i)->length, a));
-        _fmpz_poly_normalise(cp + i);
+        fmpz_pow_ui(t, p, v);
+        fmpz_poly_mat_scalar_mul_fmpz(mat, op, t);
+        _fmpz_poly_mat_revcharpoly(cp, mat);
+
+        for (i = 0; i <= hi; i++)
+        {
+            _fmpz_mod_poly_reduce((cp + i)->coeffs, (cp + i)->length, 
+                                  Qq->a, Qq->j, Qq->len, pN);
+            _fmpz_poly_set_length(cp + i, FLINT_MIN((cp + i)->length, a));
+            _fmpz_poly_normalise(cp + i);
+        }
+    }
+    else
+    {
+        fmpz_t f;
+
+        fmpz_init(f);
+        fmpz_pow_ui(f, p, -v);
+
+        /*
+            charpoly(A/f)(T) = det(T Id - A/f) 
+                             = f^{-b} det((f T) Id - A)
+                             = f^{-b} charpoly(A)(f T)
+         */
+        _fmpz_poly_mat_revcharpoly(cp, mat);
+printf("val = %v\n", v);
+        for (i = 0; i <= hi; i++)
+        {
+            _fmpz_poly_reduce((cp + i)->coeffs, (cp + i)->length, 
+                              Qq->a, Qq->j, Qq->len);
+            _fmpz_poly_set_length(cp + i, FLINT_MIN((cp + i)->length, a));
+            _fmpz_poly_normalise(cp + i);
+
+printf("i  = %ld\n", i);
+fmpz_poly_print_pretty(cp + i, "X");
+printf("\n");
+        }
+
+        fmpz_pow_ui(t, f, b - hi);
+        for (i = hi; i >= 0; i--)
+        {
+            fmpz_poly_scalar_divexact_fmpz(cp + i, cp + i, t);
+            fmpz_poly_scalar_mod_fmpz(cp + i, cp + i, pN);
+            fmpz_mul(t, t, f);
+        }
+
+        fmpz_clear(f);
     }
 
     /* Step 2.  Compute the lower half of the coefficients *******************/
@@ -213,13 +252,6 @@ void deformation_revcharpoly(fmpz_poly_t rop, const fmpz_poly_mat_t op, long v, 
         printf("Exception (deformation_revcharpoly).\n");
         printf("The valuation of the action of F_q is %ld, less than\n", v);
         printf("- (r + s) = %ld.\n", - (r + s));
-        abort();
-    }
-
-    if (v < 0)
-    {
-        printf("Exception (deformation_revcharpoly).\n");
-        printf("Case of negative valuation not implemented yet.\n");
         abort();
     }
 
