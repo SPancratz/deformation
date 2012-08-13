@@ -21,6 +21,10 @@ main(void)
 
     _randinit(state);
 
+    /*
+        A generic sextic curve.
+     */
+
     {
         const char *str = 
             "3  [6 0 0] [0 6 0] [0 0 6] "
