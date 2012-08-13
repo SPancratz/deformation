@@ -16,20 +16,20 @@
 int main(void)
 {
     /* Example 1 */
+    /* 
     long n = 3;
     long d = 4;
     long N = 374;
     fmpz_t p = {3L};
     fmpz a[4] = {1, 1, 1, 1};
+     */
 
     /* Example 2 */
-    /*
     long n = 3;
     long d = 5;
-    long N = 355;
+    long N = 80;
     fmpz_t p = {2L};
     fmpz a[4] = {1, 1, 1, 1};
-    */
 
     padic_ctx_t pctx;
 
