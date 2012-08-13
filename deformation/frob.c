@@ -255,6 +255,47 @@ void fmpz_poly_mat_frobenius(fmpz_poly_mat_t B,
 }
 
 static 
+void fmpz_poly_evaluate_qadic(qadic_t rop, 
+    const fmpz_poly_t op1, const qadic_t op2, const qadic_ctx_t ctx)
+{
+    const long N = (&ctx->pctx)->N;
+    const long d = qadic_ctx_degree(ctx);
+
+    if (N <= 0 || op2->val != 0 || rop == op2)
+    {
+        printf("Exception (fmpz_poly_evaluate_qadic):\n");
+        printf("Currently assumes that N > 0 and op2->val == 0, \n");
+        printf("and does not support aliasing.\n");
+        abort();
+    }
+
+    if (fmpz_poly_is_zero(op1))
+    {
+        qadic_zero(rop);
+    }
+    else if (qadic_is_zero(op2))
+    {
+        padic_poly_set_fmpz(rop, op1->coeffs + 0, &ctx->pctx);
+    }
+    else
+    {
+        fmpz_t pN;
+
+        fmpz_init(pN);
+        fmpz_pow_ui(pN, (&ctx->pctx)->p, N);
+
+        padic_poly_fit_length(rop, d);
+        _fmpz_mod_poly_compose_mod(rop->coeffs, 
+            op1->coeffs, op1->length, op2->coeffs, op2->length, 
+            ctx->a, ctx->j, ctx->len, pN);
+        _padic_poly_set_length(rop, d);
+        qadic_reduce(rop, ctx);
+
+        fmpz_clear(pN);
+    }
+}
+
+static 
 void _qadic_mat_mul(fmpz_poly_mat_t C, 
                     const fmpz_poly_mat_t A, const fmpz_poly_mat_t B, 
                     const fmpz_t pN, const qadic_ctx_t ctx)
@@ -395,6 +436,21 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
         printf("  Time = %f\n", c);
         printf("\n");
         fflush(stdout);
+    }
+
+    {
+        qadic_t t;
+
+        qadic_init(t);
+        fmpz_poly_evaluate_qadic(t, r, t1, Qq);
+
+        if (qadic_is_zero(t))
+        {
+            printf("Exception (deformation_frob).\n");
+            printf("The resultant r evaluates to zero at t1.\n");
+            abort();
+        }
+        qadic_clear(t);
     }
 
     /* Precisions ************************************************************/
