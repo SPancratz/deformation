@@ -314,7 +314,7 @@ void _qadic_mat_mul(fmpz_poly_mat_t C,
  */
 
 void frob(const mpoly_t P, const ctx_t ctxFracQt, 
-          const fmpz *t1, const qadic_ctx_t Qq, 
+          const qadic_t t1, const qadic_ctx_t Qq, 
           prec_t *prec, const prec_t *prec_in, 
           int verbose)
 {
@@ -356,7 +356,7 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
         printf("Input:\n");
         printf("  P  = "), mpoly_print(P, ctxFracQt), printf("\n");
         printf("  p  = "), fmpz_print(p), printf("\n");
-        printf("  t1 = "), _fmpz_vec_print(t1, a), printf("\n");
+        printf("  t1 = "), qadic_print_pretty(t1, Qq), printf("\n");
         printf("\n");
         fflush(stdout);
     }
@@ -673,7 +673,7 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
             fmpz_pow_ui(pN, p, N);
 
             /* f := \hat{t_1}, g := r(\hat{t_1})^{-m} */
-            _padic_teichmuller(f, t1, p, N);
+            _padic_teichmuller(f, t1->coeffs + 0, p, N);
             _fmpz_mod_poly_evaluate_fmpz(t, r->coeffs, r->length, f, pN);
             _padic_inv(t, t, p, N);
             fmpz_powm_ui(g, t, prec->m, pN);
@@ -741,8 +741,7 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
             fmpz_pow_ui(pN, p, N);
 
             /* f := \hat{t_1}, g := r(\hat{t_1})^{-m} */
-            _qadic_teichmuller(f, t1, a, Qq->a, Qq->j, Qq->len, p, N);
-
+            _qadic_teichmuller(f, t1->coeffs, t1->length, Qq->a, Qq->j, Qq->len, p, N);
             _fmpz_mod_poly_compose_mod(g, r->coeffs, r->length, f, a, 
                                           Qq->a, Qq->j, Qq->len, pN);
             _qadic_inv(t, g, a, Qq->a, Qq->j, Qq->len, p, N);

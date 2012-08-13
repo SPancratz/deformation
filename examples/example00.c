@@ -29,23 +29,23 @@ main(void)
         mpoly_t P;
         ctx_t ctxFracQt;
         qadic_ctx_t Qq;
-        fmpz_t p  = {2L};
+        fmpz_t p  = {5L};
         long d    = 1;
-        fmpz *t1;
+        qadic_t t1;
         prec_t prec, prec_in;
-
-        t1 = _fmpz_vec_init(d);
-        t1[0] = 1L;
 
         ctx_init_fmpz_poly_q(ctxFracQt);
         qadic_ctx_init_conway(Qq, p, d, 1, "X", PADIC_SERIES);
+
+        qadic_init(t1);
+        qadic_one(t1, Qq);
 
         mpoly_init(P, n + 1, ctxFracQt);
         mpoly_set_str(P, str, ctxFracQt);
 
         frob(P, ctxFracQt, t1, Qq, &prec, NULL, 1);
 
-        _fmpz_vec_clear(t1, d);
+        qadic_clear(t1);
         mpoly_clear(P, ctxFracQt);
         ctx_clear(ctxFracQt);
         qadic_ctx_clear(Qq);

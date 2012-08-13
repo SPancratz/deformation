@@ -92,7 +92,7 @@ void deformation_revcharpoly(fmpz_poly_t rop, const fmpz_poly_mat_t op, long v, 
                              long N0, long r, long s, const qadic_ctx_t Qq);
 
 void frob(const mpoly_t P, const ctx_t ctxFracQt, 
-          const fmpz *t1, const qadic_ctx_t Qq, 
+          const qadic_t t1, const qadic_ctx_t Qq, 
           prec_t *prec, const prec_t *prec_in,
           int verbose);
 

@@ -31,23 +31,18 @@ main(void)
         qadic_ctx_t Qq;
         fmpz_t p  = {3L};
         long d    = 2;
-        fmpz *t1;
+        qadic_t t1;
         prec_t prec, prec_in;
-
-        t1 = _fmpz_vec_init(d);
-        t1[1] = 1L;
 
         ctx_init_fmpz_poly_q(ctxFracQt);
         qadic_ctx_init_conway(Qq, p, d, 1, "X", PADIC_SERIES);
 
+        qadic_init(t1);
+        qadic_gen(t1, Qq);
 {
-    const fmpz_t e = {2345L};
-    fmpz *w = _fmpz_vec_init(2 * d - 1);
+        const fmpz_t e = {2345L};
 
-    _qadic_pow(w, t1, 2, e, Qq->a, Qq->j, Qq->len, p);
-    _fmpz_vec_set(t1, w, d);
-
-    _fmpz_vec_clear(w, d);
+        qadic_pow(t1, t1, e, Qq);
 }
 
         mpoly_init(P, n + 1, ctxFracQt);
@@ -55,7 +50,7 @@ main(void)
 
         frob(P, ctxFracQt, t1, Qq, &prec, NULL, 1);
 
-        _fmpz_vec_clear(t1, d);
+        qadic_clear(t1);
         mpoly_clear(P, ctxFracQt);
         ctx_clear(ctxFracQt);
         qadic_ctx_clear(Qq);
