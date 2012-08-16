@@ -165,7 +165,7 @@ void _deformation_revcharpoly(fmpz *rop, const fmpz_poly_mat_t op, long v, long 
                              = f^{-b} charpoly(A)(f T)
          */
         _fmpz_poly_mat_revcharpoly(cp, mat);
-printf("val = %v\n", v);
+printf("val = %ld\n", v);
         for (i = 0; i <= hi; i++)
         {
             _fmpz_poly_reduce((cp + i)->coeffs, (cp + i)->length, 
@@ -237,27 +237,142 @@ printf("\n");
     flint_free(cp);
 }
 
+static 
+void _deformation_revcharpoly_surfaces(
+    fmpz *rop, const fmpz_poly_mat_t op, long v, long d, long N0, const qadic_ctx_t Qq)
+{
+    const long n  = 3;
+    const long a  = qadic_ctx_degree(Qq);
+    const long b  = op->r;
+    const fmpz *p = (&Qq->pctx)->p;
+
+    long i, j;
+    fmpz_t h02, s, t, q, pN;
+    fmpz_poly_mat_t mat;
+    fmpz_poly_struct *cp;
+
+    if (fmpz_cmp_ui(p, 2) == 0)
+    {
+        printf("Exception (_deformation_revcharpoly_surfaces). \n");
+        printf("Assumes that p is not 2, but found p = "), fmpz_print(p), printf(".\n");
+        abort();
+    }
+
+    if (v < 0)
+    {
+        printf("Exception (_deformation_revcharpoly_surfaces). \n");
+        printf("Assumes that v >= 0, but found v = %ld.\n", v);
+        abort();
+    }
+
+    fmpz_init(h02);
+    fmpz_init(s);
+    fmpz_init(t);
+    fmpz_init(q);
+    fmpz_init(pN);
+    fmpz_poly_mat_init(mat, b, b);
+    cp = flint_malloc((b + 1) * sizeof(fmpz_poly_struct));
+    for (i = 0; i <= b; i++)
+        fmpz_poly_init(cp + i);
+
+    fmpz_pow_ui(q, p, a);
+    fmpz_pow_ui(pN, p, N0);
+
+    /* Step 1.  Compute exact reverse charpoly *******************************/
+
+    fmpz_pow_ui(t, p, v);
+    fmpz_poly_mat_scalar_mul_fmpz(mat, op, t);
+    _fmpz_poly_mat_revcharpoly(cp, mat);
+
+    for (i = 0; i <= b; i++)
+    {
+        _fmpz_poly_reduce((cp + i)->coeffs, (cp + i)->length, 
+                          Qq->a, Qq->j, Qq->len);
+        _fmpz_poly_set_length(cp + i, FLINT_MIN((cp + i)->length, a));
+        _fmpz_poly_normalise(cp + i);
+    }
+
+    /* Step 2.  Compute the coefficients of q^{h_{0,2}} f(T/q) ***************/
+
+    /* t = p^N - (p^N / 2) */
+    fmpz_fdiv_q_ui(t, pN, 2);
+    fmpz_sub(t, pN, t);
+
+    /* h02 = h_{0,2} */
+    fmpz_bin_uiui(h02, d-1, 3);
+
+    for (i = 0; i <= b; i++)
+    {
+        fmpz_poly_get_coeff_fmpz(rop + i, cp + i, 0);
+
+        fmpz_pow_ui(s, q, FLINT_ABS(*h02 - i));
+        if (*h02 > i)
+        {
+            fmpz_mul(rop + i, rop + i, s);
+        }
+        else if (*h02 < i)
+        {
+            if (!fmpz_divisible(rop + i, s))
+            {
+                printf("Exception (_deformation_revcharpoly_surfaces). \n");
+                printf("Divisibility condition is not satisfied.\n");
+                abort();
+            }
+
+            fmpz_divexact(rop + i, rop + i, s);
+        }
+
+        fmpz_mod(rop + i, rop + i, pN);
+        if (fmpz_cmp(rop + i, t) >= 0)
+        {
+            fmpz_sub(rop + i, rop + i, pN);
+        }
+
+        if (*h02 > i)
+        {
+            fmpz_divexact(rop + i, rop + i, s);
+        }
+        else if (*h02 < i)
+        {
+            fmpz_mul(rop + i, rop + i, s);
+        }
+    }
+
+    fmpz_clear(h02);
+    fmpz_clear(s);
+    fmpz_clear(q);
+    fmpz_clear(pN);
+    fmpz_poly_mat_clear(mat);
+    for (i = 0; i <= b; i++)
+        fmpz_poly_clear(cp + i);
+    flint_free(cp);
+}
+
 /*
     Assumes that the matrix is integral and that its entries lie 
     in the interval $[0,p^{N_0})$.
  */
 
-void deformation_revcharpoly(fmpz_poly_t rop, const fmpz_poly_mat_t op, long v, long n, 
+void deformation_revcharpoly(fmpz_poly_t rop, const fmpz_poly_mat_t op, long v, long n, long d, 
                              long N0, long r, long s, const qadic_ctx_t Qq)
 {
-    const long b = op->r;
+    const long b  = op->r;
+    const fmpz *p = (&Qq->pctx)->p;
 
     if (v < - (r + s))
     {
         printf("Exception (deformation_revcharpoly).\n");
-        printf("The valuation of the action of F_q is %ld, less than\n", v);
-        printf("- (r + s) = %ld.\n", - (r + s));
+        printf("The valuation of the action of q^{-1} F_q is %ld,\n", v);
+        printf("less than - (r + s) = %ld.\n", - (r + s));
         abort();
     }
 
     fmpz_poly_fit_length(rop, b + 1);
     _fmpz_poly_set_length(rop, b + 1);
 
-    _deformation_revcharpoly(rop->coeffs, op, v, n, N0, Qq);
+    if (n == 3 && fmpz_cmp_ui(p, 2) != 0)
+        _deformation_revcharpoly_surfaces(rop->coeffs, op, v, d, N0, Qq);
+    else
+        _deformation_revcharpoly(rop->coeffs, op, v, n, N0, Qq);
 }
 

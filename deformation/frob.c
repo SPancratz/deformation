@@ -902,7 +902,7 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
 
     c0 = clock();
 
-    deformation_revcharpoly(cp, F1, vF1, n, prec->N0, prec->r, prec->s, Qq);
+    deformation_revcharpoly(cp, F1, vF1, n, d, prec->N0, prec->r, prec->s, Qq);
 
     c1 = clock();
     c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
