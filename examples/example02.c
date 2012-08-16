@@ -30,7 +30,7 @@ main(void)
         ctx_t ctxFracQt;
         qadic_ctx_t Qq;
         fmpz_t p  = {3L};
-        long d    = 2;
+        long d    = 20;
         qadic_t t1;
         prec_t prec, prec_in;
 
