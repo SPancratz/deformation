@@ -679,7 +679,7 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
 
         fmpz_pow_ui(pN, p, prec->N2 - vF);
 
-        /* TODO: Could reduce this mod p^{N2-vF} */
+        /* Compute r(t)^m mod p^{N2-vF} */
         {
             fmpz_mod_poly_t _t;
 

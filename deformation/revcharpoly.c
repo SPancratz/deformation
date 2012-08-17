@@ -107,10 +107,6 @@ void _fmpz_poly_mat_revcharpoly(fmpz_poly_struct *cp,
     }
 }
 
-/*
-    TODO:  Currently only works with non-negative valuations.
- */
-
 static 
 void _deformation_revcharpoly(fmpz *rop, const fmpz_poly_mat_t op, long v, long n, 
                               long N0, const qadic_ctx_t Qq)
@@ -122,13 +118,11 @@ void _deformation_revcharpoly(fmpz *rop, const fmpz_poly_mat_t op, long v, long 
 
     long i, j;
     fmpz_t t, q, pN;
-    fmpz_poly_mat_t mat;
     fmpz_poly_struct *cp;
 
     fmpz_init(t);
     fmpz_init(q);
     fmpz_init(pN);
-    fmpz_poly_mat_init(mat, b, b);
     cp = flint_malloc((b + 1) * sizeof(fmpz_poly_struct));
     for (i = 0; i <= b; i++)
         fmpz_poly_init(cp + i);
@@ -140,6 +134,9 @@ void _deformation_revcharpoly(fmpz *rop, const fmpz_poly_mat_t op, long v, long 
 
     if (v >= 0)
     {
+        fmpz_poly_mat_t mat;
+
+        fmpz_poly_mat_init(mat, b, b);
         fmpz_pow_ui(t, p, v);
         fmpz_poly_mat_scalar_mul_fmpz(mat, op, t);
         _fmpz_poly_mat_revcharpoly(cp, mat);
@@ -151,21 +148,12 @@ void _deformation_revcharpoly(fmpz *rop, const fmpz_poly_mat_t op, long v, long 
             _fmpz_poly_set_length(cp + i, FLINT_MIN((cp + i)->length, a));
             _fmpz_poly_normalise(cp + i);
         }
+        fmpz_poly_mat_clear(mat);
     }
     else
     {
-        fmpz_t f;
+        _fmpz_poly_mat_revcharpoly(cp, op);
 
-        fmpz_init(f);
-        fmpz_pow_ui(f, p, -v);
-
-        /*
-            charpoly(A/f)(T) = det(T Id - A/f) 
-                             = f^{-b} det((f T) Id - A)
-                             = f^{-b} charpoly(A)(f T)
-         */
-        _fmpz_poly_mat_revcharpoly(cp, mat);
-printf("val = %ld\n", v);
         for (i = 0; i <= hi; i++)
         {
             _fmpz_poly_reduce((cp + i)->coeffs, (cp + i)->length, 
@@ -173,20 +161,10 @@ printf("val = %ld\n", v);
             _fmpz_poly_set_length(cp + i, FLINT_MIN((cp + i)->length, a));
             _fmpz_poly_normalise(cp + i);
 
-printf("i  = %ld\n", i);
-fmpz_poly_print_pretty(cp + i, "X");
-printf("\n");
-        }
-
-        fmpz_pow_ui(t, f, b - hi);
-        for (i = hi; i >= 0; i--)
-        {
+            fmpz_pow_ui(t, p, (-v) * i);
             fmpz_poly_scalar_divexact_fmpz(cp + i, cp + i, t);
             fmpz_poly_scalar_mod_fmpz(cp + i, cp + i, pN);
-            fmpz_mul(t, t, f);
         }
-
-        fmpz_clear(f);
     }
 
     /* Step 2.  Compute the lower half of the coefficients *******************/
@@ -231,7 +209,6 @@ printf("\n");
     fmpz_clear(t);
     fmpz_clear(q);
     fmpz_clear(pN);
-    fmpz_poly_mat_clear(mat);
     for (i = 0; i <= b; i++)
         fmpz_poly_clear(cp + i);
     flint_free(cp);
