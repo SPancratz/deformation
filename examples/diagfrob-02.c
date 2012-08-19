@@ -18,7 +18,7 @@ int main(void)
     /* Example 2 */
     long n = 3;
     long d = 5;
-    long N = 80;
+    long N = 370;
     fmpz_t p = {2L};
     fmpz a[4] = {1, 1, 1, 1};
 
