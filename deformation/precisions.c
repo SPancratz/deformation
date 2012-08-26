@@ -52,7 +52,7 @@ long _zeta_function(const fmpz_t p, long a,
         fmpz_mul_ui(g, g, 2);
         N = a * (*f) + fmpz_clog(g, p);
     }
-    else if (b % 2L == 0)
+    else if (n % 2L == 0)  /* n even implies b even */
     {
         fmpz_bin_uiui(f, b, b / 2);
         fmpz_pow_ui(g, p, (a * (b / 2) * (n - 1) + 1) / 2);

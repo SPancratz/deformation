@@ -113,7 +113,7 @@ void _deformation_revcharpoly(fmpz *rop, const fmpz_poly_mat_t op, long v, long 
 {
     const long a  = qadic_ctx_degree(Qq);
     const long b  = op->r;
-    const long hi = (b % 2L == 0) ? (b / 2) : b;
+    const long hi = (n % 2L == 0) ? (b / 2) : b;
     const fmpz *p = (&Qq->pctx)->p;
 
     long i, j;
@@ -191,7 +191,7 @@ void _deformation_revcharpoly(fmpz *rop, const fmpz_poly_mat_t op, long v, long 
         }
     }
 
-    if (b % 2L == 0)
+    if (n % 2L == 0)
     {
         const int sgn = 1;
 
