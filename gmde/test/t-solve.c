@@ -22,18 +22,13 @@ __fmpz_poly_q_print_pretty(const struct __ctx_struct * ctx, const void *op)
     return fmpz_poly_q_print_pretty(op, "t");
 }
 
-static int 
-__padic_poly_print_pretty(const struct __ctx_struct * ctx, const void *op)
-{
-    return padic_poly_print_pretty(op, "t", ctx->pctx);
-}
-
 int main(void)
 {
     char *str;  /* String for the input polynomial P */
     mpoly_t P;  /* Input polynomial P */
     int n;      /* Number of variables minus one */
-    int N;      /* Required t-adic precision */
+    long K;     /* Required t-adic precision */
+    long N, Nw;
     long b;     /* Matrix dimensions */
     long i, j, k;
 
@@ -43,17 +38,16 @@ int main(void)
     mon_t *rows, *cols;
 
     padic_mat_struct *C;
-    padic_ctx_t pctx;
     fmpz_t p;
 
-    mat_t B;
-    ctx_t ctxZpt;
+    fmpz_poly_mat_t B;
+    long vB;
 
     printf("solve... \n");
     fflush(stdout);
 
     /* Example 3-1-1 */
-    str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]";
+    /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[1 1 1]"; */
 
     /* Example 3-3-2 */
     /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[2 1 0] (2  0 1)[0 2 1] (2  0 1)[1 0 2]"; */
@@ -64,16 +58,21 @@ int main(void)
     /* Example ... */
     /* str = "4  [4 0 0 0] [0 4 0 0] [0 0 4 0] [0 0 0 4] (2  0 1)[1 1 1 1]"; */
 
-    n = atoi(str) - 1;
-    N = 100;
+    /* Example from AKR */
+    str = "4  (1  3)[0 3 0 0] (2  0 3)[0 1 2 0] "
+          "(2  0 -1)[1 1 1 0] (2  0 3)[1 1 0 1] "
+          "(2  0 -1)[2 1 0 0] [0 0 3 0] (2  0 -1)[1 0 2 0] "
+          "(1  2)[0 0 0 3] [3 0 0 0]";
+
+    n  = atoi(str) - 1;
+    K  = 616;
+    N  = 10;
+    Nw = 22;
 
     fmpz_init(p);
-    fmpz_set_ui(p, 7);
-    padic_ctx_init(pctx, p, 100, PADIC_VAL_UNIT);
-    ctx_init_padic_poly(ctxZpt, pctx);
+    fmpz_set_ui(p, 5);
     ctx_init_fmpz_poly_q(ctxM);
 
-    ctxZpt->print = &__padic_poly_print_pretty;
     ctxM->print   = &__fmpz_poly_q_print_pretty;
 
     mpoly_init(P, n + 1, ctxM);
@@ -84,41 +83,38 @@ int main(void)
     b = gmc_basis_size(n, mpoly_degree(P, -1, ctxM));
 
     mat_init(M, b, b, ctxM);
-    mat_init(B, b, b, ctxZpt);
+    fmpz_poly_mat_init(B, b, b);
+    vB = 0;
 
     gmc_compute(M, &rows, &cols, P, ctxM);
 
     mat_print(M, ctxM);
     printf("\n");
 
-    C = malloc(N * sizeof(padic_mat_struct));
-    for(i = 0; i < N; i++)
+    C = malloc(K * sizeof(padic_mat_struct));
+    for(i = 0; i < K; i++)
         padic_mat_init(C + i, b, b);
 
-    gmde_solve(C, N, pctx, M, ctxM);
-    gmde_convert_soln(B, ctxZpt, C, N);
+    gmde_solve(C, K, p, N, Nw, M, ctxM);
+    gmde_convert_soln(B, &vB, C, K, p);
 
-    printf("Solution to (d/dt + M) B = 0:\n");
-    mat_print(B, ctxZpt);
-    printf("\n");
+    printf("Solution to (d/dt + M) C = 0:\n");
+    fmpz_poly_mat_print(B, "t");
+    printf("vB = %ld\n", vB);
 
-    gmde_check_soln(B, ctxZpt, N, M, ctxM);
+    gmde_check_soln(B, vB, p, N, K, M, ctxM);
 
     mpoly_clear(P, ctxM);
     mat_clear(M, ctxM);
     free(rows);
     free(cols);
+    fmpz_poly_mat_clear(B);
+    ctx_clear(ctxM);
+    fmpz_clear(p);
 
-    mat_clear(B, ctxZpt);
-
-    for (i = 0; i < N; i++)
+    for (i = 0; i < K; i++)
         padic_mat_clear(C + i);
     free(C);
-
-    ctx_clear(ctxM);
-    ctx_clear(ctxZpt);
-    padic_ctx_clear(pctx);
-    fmpz_clear(p);
 
     _fmpz_cleanup();
 

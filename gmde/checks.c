@@ -10,73 +10,78 @@
 #include "gmde.h"
 
 /*
-    Checks whether the matrix C over Zp[[t]] satisfies (d/dt + M) C = 0.
+    Checks whether the matrix C over Zp[[t]] satisfies the equation 
+    (d/dt + M) C = 0 modulo t^K.
  */
 
-void gmde_check_soln(const mat_t C, const ctx_t Zpt, long K, 
-                     const mat_t M, const ctx_t FracZt)
+void gmde_check_soln(const fmpz_poly_mat_t C, long vC, const fmpz_t p, long N, 
+                     long K, const mat_t M, const ctx_t FracZt)
 {
-    long b = M->m, i, j, k, v;
-    mat_t T;
-    padic_ctx_struct *pctx = Zpt->pctx;
+    long b = M->m, i, j, v;
 
-    mat_init(T, b, b, Zpt);
+    fmpz_poly_t r;
+    fmpz_poly_mat_t Mn, T;
+
+    fmpz_poly_init(r);
+    fmpz_poly_mat_init(Mn, b, b);
+    fmpz_poly_mat_init(T, b, b);
+
+    /* Compute denominator r(t) */
+    {
+        fmpz_poly_t t;
+
+        fmpz_poly_init(t);
+        fmpz_poly_set_ui(r, 1);
+        for (i = 0; i < M->m; i++)
+            for (j = 0; j < M->n; j++)
+            {
+                fmpz_poly_lcm(t, r, fmpz_poly_q_denref(
+                    (fmpz_poly_q_struct *) mat_entry(M, i, j, FracZt)));
+                fmpz_poly_swap(r, t);
+            }
+        fmpz_poly_clear(t);
+    }
+
+    /* Compute Mn = r M */
+    for (i = 0; i < b; i++)
+        for (j = 0; j < b; j++)
+        {
+            fmpz_poly_div(fmpz_poly_mat_entry(Mn, i, j), r, fmpz_poly_q_denref((fmpz_poly_q_struct *) mat_entry(M, i, j, FracZt)));
+            fmpz_poly_mul(fmpz_poly_mat_entry(Mn, i, j), fmpz_poly_mat_entry(Mn, i, j), fmpz_poly_q_numref((fmpz_poly_q_struct *) mat_entry(M, i, j, FracZt)));
+        }
+
+    fmpz_poly_mat_mul(T, Mn, C);
 
     for (i = 0; i < b; i++)
         for (j = 0; j < b; j++)
         {
-            padic_poly_derivative((padic_poly_struct *) mat_entry(T, i, j, Zpt), 
-                                  (padic_poly_struct *) mat_entry(C, i, j, Zpt), pctx);
+            fmpz_poly_t t;
 
-            for (k = 0; k < b; k++)
-            {
-                fmpq_poly_t t1, t2;
-                padic_poly_t t;
-
-                fmpq_poly_init(t1);
-                fmpq_poly_init(t2);
-                padic_poly_init(t);
-
-                fmpq_poly_set_fmpz_poly(t1, fmpz_poly_q_numref(
-                    (fmpz_poly_q_struct *) mat_entry(M, i, k, FracZt)));
-                fmpq_poly_set_fmpz_poly(t2, fmpz_poly_q_denref(
-                    (fmpz_poly_q_struct *) mat_entry(M, i, k, FracZt)));
-
-                fmpq_poly_inv_series(t2, t2, K);
-                fmpq_poly_mul(t1, t1, t2);
-
-                padic_poly_set_fmpq_poly(t, t1, pctx);
-                padic_poly_mul(t, t, 
-                    (padic_poly_struct *) mat_entry(C, k, j, Zpt), pctx);
-                padic_poly_add((padic_poly_struct *) mat_entry(T, i, j, Zpt), 
-                               (padic_poly_struct *) mat_entry(T, i, j, Zpt), 
-                               t, pctx);
-
-                padic_poly_truncate(
-                    (padic_poly_struct *) mat_entry(T, i, j, Zpt), K - 1, 
-                    pctx->p);
-
-                fmpq_poly_clear(t1);
-                fmpq_poly_clear(t2);
-                padic_poly_clear(t);
-            }
+            fmpz_poly_init(t);
+            fmpz_poly_derivative(t, fmpz_poly_mat_entry(C, i, j));
+            fmpz_poly_mul(t, r, t);
+            fmpz_poly_add(fmpz_poly_mat_entry(T, i, j), t, fmpz_poly_mat_entry(T, i, j));
+            fmpz_poly_truncate(fmpz_poly_mat_entry(T, i, j), K - 1);
+            fmpz_poly_clear(t);
         }
 
     v = LONG_MAX;
     for (i = 0; i < b; i++)
         for (j = 0; j < b; j++)
-        {
-            const padic_poly_struct *poly = 
-                (padic_poly_struct *) mat_entry(T, i, j, Zpt);
-            if (!padic_poly_is_zero(poly))
-                v = FLINT_MIN(padic_poly_val(poly), v);
-        }
+            if (!fmpz_poly_is_zero(fmpz_poly_mat_entry(T, i, j)))
+            {
+                fmpz_poly_struct *poly = fmpz_poly_mat_entry(T, i, j);
+                long w = _fmpz_vec_ord_p(poly->coeffs, poly->length, p);
+                v = FLINT_MIN(v, w);
+            }
 
     printf("(d/dt + M) * C (mod t^%ld)\n", K - 1);
-    mat_print(T, Zpt);
-    printf("\n");
-    printf("ord_p(...) = %ld\n", v);
+    fmpz_poly_mat_print(T, "t");
+    printf("ord_p(.) = %ld\n", v);
+    printf("ord_p(.) >= N - ord_p(C) ? %d\n", v >= N - vC);
 
-    mat_clear(T, Zpt);
+    fmpz_poly_clear(r);
+    fmpz_poly_mat_clear(Mn);
+    fmpz_poly_mat_clear(T);
 }
 

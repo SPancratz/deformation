@@ -36,8 +36,8 @@ void gmde_convert_soln(fmpz_poly_mat_t A, long *vA,
 
 /* Checks ********************************************************************/
 
-void gmde_check_soln(const mat_t C, const ctx_t Zpt, long K, 
-                     const mat_t M, const ctx_t FracZt);
+void gmde_check_soln(const fmpz_poly_mat_t C, long vC, const fmpz_t p, long N, 
+                     long K, const mat_t M, const ctx_t FracZt);
 
 #endif
 

@@ -25,7 +25,8 @@ int main(void)
     char *str;  /* String for the input polynomial P */
     mpoly_t P;  /* Input polynomial P */
     long n;     /* Number of variables minus one */
-    long N;     /* Required t-adic precision */
+    long K;     /* Required t-adic precision */
+    long N, Nw;
     long i, b;
 
     mat_t M;
@@ -35,7 +36,6 @@ int main(void)
 
     padic_mat_struct *C;
     fmpz_t p;
-    padic_ctx_t pctx;
 
     printf("valuations... \n");
     fflush(stdout);
@@ -52,10 +52,19 @@ int main(void)
     /* Example 3-3-2 */
     /* str = "3  [3 0 0] [0 3 0] [0 0 3] (2  0 1)[2 1 0] (2  0 1)[0 2 1] (2  0 1)[1 0 2]"; */
 
-    str = "4  [4 0 0 0] [0 4 0 0] [0 0 4 0] [0 0 0 4] (2  0 1)[1 1 1 1]";
+    /* Example ... */
+    /* str = "4  [4 0 0 0] [0 4 0 0] [0 0 4 0] [0 0 0 4] (2  0 1)[1 1 1 1]"; */
 
-    n = atoi(str) - 1;
-    N = 500;
+    /* Cubic surface from AKR */
+    str = "4  (1  3)[0 3 0 0] (2  0 3)[0 1 2 0] "
+          "(2  0 -1)[1 1 1 0] (2  0 3)[1 1 0 1] "
+          "(2  0 -1)[2 1 0 0] [0 0 3 0] (2  0 -1)[1 0 2 0] "
+          "(1  2)[0 0 0 3] [3 0 0 0]";
+
+    n  = atoi(str) - 1;
+    N  = 10;
+    Nw = 22;
+    K  = 616;
 
     ctx_init_fmpz_poly_q(ctxM);
 
@@ -72,18 +81,17 @@ int main(void)
     printf("\n");
 
     fmpz_init(p);
-    fmpz_set_ui(p, 3);
-    padic_ctx_init(pctx, p, 350, PADIC_VAL_UNIT);
+    fmpz_set_ui(p, 5);
 
-    C = malloc(N * sizeof(padic_mat_struct));
-    for(i = 0; i < N; i++)
+    C = malloc(K * sizeof(padic_mat_struct));
+    for(i = 0; i < K; i++)
         padic_mat_init(C + i, b, b);
 
-    gmde_solve(C, N, pctx, M, ctxM);
+    gmde_solve(C, K, p, N, Nw, M, ctxM);
 
     printf("Valuations\n");
 
-    for (i = 0; i < N; i++)
+    for (i = 0; i < K; i++)
     {
         long v = padic_mat_val(C + i);
 
@@ -95,10 +103,9 @@ int main(void)
     }
 
     fmpz_clear(p);
-    padic_ctx_clear(pctx);
     mpoly_clear(P, ctxM);
     mat_clear(M, ctxM);
-    for (i = 0; i < N; i++)
+    for (i = 0; i < K; i++)
         padic_mat_clear(C + i);
     free(C);
     ctx_clear(ctxM);
