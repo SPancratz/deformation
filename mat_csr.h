@@ -1,3 +1,7 @@
+/*
+    Copyright (C) 2010, 2011 Sebastian Pancratz
+ */
+
 #ifndef MAT_CSR_H
 #define MAT_CSR_H
 

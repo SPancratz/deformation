@@ -1,3 +1,7 @@
+/*
+    Copyright (C) 2010, 2011 Sebastian Pancratz
+ */
+
 #ifndef VEC_H
 #define VEC_H
 

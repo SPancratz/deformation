@@ -1,3 +1,7 @@
+/*
+    Copyright (C) 2010, 2011, 2012 Sebastian Pancratz
+ */
+
 #ifndef MAT_DENSE_H
 #define MAT_DENSE_H
 

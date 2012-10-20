@@ -1,3 +1,7 @@
+/*
+    Copyright (C) 2010, 2011, 2012 Sebastian Pancratz
+ */
+
 #ifndef DEFORMATION_H
 #define DEFORMATION_H
 

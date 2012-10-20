@@ -1,3 +1,7 @@
+/*
+    Copyright (C) 2010, 2011, 2012 Sebastian Pancratz
+ */
+
 #ifndef GENERICS_H
 #define GENERICS_H
 
