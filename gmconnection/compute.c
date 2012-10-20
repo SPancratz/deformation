@@ -1,7 +1,5 @@
 #include "gmconnection.h"
 
-#define DEBUG  0
-
 /*
     Sets the polynomial \code{rop} to the derivative of \code{op} 
     with respect to the indeterminate $t$ of the base field.
@@ -72,11 +70,6 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
     long **aux_p;
     mat_csr_solve_t *aux_s;
     
-    #if (DEBUG > 0)
-    printf("Input:\n");
-    printf("  P = "), mpoly_print(P, ctx), printf("\n");
-    #endif
-    
     /*
         Compute all partial derivatives of P, and the derivative of P with 
         respect to t, the variable of the coefficient field
@@ -88,23 +81,8 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
     mpoly_init(dPdt, n + 1, ctx);
     mpoly_tderivative(dPdt, P, ctx);
     
-    #if (DEBUG > 0)
-    printf("Derivatives:\n");
-    for (i = 0; i <= n; i++)
-    {
-        printf("  dPdX %ld = ", i), mpoly_print(dP[i], ctx), printf("\n");
-    }
-    printf("  dPdt = "), mpoly_print(dPdt, ctx), printf("\n");
-    #endif
-    
     /* Construct the index set B */
     gmc_basis_sets(&B, &iB, &lenB, &l, &u, n, d);
-    
-    #if (DEBUG > 0)
-    printf("Basis sets:\n  ");
-    gmc_basis_print(B, iB, lenB, n, d), printf("\n");
-    fflush(stdout);
-    #endif
     
     /*
         Construct the auxiliary matrices
@@ -120,17 +98,8 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
     aux_p    = malloc((n + 2) * sizeof(long *));
     aux_s    = malloc((n + 2) * sizeof(mat_csr_solve_t));
 
-    #if (DEBUG > 0)
-    printf("Computing auxiliary matrices..\n");
-    #endif
-
     for (k = (n + (d - 1)) / d + 1; k <= u + 1; k++)
     {
-        
-        #if (DEBUG > 0)
-        printf("  k = %ld\n", k), fflush(stdout);
-        #endif
-        
         aux_p[k] = malloc((n + 2) * sizeof(long));
 
         gmc_init_auxmatrix(aux[k], aux_rows + k, aux_cols + k, aux_p[k], 
@@ -140,10 +109,6 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
     }
     
     /* Construct the Gauss--Manin connection matrix */
-
-    #if (DEBUG > 0)
-    printf("Computing columns..\n");
-    #endif
 
     for (colk = l; colk <= u; colk++)
     {
@@ -156,10 +121,6 @@ void gmc_compute(mat_t M, mon_t **rows, mon_t **cols,
             for (i = 0; i <= n + 1; i++)
                 mpoly_init(R[i], n + 1, ctx);
 
-            #if (DEBUG > 0)
-            printf("  j = %ld\n", j);
-            #endif
-            
             /* Set Q to -colk B[j] dPdt, and then reduce */
             mpoly_mul_mon(Q, dPdt, B[j], ctx);
             mpoly_scalar_mul_si(Q, Q, -colk, ctx);
