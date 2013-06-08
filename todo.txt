@@ -1,13 +1,6 @@
-mat_dense
-=========
+generics
+========
 
-* Eventually, once there is a module for generic dense vectors, 
-  re-write some parts of the code to use these
-
-generics.h
-==========
-
-* Rename "mat_ctx_t" throughout the whole project
 * Add test code for all the functionality that the generic 
   rings/ fields provide
 
@@ -23,14 +16,17 @@ perm
 * There is also one function remaining in "perm.h", namely for the 
   printing of long vectors, that needs to be moved or removed
 
+mat
+===
+
+* Eventually, once there is a module for generic dense vectors, 
+  re-write some parts of the code to use these
+
 mat_csr
 =======
 
 * Implement sparse system solving using block triangularisation and 
   LUP decomposition on the (dense) kernels
-
-* Change mat_csr_block_triangularise to include a value at 
-  B[nb] == m
 
 mon
 ===
