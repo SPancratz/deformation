@@ -1,7 +1,7 @@
 #include "mpoly.h"
 
-void mpoly_randhom(mpoly_t rop, flint_rand_t state, long d, long N, 
-                   const ctx_t ctx)
+void mpoly_randtest_hom(mpoly_t rop, flint_rand_t state, long d, long N, 
+                        const ctx_t ctx)
 {
     long i, n = rop->n;
 

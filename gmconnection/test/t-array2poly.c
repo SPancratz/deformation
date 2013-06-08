@@ -42,7 +42,7 @@ main(void)
         mpoly_init(a, n, ctx);
         mpoly_init(b, n, ctx);
         mpoly_init(c, n, ctx);
-        mpoly_randhom(a, state, d, N, ctx);
+        mpoly_randtest_hom(a, state, d, N, ctx);
 
         m = mon_generate_by_degree(&len, n, d);
 

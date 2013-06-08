@@ -88,7 +88,7 @@ main(void)
                 ctx->init(ctx, zero);
                 ctx->zero(ctx, zero);
 
-                mpoly_randhom(poly1, state, k * d - (n + 1), 20, ctx);
+                mpoly_randtest_hom(poly1, state, k * d - (n + 1), 20, ctx);
                 for (j = iB[k]; j < iB[k + 1]; j++)
                     mpoly_set_coeff(poly1, B[j], zero, ctx);
 
