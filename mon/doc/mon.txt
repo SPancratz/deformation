@@ -10,21 +10,21 @@
 
     The monomial type is a \emph{primitive} type.
 
-    We represent a monomial as a 64-bit word.  More precisely, we store 
-    the monomial $(i_0, \dotsc, i_n)$ using \code{MON_BITS_PER_EXP} bits 
-    per exponent, where the least significant block is used for $i_0$.  If 
-    $n + 1$ does not divide 64 exactly then the $64 \bmod (n+1)$ most 
-    significant bits are always $0$.
+    We represent a monomial as a 32- or 64-bit word.  More precisely, we 
+    store the monomial $(i_0, \dotsc, i_n)$ using \code{MON_BITS_PER_EXP} 
+    bits per exponent, where the least significant block is used for $i_0$. 
+    Let $B$ denote the machine word size in bits.  If $n + 1$ does not divide 
+    $B$ exactly then the $B \bmod (n+1)$ most significant bits are always $0$.
 
     The type of the exponent of a single variable is \code{exponent_t}, 
     which is guaranteed to be an unsigned type of width at least~$8$.
 
-    \section Acknowledgements:
+    Acknowledgements
 
     I would like to thank Andrew Lewis from the Computer Laboratory at the 
     University of Cambridge for helpful discussions.
     
-    \section Overview
+    Overview
     
     The aim of this work is to provide a basic but very thin and fast 
     implementation of monomials with only minimal overhead.  The main step 
@@ -34,50 +34,57 @@
     used for monomials in a fixed small number of variables and with small 
     non-negative exponents.
     
-    \section Introduction  Detailed introduction
+    Detailed introduction
     
-    We assume that a number \f$n+1\f$ of variables is fixed from the beginning, 
-    where \f$1 \leq n \leq 7\f$, and that we only consider monomials with 
-    non-negative partial degrees of at most \f$2^8 - 1\f$.  Using 8 bits per 
-    exponent, we can encode the monomial \f$i = (i_0, \dotsc, i_n)\f$ as 
-    \f[
-    \sigma(i) = \sum_{j=0}^n i_j 2^{j 8}
-    \f]
-    in a 64-bit word.
+    We assume that a number $n$ of variables is fixed from the beginning, 
+    where $1 \leq n \leq \floor{B/8}$, and that we only consider monomials 
+    with non-negative partial degrees of at most $2^8 - 1$.  Using~$8$ bits 
+    per exponent, we can encode the monomial $i = (i_0, \dotsc, i_{n-1})$ as 
+    \begin{equation*}
+    \sigma(i) = \sum_{j=0}^{n-1} i_j 2^{8j}
+    \end{equation*}
+    in a $B$-bit word.
     
     It turns out that, for many operations on monomials, this form is very 
     convenient in the sense that the operation can be performed on 
-    \f$\sigma(i)\f$ as one word instead of \f$i_0, \dotsc, i_n\f$ involving 
-    \f$n+1\f$ words.  Examples of this are multiplication and division, 
+    $\sigma(i)$ as one word instead of $i_0, \dotsc, i_{n-1}$ involving 
+    $n$~words.  Examples of this are multiplication and division, 
     which correspond to addition and subtraction, and the inverse 
-    lexicographical order, which corresponds to the operator \c <.  As an 
-    aside, the problem of possible overflow is burried in the our assumption 
-    that no monomial operation will involve partial exponents exceeding 
-    \f$2^8 - 1\f$.  Other operations, for example, checking whether one 
-    monomial is divisible by another, involve explicitly considering partial 
-    exponents using bitmasks.
+    lexicographical order, which corresponds to the operator \code{<}.
+
+    Importantly, the problem of possible overflow is burried in the our 
+    assumption that no monomial operation will involve partial exponents 
+    exceeding $2^8 - 1$.  Other operations, for example, checking whether 
+    one monomial is divisible by another, involve explicitly considering 
+    partial exponents using bitmasks.
     
-    \section Orderings  Monomial orderings
+    Monomial orderings
     
     The following (global) monomial orderings are typically considered:
     
-    - Lexicographic ordering (\em lex).
-      \f[i < i' \iff \exists j \quad i_0 = i_0', \dotsc, i_{j-1} = i_{j-1}', i_j < i_j'\f]
+    - Lexicographic ordering (\emph{lex}).
+      \[i < i' \iff \exists j \quad i_0 = i_0', \dotsc, 
+                                    i_{j-1} = i_{j-1}', i_j < i_j'\]
     
-    - Inverse lexicographic ordering (\em invlex).
-      \f[i < i' \iff \exists j \quad i_n = i_n', \dotsc, i_{j+1} = i_{j+1}', i_j < i_j'\f]
+    - Inverse lexicographic ordering (\emph{invlex}).
+      \[i < i' \iff \exists j \quad i_{n-1} = i_{n-1}', \dotsc, 
+                                    i_{j+1} = i_{j+1}', i_j < i_j'\]
     
-    - Degree lexicographic (\em deglex).
-      \f[i < i' \iff \deg(i) < \deg(i') \text{ or } \bigl(\deg(i) < \deg(i') \text{ and } \exists j \quad i_0 = i_0', \dotsc, i_{j-1} = i_{j-1}, i_j < i_j'\bigr)\f]
+    - Degree lexicographic (\emph{deglex}).
+      \[i < i' \iff \deg(i) < \deg(i') \text{ or } \bigl(\deg(i) < \deg(i') 
+        \text{ and } \exists j \quad i_0 = i_0', \dotsc, 
+                                     i_{j-1} = i_{j-1}, i_j < i_j'\bigr)\]
     
-    - Degree reverse lexicographic (\em degrevlex).
-      \f[i < i' \iff \deg(i) < \deg(i') \text{ or } \bigl(\deg(i) < \deg(i') \text{ and } \exists j \quad i_n = i_n', \dotsc, i_{j+1} = i_{j+1}, i_j > i_j'\bigr)\f]
+    - Degree reverse lexicographic (\emph{degrevlex}).
+      \[i < i' \iff \deg(i) < \deg(i') \text{ or } \bigl(\deg(i) < \deg(i') 
+        \text{ and } \exists j \quad i_{n-1} = i_{n-1}', \dotsc, 
+                                     i_{j+1} = i_{j+1}, i_j > i_j'\bigr)\]
     
     In this context, it is very useful to note that, in the inverse 
-    lexicographic ordering, we have \f$i < i'\f$ if and only 
-    \f$\sigma(i) < \sigma(i')\f$.  While the first test could involve \f$n+1\f$ 
-    word comparisons plus the overhead of a loop, the second test only involves 
-    one word comparison.
+    lexicographic ordering, we have $i < i'$ if and only 
+    $\sigma(i) < \sigma(i')$.  While the first test could involve $n$ 
+    word comparisons plus the overhead of a loop, the second test only 
+    involves one word comparison.
 
 *******************************************************************************
 

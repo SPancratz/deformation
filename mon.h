@@ -15,9 +15,9 @@
 typedef unsigned long mon_t;
 typedef unsigned long exp_t;
 
-#define MON_BITS_PER_EXP  8
-#define MON_BITMASK_BLOCK  (0xFFul)
-#define MON_BITMASK_ALL  (~ (0ul))
+#define MON_BITS_PER_EXP   8
+#define MON_BITMASK_BLOCK  ((1UL << MON_BITS_PER_EXP) - 1UL)
+#define MON_BITMASK_ALL    (~(0UL))
 
 #define MON_MIN_VARS  1
 #define MON_MAX_VARS  (FLINT_BITS / MON_BITS_PER_EXP)
@@ -37,7 +37,8 @@ typedef unsigned long exp_t;
     ((exp_t) (((x) >> ((i) * MON_BITS_PER_EXP)) & MON_BITMASK_BLOCK))
 
 #define mon_set_exp(x, i, e)  \
-    ((x) = (((x) & (MON_BITMASK_ALL - (MON_BITMASK_BLOCK << ((i) * MON_BITS_PER_EXP)))) | (((mon_t)(e)) << ((i) * MON_BITS_PER_EXP))))
+    ((x) = (((x) & (MON_BITMASK_ALL - (MON_BITMASK_BLOCK << ((i) * MON_BITS_PER_EXP)))) \
+            | (((mon_t)(e)) << ((i) * MON_BITS_PER_EXP))))
 
 #define mon_inc_exp(x, i, e)  \
     ((x) = ((x) + (((mon_t)(e)) << ((i) * MON_BITS_PER_EXP))))

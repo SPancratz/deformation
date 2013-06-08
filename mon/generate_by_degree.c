@@ -1,3 +1,9 @@
+/******************************************************************************
+
+    Copyright (C) 2013 Sebastian Pancratz
+
+******************************************************************************/
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -73,7 +79,7 @@ mon_t * mon_generate_by_degree(long * len, int n, int d)
         {
             j--;
             mon_set(st[j], m);
-            mon_inc_exp(st[j], ind, d-sum);
+            mon_inc_exp(st[j], ind, d - sum);
         }
     }
     
@@ -81,11 +87,8 @@ mon_t * mon_generate_by_degree(long * len, int n, int d)
     free(sums);
     free(inds);
     
-    if (N > 1)
-    {
-        for (i = 0, j = N - 1; i < N / 2; i++, j--)
-            mon_swap(st[i], st[j]);
-    }
+    for (i = 0; i < N / 2; i++)
+        mon_swap(st[i], st[N - 1 - i]);
     
     *len = N;
     return st;

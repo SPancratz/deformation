@@ -1,11 +1,14 @@
+/******************************************************************************
+
+    Copyright (C) 2013 Sebastian Pancratz
+
+******************************************************************************/
+
 #include "mon.h"
 
 #include "flint.h"
 #include "ulong_extras.h"
 
-/**
- * Generates a random monomial with all individual exponents less than k.
- */
 mon_t _mon_randtest(flint_rand_t state, int n, exp_t k)
 {
     int i;
