@@ -586,7 +586,7 @@ void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v,
 }
 
 void diagfrob(padic_mat_t F, const fmpz *a, long n, long d, 
-              const padic_ctx_t ctx, int verbose)
+              const padic_ctx_t ctx, const int verbose)
 {
     const fmpz *P = ctx->p;
     const long p  = fmpz_get_si(P);
@@ -610,7 +610,7 @@ void diagfrob(padic_mat_t F, const fmpz *a, long n, long d,
 
     fmpz *alift, *dinv, *mu;
 
-    clock_t t0, t1;
+    clock_t t0 = 0, t1 = 0;
     double t;
 
     gmc_basis_sets(&B, &iB, &lenB, &lo, &hi, n, d);

@@ -9,6 +9,9 @@ long _mat_csr_zfdiagonal(long *pi, long n, const long *j, const long *p,
 
     long *pr, *arp, *cv, *out;
 
+    /* Dummy initialisations, for compiler warnings */
+    i2 = in2 = 0;
+
     /*
         Explanation of the work space
 
@@ -88,7 +91,7 @@ long _mat_csr_zfdiagonal(long *pi, long n, const long *j, const long *p,
                         /* Column i1 not yet accessed during this pass */
                         j2 = j1;
                         j1 = pi[i1];
-                        cv[i1]   = jord;
+                        cv[i1]  = jord;
                         pr[j1]  = j2;
                         out[j2] = in2 - i2 - 2;
 
@@ -108,7 +111,7 @@ long _mat_csr_zfdiagonal(long *pi, long n, const long *j, const long *p,
       s_110:
 
         /* New assignment */
-        pi[i1]   = j1;
+        pi[i1]  = j1;
         arp[j1] = in2 - i2 - 2;
         numnz = numnz + 1;
         for (k1 = 0; k1 <= jord; k1++)

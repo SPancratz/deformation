@@ -78,7 +78,7 @@ void diagfrob_matrix_prec(long *r, long *s, long n, const fmpz_t p)
 }
 
 void diagfrob(padic_mat_t F, const fmpz *a, long n, long d, 
-              const padic_ctx_t ctx, int verbose);
+              const padic_ctx_t ctx, const int verbose);
 
 void diagfrob_revcharpoly(fmpz *poly, const char *f, long n, long b, 
                           const ctx_t ctx);
