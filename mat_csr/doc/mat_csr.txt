@@ -174,8 +174,8 @@ void mat_csr_mul_vec(char *y, const mat_csr_t A, const char *x,
 
     Linear systems
 
-    This group contains functions that help solving linear systems 
-    $A x = b$ with an emphasis on repeated solving systems with 
+    This group contains functionality for solving linear systems 
+    $A x = b$ with an emphasis on repeatedly solving systems with 
     constant matrix $A$ and varying constraints $b$.
 
     There is a structure \code{__mat_csr_solve_struct} that encapsulates 
@@ -202,10 +202,9 @@ long mat_csr_block_triangularise(long *pi, long *b, const mat_csr_t A,
     block triangular.
 
     Returns an integer $\beta$ with $1 \leq \beta \leq n$ that denotes 
-    the number of blocks.  On entry the array $b$ is expected to be of 
-    length $n$, which is the maximum possible number of blocks.  On exit, 
-    for $0 \leq k < \beta$, \code{b[k]} is the lowest row index in the 
-    $k$th block.
+    the number of blocks.  The array $b$ is expected to be of length $n$. 
+    On exit, for $0 \leq k < \beta$, \code{b[k]} is the lowest row index in 
+    the $k$th block.
 
     All the above mentioned \emph{blocks} are square.
 
