@@ -9,6 +9,35 @@
 #include "gmconnection.h"
 #include "diagfrob.h"
 
+static void _sort(long *a, long n)
+{
+    long i, j, v;
+    for (i = 1; i < n; i++)
+    {
+        v = a[i];
+        for (j = i; j > 0 && v < a[j - 1]; j--)
+        {
+            a[j] = a[j - 1];
+        }
+        a[j] = v;
+    }
+}
+
+static long _bsearch(long *a, long lo, long hi, long x)
+{
+    while (lo <= hi)
+    {
+        long mi = lo + (hi - lo) / 2;
+        if (x < a[mi])
+            hi = mi - 1;
+        else if (x > a[mi])
+            lo = mi + 1;
+        else
+            return mi;
+    }
+    return -1;
+}
+
 /*
     Computes the expression 
     \[
@@ -182,14 +211,18 @@ void mu(fmpz_t rop, long m, long p, long N)
 
 /*
     Computes the list $\mu_0, \dotsc, \mu_M$ modulo $p^N$.
+
+    The array (C, lenC) contains the sorted list of congruence classes 
+    modulo $p$ for which we have to compute $\mu_m$.
  */
 
-void precompute_mu(fmpz *list, long M, long p, long N)
+void precompute_mu(fmpz *list, long M, long *C, long lenC, long p, long N)
 {
     long m;
 
     for (m = 0; m <= M; m++)
-        mu(list + m, m, p, N);
+        if (_bsearch(C, 0, lenC, m % p) != -1)
+            mu(list + m, m, p, N);
 }
 
 /*
@@ -549,9 +582,11 @@ void diagfrob(padic_mat_t F, const fmpz *a, long n, long d,
     mon_t *B;
     long *iB, lenB, lo, hi;
 
-    long i, j, *u, *v;
+    long i, j, k, *u, *v;
 
     fmpz *dinv, *mu;
+
+    long *C, lenC;
 
     clock_t t0 = 0, t1 = 0;
     double t;
@@ -576,6 +611,44 @@ if (verbose)
     u = malloc((n + 1) * sizeof(long));
     v = malloc((n + 1) * sizeof(long));
 
+    /* Compute array of congruence classes for which we need mu[m] */
+    C = malloc(lenB * (n + 1) * sizeof(long));
+    lenC = 0;
+    for (i = 0; i < lenB; i++)
+        for (j = 0; j < lenB; j++)
+        {
+            for (k = 0; k <= n; k++)
+            {
+                u[k] = mon_get_exp(B[i], k);
+                v[k] = mon_get_exp(B[j], k);
+                if ((p * (u[k] + 1) - (v[k] + 1)) % d != 0)
+                {
+                    break;
+                }
+            }
+            if (k > n)
+            {
+                for (k = 0; k <= n; k++)
+                {
+                    C[lenC++] = ((p * (u[k] + 1) - (v[k] + 1)) / d) % p;
+                }
+            }
+        }
+    /* Remove duplicates */
+    k = 1;
+    for (i = 1; i < lenC; i++)
+    {
+        for (j = 0; j < k; j++)
+        {
+            if (C[i] == C[j])
+                break;
+        }
+        if (j == k)
+            C[k++] = C[i];
+    }
+    lenC = k;
+    _sort(C, lenC);
+
 if (verbose)
 {
     printf("Sequence d^{-r}\n");
@@ -594,7 +667,7 @@ if (verbose)
     t0 = clock();
 }
 
-    precompute_mu(mu, M, p, N2);
+    precompute_mu(mu, M, C, lenC, p, N2);
 
 if (verbose)
 {
@@ -609,8 +682,6 @@ if (verbose)
     for (i = 0; i < lenB; i++)
         for (j = 0; j < lenB; j++)
         {
-            long k;
-
             for (k = 0; k <= n; k++)
             {
                 u[k] = mon_get_exp(B[i], k);
@@ -620,7 +691,6 @@ if (verbose)
                      break;
                 }
             }
-
             if (k <= n)
             {
                 fmpz_zero(padic_mat_unit(F, i, j));
@@ -660,5 +730,6 @@ if (verbose)
     free(v);
     free(B);
     free(iB);
+    free(C);
 }
 
