@@ -10,8 +10,8 @@ void gmc_basis_sets(mon_t **B, long **iB, long *lenB, long *l, long *u,
 
     *lenB = gmc_basis_size(n, d);
     *B    = malloc(*lenB * sizeof(mon_t));
+    *iB   = malloc((n + 2) * sizeof(long));
 
-    *iB = malloc((*u + 2) * sizeof(long));
     for (k = 0; k < *l; k++)
         (*iB)[k] = 0;
 
@@ -39,6 +39,8 @@ void gmc_basis_sets(mon_t **B, long **iB, long *lenB, long *l, long *u,
             mon_clear(L[i]);
         free(L);
     }
-    (*iB)[*u + 1] = *lenB;
+
+    for (k = *u + 1; k <= n + 1; k++)
+        (*iB)[k] = *lenB;
 }
 

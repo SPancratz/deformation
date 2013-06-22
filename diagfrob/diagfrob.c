@@ -1,6 +1,6 @@
 /******************************************************************************
 
-    Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2012, 2013 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -127,9 +127,7 @@ void mu_p(fmpz_t rop, long m, long p, long N)
     fmpz_init(f);
     fmpz_init(s);
     fmpz_init(t);
-    fmpz_init(P);
-
-    fmpz_set_si(P, p);
+    fmpz_init_set_ui(P, p);
 
     fmpz_one(s);
     fmpz_one(t);
@@ -269,7 +267,7 @@ void precompute_dinv(fmpz *list, long M, long d, long p, long N)
     Computes the double sum involved in the expression for 
     $\alpha_{u+1, v+1}$ when $p = 2$, namely
     \[
-    \sum_{m,r} 
+    \sum_{m,r} a_i^{(p-1)r} 
         \Bigl(\frac{u_i + 1}{d}\Bigr)_r 2^{- \floor{(m+1)/4} + \nu} \mu_m.
     \]
 
@@ -285,7 +283,7 @@ void precompute_dinv(fmpz *list, long M, long d, long p, long N)
  */
 
 void dsum_2(
-    fmpz_t rop, const fmpz *dinv, const fmpz *mu, 
+    fmpz_t rop, const fmpz *dinv, const fmpz *mu, const fmpz_t ai, 
     long ui, long vi, long M, long n, long d, long N)
 {
     const fmpz_t P = {2L};
@@ -293,14 +291,16 @@ void dsum_2(
     const long u   = ui + 1;
 
     long m, r;
-    fmpz_t f0, f1, f2, g;
+    fmpz_t f0, f1, f2, g, h;
 
     fmpz_init(f0);
     fmpz_init(f1);
     fmpz_init(f2);
     fmpz_init(g);
+    fmpz_init(h);
 
     fmpz_zero(rop);
+    fmpz_one(g);
 
     for (m = m0; m <= M; m += 2)
     {
@@ -328,16 +328,21 @@ void dsum_2(
         }
 
         /*
-            g = f_{r} d^{-r} \mu_m
-              = f2 * dinv[r] * mu[m]
+            h = a_i^{r} f_{r} d^{-r} \mu_m
+              = g * f2 * dinv[r] * mu[m]
          */
+        fmpz_mul(h, f2, g);
+        fmpz_fdiv_r_2exp(h, h, N);
+        fmpz_mul(h, h, dinv + r);
+        fmpz_fdiv_r_2exp(h, h, N);
+        fmpz_mul(h, h, mu + m);
+        fmpz_fdiv_r_2exp(h, h, N);
 
-        fmpz_mul(g, f2, dinv + r);
-        fmpz_fdiv_r_2exp(g, g, N);
-        fmpz_mul(g, g, mu + m);
-        fmpz_fdiv_r_2exp(g, g, N);
+        fmpz_add(rop, rop, h);
 
-        fmpz_add(rop, rop, g);
+        /* g = a_i^{r+1} mod 2^N */
+        fmpz_mul(g, g, ai);
+        fmpz_fdiv_r_2exp(g, g, N);
     }
 
     fmpz_fdiv_r_2exp(rop, rop, N);
@@ -346,13 +351,15 @@ void dsum_2(
     fmpz_clear(f1);
     fmpz_clear(f2);
     fmpz_clear(g);
+    fmpz_clear(h);
 }
 
 /*
     Computes the double sum involved in the expression for 
     $\alpha_{u+1, v+1}$ when $p$ is an odd prime, namely
     \[
-    \sum_{m,r} \Bigl(\frac{u_i + 1}{d}\Bigr)_r p^{r - \floor{m/p}} \mu_m.
+    \sum_{m,r} a_i^{(p-1)r} 
+        \Bigl(\frac{u_i + 1}{d}\Bigr)_r p^{r - \floor{m/p}} \mu_m.
     \]
 
     Assumptions:
@@ -362,12 +369,13 @@ void dsum_2(
  */
 
 void dsum_p(
-    fmpz_t rop, const fmpz *dinv, const fmpz *mu, 
+    fmpz_t rop, const fmpz *dinv, const fmpz *mu, const fmpz_t ai, 
     long ui, long vi, long M, long n, long d, long p, long N)
 {
     long m, r;
-    fmpz_t f, g, h, P, PN;
+    fmpz_t aiPow, f, g, h, P, PN;
 
+    fmpz_init(aiPow);
     fmpz_init(f);
     fmpz_init(g);
     fmpz_init(h);
@@ -383,27 +391,28 @@ void dsum_p(
 
     if (m <= M)
     {
-        fmpz_pow_ui(h, P, r - (m / p));
-        fmpz_mul(g, h, mu + m);
-        fmpz_mod(g, g, PN);
-        fmpz_add(rop, rop, g);
-    }
+        fmpz_add(rop, rop, mu + m);
 
-    fmpz_one(f);
+        fmpz_powm_ui(aiPow, ai, p - 1, PN);
+        fmpz_one(f);
+        fmpz_one(g);
+    }
 
     for (r = 1, m += p; m <= M; r++, m += p)
     {
         fmpz_mul_ui(f, f, ui + 1 + (r - 1) * d);
-        fmpz_mul(g, f, dinv + r);
-        fmpz_pow_ui(h, P, r - (m / p));
-        fmpz_mul(g, g, h);
-        fmpz_mul(g, g, mu + m);
+        fmpz_mul(g, g, aiPow);
         fmpz_mod(g, g, PN);
-        fmpz_add(rop, rop, g);
+        fmpz_mul(h, f, g);
+        fmpz_mul(h, h, dinv + r);
+        fmpz_mul(h, h, mu + m);
+        fmpz_mod(h, h, PN);
+        fmpz_add(rop, rop, h);
     }
 
     fmpz_mod(rop, rop, PN);
 
+    fmpz_clear(aiPow);
     fmpz_clear(f);
     fmpz_clear(g);
     fmpz_clear(h);
@@ -412,70 +421,27 @@ void dsum_p(
 }
 
 void dsum(
-    fmpz_t rop, const fmpz *dinv, const fmpz *mu, 
+    fmpz_t rop, const fmpz *dinv, const fmpz *mu, const fmpz_t ai, 
     long ui, long vi, long M, long n, long d, long p, long N)
 {
     if (p == 2)
-        dsum_2(rop, dinv, mu, ui, vi, M, n, d, N);
+        dsum_2(rop, dinv, mu, ai, ui, vi, M, n, d, N);
     else
-        dsum_p(rop, dinv, mu, ui, vi, M, n, d, p, N);
+        dsum_p(rop, dinv, mu, ai, ui, vi, M, n, d, p, N);
 }
 
 /*
-    Computes $\alpha_{u+1,v+1}$ modulo $p^N$ in the case when $p = 2$.
+    Computes $\alpha_{u+1,v+1}$ modulo $p^N$.
  */
 
-void alpha_2(fmpz_t rop, const long *u, const long *v, 
-    const fmpz *dinv, const fmpz *mu, long M, 
-    long n, long d, long N)
-{
-    const fmpz_t P = {2L};
-
-    long i, ud;
-    fmpz_t g;
-
-    ud = n + 1;
-    for (i = 0; i <= n; i++)
-        ud += u[i];
-    ud /= d;
-
-    fmpz_init(g);
-
-    fmpz_zero(rop);
-    fmpz_setbit(rop, ud);
-
-    for (i = 0; i <= n; i++)
-    {
-        dsum(g, dinv, mu, u[i], v[i], M, n, d, 2, N);
-        fmpz_mul(rop, rop, g);
-        fmpz_fdiv_r_2exp(rop, rop, N);
-    }
-
-    if (ud % 2 != 0 && !fmpz_is_zero(rop))
-    {
-        fmpz_zero(g);
-        fmpz_setbit(g, N);
-        fmpz_sub(rop, g, rop);
-    }
-
-    fmpz_clear(g);
-}
-
-/*
-    Computes $\alpha_{u+1,v+1}$ modulo $p^N$ when $p > 2$ is an odd prime.
- */
-
-void alpha_p(fmpz_t rop, const long *u, const long *v, 
+void alpha(fmpz_t rop, const long *u, const long *v, 
     const fmpz *a, const fmpz *dinv, const fmpz *mu, long M, 
     long n, long d, long p, long N)
 {
     long e, i, ud;
     fmpz_t f, g, P, PN;
 
-    ud = n + 1;
-    for (i = 0; i <= n; i++)
-        ud += u[i];
-    ud /= d;
+    ud = diagfrob_k(u, n, d);
 
     fmpz_init(f);
     fmpz_init(g);
@@ -490,7 +456,7 @@ void alpha_p(fmpz_t rop, const long *u, const long *v,
     {
         e = (p * (u[i] + 1) - (v[i] + 1)) / d;
         fmpz_powm_ui(f, a + i, e, PN);
-        dsum(g, dinv, mu, u[i], v[i], M, n, d, p, N);
+        dsum(g, dinv, mu, a + i, u[i], v[i], M, n, d, p, N);
         fmpz_mul(rop, rop, f);
         fmpz_mul(rop, rop, g);
         fmpz_mod(rop, rop, PN);
@@ -507,19 +473,9 @@ void alpha_p(fmpz_t rop, const long *u, const long *v,
     fmpz_clear(PN);
 }
 
-void alpha(fmpz_t rop, const long *u, const long *v, 
-    const fmpz *a, const fmpz *dinv, const fmpz *mu, long M, 
-    long n, long d, long p, long N)
-{
-    if (p == 2)
-        alpha_2(rop, u, v, dinv, mu, M, n, d, N);
-    else
-        alpha_p(rop, u, v, a, dinv, mu, M, n, d, p, N);
-}
-
 void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v, 
-    const fmpz *a, const fmpz *dinv, const fmpz *mu, long M, long C, 
-    long n, long d, long p, long N)
+    const fmpz *a, const fmpz *dinv, const fmpz *mu, long M, 
+    long n, long d, long p, long N, long N2)
 {
     long i, ud, vd;
     fmpz_t f, g, h, P;
@@ -533,15 +489,8 @@ void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v,
         Compute $f := (-1)^{u'+v'} (v'-1)! p^n$ exactly.
      */
 
-    ud = n + 1;
-    for (i = 0; i <= n; i++)
-        ud += u[i];
-    ud /= d;
-
-    vd = n + 1;
-    for (i = 0; i <= n; i++)
-        vd += v[i];
-    vd /= d;
+    ud = diagfrob_k(u, n, d);
+    vd = diagfrob_k(v, n, d);
 
     fmpz_fac_ui(f, vd - 1);
     fmpz_pow_ui(h, P, n);
@@ -552,15 +501,15 @@ void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v,
     }
 
     /*
-        Compute $g := (u'-1)! \alpha_{u+1,v+1}$ to precision $N - n + 2 C$.
+        Compute $g := (u'-1)! \alpha_{u+1,v+1}$ to precision $N2$.
      */
 
     fmpz_fac_ui(g, ud - 1);
-    alpha(h, u, v, a, dinv, mu, M, n, d, p, N - n + 2 * C);
+    alpha(h, u, v, a, dinv, mu, M, n, d, p, N2);
     fmpz_mul(g, g, h);
 
     /*
-        Set rop to the product of $f$ and $g^{-1}$.
+        Set rop to the product of $f$ and $g^{-1} mod p^N$
      */
 
     *rop_v = fmpz_remove(f, f, P) - fmpz_remove(g, g, P);
@@ -586,29 +535,23 @@ void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v,
 }
 
 void diagfrob(padic_mat_t F, const fmpz *a, long n, long d, 
-              const padic_ctx_t ctx, const int verbose)
+              const padic_ctx_t ctx, int verbose)
 {
     const fmpz *P = ctx->p;
     const long p  = fmpz_get_si(P);
-    const long r  = padic_val_fac_ui(n - 1, P);
-    const long s  = (n + 1) * n_flog(n - 1, p);
     const long N  = ctx->N;
 
-    /*
-        $C$ is such that $\ord_p((u'-1)! \alpha_{u+1,v+1}) \leq C$.
-     */
-
-    const long C  = n + 2 * r + s;
-    const long N2 = N - n + 2 * C;
-    const long M  =  (p * p * N2) / (p-1) + p * p * n_flog(N2 / (p-1) + 2, p) 
-                     + p * p * 4;
+    const long delta = diagfrob_delta(n, P);
+    const long N2    = N - n + 2 * (padic_val_fac_ui(n - 1, P) + n + delta);
+    const long M     = (p * p * (N2 + n_clog(N2 + 3, p) + 4) + (p - 2)) 
+                       / (p - 1) - 1;
 
     mon_t *B;
     long *iB, lenB, lo, hi;
 
     long i, j, *u, *v;
 
-    fmpz *alift, *dinv, *mu;
+    fmpz *dinv, *mu;
 
     clock_t t0 = 0, t1 = 0;
     double t;
@@ -621,39 +564,17 @@ if (verbose)
     printf("N  = %ld\n", N);
     printf("N2 = %ld\n", N2);
     printf("M  = %ld\n", M);
-}
 
-if (verbose)
-{
     printf("Basis for H_{dR}^%ld(U)\n", n);
     gmc_basis_print(B, iB, lenB, n, d);
     printf("\n");
 }
 
-    alift = _fmpz_vec_init(n + 1);
-    dinv  = _fmpz_vec_init(M/p + 1);
-    mu    = _fmpz_vec_init(M + 1);
+    dinv = _fmpz_vec_init(M/p + 1);
+    mu   = _fmpz_vec_init(M + 1);
 
     u = malloc((n + 1) * sizeof(long));
     v = malloc((n + 1) * sizeof(long));
-
-if (verbose)
-{
-    printf("Teichmuller lifts\n");
-    t0 = clock();
-}
-
-    for (i = 0; i <= n; i++)
-    {
-        _padic_teichmuller(alift + i, a + i, P, N2);
-    }
-
-if (verbose)
-{
-    t1 = clock();
-    t  = (double) (t1 - t0) / CLOCKS_PER_SEC;
-    printf("T = %f\n", t);
-}
 
 if (verbose)
 {
@@ -668,10 +589,7 @@ if (verbose)
     t1 = clock();
     t  = (double) (t1 - t0) / CLOCKS_PER_SEC;
     printf("T = %f\n", t);
-}
 
-if (verbose)
-{
     printf("Sequence mu_{m}\n");
     t0 = clock();
 }
@@ -683,10 +601,7 @@ if (verbose)
     t1 = clock();
     t  = (double) (t1 - t0) / CLOCKS_PER_SEC;
     printf("T = %f\n", t);
-}
 
-if (verbose)
-{
     printf("Matrix F\n");
     t0 = clock();
 }
@@ -715,21 +630,21 @@ if (verbose)
                 long o;
 
                 entry(padic_mat_unit(F, i, j), &o, 
-                      u, v, alift, dinv, mu, M, C, n, d, p, N);
+                      u, v, a, dinv, mu, M, n, d, p, N, N2);
 
-                if (o != - (r + s))
+                if (o != - delta)
                 {
-                    fmpz_t w;
-                    fmpz_init(w);
-                    fmpz_pow_ui(w, P, o + (r + s));
+                    fmpz_t f;
+                    fmpz_init(f);
+                    fmpz_pow_ui(f, P, o + delta);
                     fmpz_mul(padic_mat_unit(F, i, j), 
-                             padic_mat_unit(F, i, j), w);
-                    fmpz_clear(w);
+                             padic_mat_unit(F, i, j), f);
+                    fmpz_clear(f);
                 }
             }
         }
 
-    padic_mat_val(F) = - (r + s);
+    padic_mat_val(F) = - delta;
     _padic_mat_canonicalise(F, ctx);
 
 if (verbose)
@@ -739,7 +654,6 @@ if (verbose)
     printf("T = %f\n", t);
 }
 
-    _fmpz_vec_clear(alift, n + 1);
     _fmpz_vec_clear(dinv, M/p + 1);
     _fmpz_vec_clear(mu, M + 1);
     free(u);
