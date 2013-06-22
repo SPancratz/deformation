@@ -31,6 +31,7 @@ typedef struct {
     long K;
     long m;
     long r, s;
+    fmpz_poly_struct *denR;
 } prec_t;
 
 /*

@@ -680,6 +680,7 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
         fmpz_pow_ui(pN, p, prec->N2 - vF);
 
         /* Compute r(t)^m mod p^{N2-vF} */
+        if (prec->denR == NULL)
         {
             fmpz_mod_poly_t _t;
 
@@ -688,6 +689,11 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
             fmpz_mod_poly_pow(_t, _t, prec->m);
             fmpz_mod_poly_get_fmpz_poly(t, _t);
             fmpz_mod_poly_clear(_t);
+        }
+        else
+        {
+            /* TODO: We don't really need a copy */
+            fmpz_poly_set(t, prec->denR);
         }
 
         fmpz_poly_mat_scalar_mul_fmpz_poly(F, F, t);
@@ -730,9 +736,16 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
 
             /* f := \hat{t_1}, g := r(\hat{t_1})^{-m} */
             _padic_teichmuller(f, t1->coeffs + 0, p, N);
-            _fmpz_mod_poly_evaluate_fmpz(t, r->coeffs, r->length, f, pN);
-            _padic_inv(t, t, p, N);
-            fmpz_powm_ui(g, t, prec->m, pN);
+            if (prec->denR == NULL)
+            {
+                _fmpz_mod_poly_evaluate_fmpz(g, r->coeffs, r->length, f, pN);
+                fmpz_powm_ui(t, g, prec->m, pN);
+            }
+            else
+            {
+                _fmpz_mod_poly_evaluate_fmpz(t, prec->denR->coeffs, prec->denR->length, f, pN);
+            }
+            _padic_inv(g, t, p, N);
 
             /* F1 := g G(\hat{t_1}) */
             for (i = 0; i < b; i++)
@@ -784,10 +797,9 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
         c0 = clock();
         {
             const long N = prec->N2 - vF;
-            fmpz_t e, pN;
+            fmpz_t pN;
             fmpz *f, *g, *t;
 
-            fmpz_init_set_ui(e, prec->m);
             fmpz_init(pN);
 
             f = _fmpz_vec_init(a);
@@ -798,10 +810,21 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
 
             /* f := \hat{t_1}, g := r(\hat{t_1})^{-m} */
             _qadic_teichmuller(f, t1->coeffs, t1->length, Qq->a, Qq->j, Qq->len, p, N);
-            _fmpz_mod_poly_compose_mod(g, r->coeffs, r->length, f, a, 
-                                          Qq->a, Qq->j, Qq->len, pN);
-            _qadic_inv(t, g, a, Qq->a, Qq->j, Qq->len, p, N);
-            _qadic_pow(g, t, a, e, Qq->a, Qq->j, Qq->len, pN);
+            if (prec->denR == NULL)
+            {
+                fmpz_t e;
+                fmpz_init_set_ui(e, prec->m);
+                _fmpz_mod_poly_compose_mod(g, r->coeffs, r->length, f, a, 
+                                              Qq->a, Qq->j, Qq->len, pN);
+                _qadic_pow(t, g, a, e, Qq->a, Qq->j, Qq->len, pN);
+                fmpz_clear(e);
+            }
+            else
+            {
+                _fmpz_mod_poly_compose_mod(t, prec->denR->coeffs, prec->denR->length, f, a, 
+                                              Qq->a, Qq->j, Qq->len, pN);
+            }
+            _qadic_inv(g, t, a, Qq->a, Qq->j, Qq->len, p, N);
 
             /* F1 := g G(\hat{t_1}) */
             for (i = 0; i < b; i++)
@@ -833,7 +856,6 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
             vF1 = vF;
             fmpz_poly_mat_canonicalise(F1, &vF1, p);
 
-            fmpz_clear(e);
             fmpz_clear(pN);
             _fmpz_vec_clear(f, a);
             _fmpz_vec_clear(g, 2 * a - 1);

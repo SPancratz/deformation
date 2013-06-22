@@ -137,5 +137,7 @@ void deformation_precisions(prec_t *prec,
     prec->N3w  = prec->N3  + (f + 1) * n_clog(prec->K, *p);
     prec->N3iw = prec->N3i + (f + 1) * n_clog((prec->K + *p - 1) / *p, *p);
     prec->N4   = prec->N2  + f * (n_clog(prec->K, *p) + n_clog((prec->K + *p - 1) / *p, *p));
+
+    prec->denR = NULL;
 }
 
