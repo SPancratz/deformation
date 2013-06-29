@@ -131,7 +131,6 @@ int main(void)
 
         padic_mat_t F;
         fmpz_poly_t chi;
-        fmpz_poly_t z;
 
         fmpz_init(p);
         do 
@@ -152,9 +151,6 @@ int main(void)
         fmpz_poly_init(chi);
         diagfrob_revcharpoly(chi, F, pctx);
 
-        fmpz_poly_init(z);
-        diagfrob_zetafunction(z, chi, n, d, p, a);
-
         /*********************************************************************/
         #if DEBUG
         printf("i    = %ld\n", i);
@@ -173,8 +169,16 @@ int main(void)
         fmpz_poly_print_pretty(chi, "T");
         printf("\n");
 
+        fflush(stdout);
+        #endif
+        /*********************************************************************/
+
+        diagfrob_zetafunction(chi, n, d, p, a);
+
+        /*********************************************************************/
+        #if DEBUG
         printf("Zeta function:\n");
-        fmpz_poly_print_pretty(z, "T");
+        fmpz_poly_print_pretty(chi, "T");
         printf("\n");
 
         fflush(stdout);
@@ -182,10 +186,9 @@ int main(void)
         /*********************************************************************/
 
         /* Alternative computation */
-
         pts_naive = points(A + 0, A + 1, A + 2, p);
 
-        result = (1 + *p - (- fmpz_poly_get_coeff_si(z, 1)) == pts_naive);
+        result = (1 + *p - (- fmpz_poly_get_coeff_si(chi, 1)) == pts_naive);
         if (!result)
         {
             printf("FAIL:\n");
@@ -193,18 +196,16 @@ int main(void)
             printf("d = %ld\n", d);
             printf("n = %ld\n", n);
             printf("p = %ld\n", *p);
-            printf("z = "), fmpz_poly_print_pretty(z, "T"), printf("\n");
+            printf("chi = "), fmpz_poly_print_pretty(chi, "T"), printf("\n");
             printf("Points = %ld\n", pts_naive);
             abort();
         }
 
         /* Clean-up */
-
         fmpz_clear(p);
         _fmpz_vec_clear(A, n + 1);
         padic_mat_clear(F);
         fmpz_poly_clear(chi);
-        fmpz_poly_clear(z);
 
         padic_ctx_clear(pctx);
     }

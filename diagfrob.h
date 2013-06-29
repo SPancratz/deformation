@@ -120,12 +120,10 @@ void diagfrob(padic_mat_t F, const fmpz *a, long n, long d,
 void diagfrob_revcharpoly(fmpz_poly_t chi, 
                           const padic_mat_t phi, const padic_ctx_t ctx);
 
-void _diagfrob_zetafunction(fmpz *z, const fmpz *chi, long n, long d, 
-                            const fmpz_t p, long a);
+void _diagfrob_zetafunction(fmpz *chi, long n, long d, const fmpz_t p, long a);
 
-void diagfrob_zetafunction(fmpz_poly_t z, 
-                           const fmpz_poly_t chi, long n, long d, 
-                           const fmpz_t p, long a);
+void diagfrob_zetafunction(fmpz_poly_t chi, 
+                           long n, long d, const fmpz_t p, long a);
 
 #endif
 

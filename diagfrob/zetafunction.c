@@ -6,8 +6,7 @@
 
 #include "diagfrob.h"
 
-void _diagfrob_zetafunction(fmpz *z, const fmpz *chi, long n, long d, 
-                            const fmpz_t p, long a)
+void _diagfrob_zetafunction(fmpz *chi, long n, long d, const fmpz_t p, long a)
 {
     const long b = gmc_basis_size(n, d);
 
@@ -15,30 +14,29 @@ void _diagfrob_zetafunction(fmpz *z, const fmpz *chi, long n, long d,
     fmpz_t f, pN, pN_2, sum;
     long i, j, n_chi;
 
+    assert(fmpz_is_one(chi + 0));
+
     s = _fmpz_vec_init(b + 1);
     fmpz_init(f);
     fmpz_init(pN);
     fmpz_init(pN_2);
     fmpz_init(sum);
 
-    fmpz_one(z + 0);
-
-    /* Compute z[j] for j = 1,...,b */
+    /* Compute s[j] and hence round chi[j] for j = 1,...,b */
     for (j = 1; j <= b; j++)
     {
         fmpz_zero(sum);
         for (i = 1; i <= j - 1; i++)
         {
-            fmpz_mul(f, s + (j - i), z + i);
-            fmpz_add(sum, sum, f);
+            fmpz_mul(f, s + (j - i), chi + i);
+            fmpz_sub(sum, sum, f);
         }
-        fmpz_neg(sum, sum);
 
-        /* Now s[j] + j z[j] = sum */
+        /* Now s[j] + j chi[j] = sum, but we don't know s[j] yet */
         fmpz_mul_ui(f, chi + j, j);
         fmpz_sub(f, sum, f);
 
-        /* Now f is an approximation to s[j] */
+        /* Round f to s[j] in $[- \floor{p^N/2}, \ceil{p^N/2})$ */
         n_chi = diagfrob_prec_chi(n, b, p, a, j);
 
         fmpz_pow_ui(pN, p, n_chi);
@@ -49,12 +47,12 @@ void _diagfrob_zetafunction(fmpz *z, const fmpz *chi, long n, long d,
         if (fmpz_cmp(s + j, pN_2) >= 0)
             fmpz_sub(s + j, s + j, pN);
 
-        /* Now f is equal to s[j] and we can recover z[j] */
-        fmpz_sub(f, sum, s + j);
+        /* Now we have s[j], we can recover chi[j] exactly */
+        fmpz_sub(sum, sum, s + j);
 
-        assert(fmpz_divisible_si(f, j));
+        assert(fmpz_divisible_si(sum, j));
 
-        fmpz_divexact_si(z + j, f, j);
+        fmpz_divexact_si(chi + j, sum, j);
     }
 
     _fmpz_vec_clear(s, b + 1);
@@ -64,17 +62,9 @@ void _diagfrob_zetafunction(fmpz *z, const fmpz *chi, long n, long d,
     fmpz_clear(sum);
 }
 
-void diagfrob_zetafunction(fmpz_poly_t z, 
-                           const fmpz_poly_t chi, long n, long d, 
-                           const fmpz_t p, long a)
+void diagfrob_zetafunction(fmpz_poly_t chi, 
+                           long n, long d, const fmpz_t p, long a)
 {
-    const long b = gmc_basis_size(n, d);
-
-    fmpz_poly_fit_length(z, b + 1);
-
-    _diagfrob_zetafunction(z->coeffs, chi->coeffs, n, d, p, a);
-
-    _fmpz_poly_set_length(z, b + 1);
-    _fmpz_poly_normalise(z);
+    _diagfrob_zetafunction(chi->coeffs, n, d, p, a);
 }
 
