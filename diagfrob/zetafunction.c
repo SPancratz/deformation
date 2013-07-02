@@ -19,6 +19,10 @@ void _diagfrob_zetafunction(fmpz *chi, long n, long d, const fmpz_t p, long a)
     long i, j, n_chi;
 
 #if DEBUG
+    double centre, radius;
+#endif
+
+#if DEBUG
     printf("Enter _diagfrob_zetafunction:\n");
     printf("  chi = "), _fmpz_vec_print(chi, b + 1), printf("\n");
     printf("  p   = %ld\n", *p);
@@ -40,8 +44,7 @@ void _diagfrob_zetafunction(fmpz *chi, long n, long d, const fmpz_t p, long a)
         fmpz_zero(sum);
         for (i = 1; i <= j - 1; i++)
         {
-            fmpz_mul(f, s + (j - i), chi + i);
-            fmpz_sub(sum, sum, f);
+            fmpz_submul(sum, s + (j - i), chi + i);
         }
 
         /* The exact value of chi[j] lies in the ball with centre sum/j 
@@ -68,11 +71,16 @@ void _diagfrob_zetafunction(fmpz *chi, long n, long d, const fmpz_t p, long a)
         fmpz_sub(s + j, sum, f);
 
 #if DEBUG
+    centre = fmpz_get_d(sum) / (double)j;
+    radius = (double)b / (double)j * pow(*p, (a * j * (n - 1)) / 2.0);
+
     printf("    j             = %ld\n", j);
-    printf("    centre of B/j = %lf\n", fmpz_get_d(sum) / (double)j);
-    printf("    radius of B/j = %lf\n", (double)b / (double)j * pow(*p, (a * j * (n - 1)) / 2.0));
-    printf("    lo            = "), fmpz_print(lo), printf("\n");
-    printf("    hi            = "), fmpz_print(hi), printf("\n");
+    printf("    centre of B/j = %lf\n", centre);
+    printf("    radius of B/j = %lf\n", radius);
+    printf("    lo (real)     = %lf\n", centre - radius);
+    printf("    hi (real)     = %lf\n", centre + radius);
+    printf("    lo (int)      = "), fmpz_print(lo), printf("\n");
+    printf("    hi (int)      = "), fmpz_print(hi), printf("\n");
     printf("    hi - lo       = "), fmpz_sub(f, hi, lo), fmpz_print(f), printf("\n");
     printf("    n_chi         = %ld\n", n_chi);
     printf("    p^{n_chi}     = "), fmpz_print(pN), printf("\n");
