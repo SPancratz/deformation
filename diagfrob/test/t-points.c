@@ -103,6 +103,7 @@ int main(void)
 
         /*********************************************************************/
         #if DEBUG
+        printf("\n");
         printf("i    = %d\n", i);
         printf("n    = %ld\n", n);
         printf("d    = %ld\n", d);

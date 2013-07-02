@@ -53,8 +53,10 @@ long diagfrob_k(const long *u, long n, long d)
 
 /* 
     Observe that 
-    \floor{log_p (2 (b/i) \mathfrak{q}^{i (n-1)/2})} + 1
-        = \floor{1/2 (\floor{\log_p (4 b^2/i^2)} + a i (n-1))}
+    \[
+    \floor{\log_p (2 (b/i) \mathfrak{q}^{i (n-1)/2})} + 1
+        = \floor{1/2 (\floor{\log_p (4 b^2/i^2)} + a i (n-1))} + 1.
+    \]
  */
 
 static __inline__
@@ -110,6 +112,7 @@ long diagfrob_prec_phi(long n, long d, const fmpz_t p, long a)
             curr = diagfrob_prec_chi(n, b, p, a, i) - a * gamma[i-1];
             prec = FLINT_MAX(prec, curr);
         }
+        free(gamma);
     }
     return prec;
 }

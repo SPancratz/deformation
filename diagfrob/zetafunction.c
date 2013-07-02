@@ -6,21 +6,33 @@
 
 #include "diagfrob.h"
 
+#include <math.h>
+
+#define DEBUG  1
+
 void _diagfrob_zetafunction(fmpz *chi, long n, long d, const fmpz_t p, long a)
 {
     const long b = gmc_basis_size(n, d);
 
     fmpz *s;
-    fmpz_t f, pN, pN_2, sum;
+    fmpz_t f, g, pN, sum, lo, hi;
     long i, j, n_chi;
+
+#if DEBUG
+    printf("Enter _diagfrob_zetafunction:\n");
+    printf("  chi = "), _fmpz_vec_print(chi, b + 1), printf("\n");
+    printf("  p   = %ld\n", *p);
+    printf("  a   = %ld\n", a);
+#endif
 
     assert(fmpz_is_one(chi + 0));
 
     s = _fmpz_vec_init(b + 1);
     fmpz_init(f);
     fmpz_init(pN);
-    fmpz_init(pN_2);
     fmpz_init(sum);
+    fmpz_init(lo);
+    fmpz_init(hi);
 
     /* Compute s[j] and hence round chi[j] for j = 1,...,b */
     for (j = 1; j <= b; j++)
@@ -32,34 +44,49 @@ void _diagfrob_zetafunction(fmpz *chi, long n, long d, const fmpz_t p, long a)
             fmpz_sub(sum, sum, f);
         }
 
-        /* Now s[j] + j chi[j] = sum, but we don't know s[j] yet */
-        fmpz_mul_ui(f, chi + j, j);
-        fmpz_sub(f, sum, f);
+        /* The exact value of chi[j] lies in the ball with centre sum/j 
+           and radius (b/j) q^{j(n-1)/2}.  The intersection of this ball 
+           with the integers is equal to [lo, hi].
+         */
+        fmpz_pow_ui(f, p, a * j * (n - 1));
+        fmpz_mul_ui(f, f, b * b);
+        fmpz_sqrt(f, f);
+        fmpz_sub(lo, sum, f);
+        fmpz_cdiv_q_ui(lo, lo, j);
+        fmpz_add(hi, sum, f);
+        fmpz_fdiv_q_ui(hi, hi, j);
 
-        /* Round f to s[j] in $[- \floor{p^N/2}, \ceil{p^N/2})$ */
         n_chi = diagfrob_prec_chi(n, b, p, a, j);
-
         fmpz_pow_ui(pN, p, n_chi);
-        fmpz_fdiv_q_ui(pN_2, pN, 2);
-        fmpz_sub(pN_2, pN, pN_2);
 
-        fmpz_mod(s + j, f, pN);
-        if (fmpz_cmp(s + j, pN_2) >= 0)
-            fmpz_sub(s + j, s + j, pN);
+        fmpz_sub(f, chi + j, lo);
+        fmpz_mod(f, f, pN);
+        fmpz_add(chi + j, f, lo);
 
-        /* Now we have s[j], we can recover chi[j] exactly */
-        fmpz_sub(sum, sum, s + j);
+        /* Now s[j] + j chi[j] = sum */
+        fmpz_mul_ui(f, chi + j, j);
+        fmpz_sub(s + j, sum, f);
 
-        assert(fmpz_divisible_si(sum, j));
-
-        fmpz_divexact_si(chi + j, sum, j);
+#if DEBUG
+    printf("    j             = %ld\n", j);
+    printf("    centre of B/j = %lf\n", fmpz_get_d(sum) / (double)j);
+    printf("    radius of B/j = %lf\n", (double)b / (double)j * pow(*p, (a * j * (n - 1)) / 2.0));
+    printf("    lo            = "), fmpz_print(lo), printf("\n");
+    printf("    hi            = "), fmpz_print(hi), printf("\n");
+    printf("    hi - lo       = "), fmpz_sub(f, hi, lo), fmpz_print(f), printf("\n");
+    printf("    n_chi         = %ld\n", n_chi);
+    printf("    p^{n_chi}     = "), fmpz_print(pN), printf("\n");
+    printf("    chi[j]        = "), fmpz_print(chi + j), printf("\n");
+    printf("    s[j]          = "), fmpz_print(s + j), printf("\n");
+#endif
     }
 
     _fmpz_vec_clear(s, b + 1);
     fmpz_clear(f);
     fmpz_clear(pN);
-    fmpz_clear(pN_2);
     fmpz_clear(sum);
+    fmpz_clear(lo);
+    fmpz_clear(hi);
 }
 
 void diagfrob_zetafunction(fmpz_poly_t chi, 
