@@ -821,6 +821,9 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
             }
             else
             {
+    _fmpz_mod_poly_reduce(prec->denR->coeffs, prec->denR->length, Qq->a, Qq->j, Qq->len, pN);
+    _fmpz_mod_poly_normalise(prec->denR);
+
                 _fmpz_mod_poly_compose_mod(t, prec->denR->coeffs, prec->denR->length, f, a, 
                                               Qq->a, Qq->j, Qq->len, pN);
             }
