@@ -16,10 +16,10 @@ int main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 500; i++)
     {
-        const long d = 3;
-        const long n = 2;
+        const long n_randint(state, 5) + 2;  /* d in [2,6] */
+        const long n_randint(state, 3) + 2;  /* n in [2,4] */
         const long a = 1;
 
         const long lenB = gmc_basis_size(n, d);
