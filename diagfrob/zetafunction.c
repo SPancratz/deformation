@@ -75,10 +75,10 @@ void _diagfrob_zetafunction(fmpz *chi, long n, long d, const fmpz_t p, long a)
     radius = (double)b / (double)j * pow(*p, (a * j * (n - 1)) / 2.0);
 
     printf("    j             = %ld\n", j);
-    printf("    centre of B/j = %lf\n", centre);
-    printf("    radius of B/j = %lf\n", radius);
-    printf("    lo (real)     = %lf\n", centre - radius);
-    printf("    hi (real)     = %lf\n", centre + radius);
+    printf("    centre of B/j = %f\n", centre);
+    printf("    radius of B/j = %f\n", radius);
+    printf("    lo (real)     = %f\n", centre - radius);
+    printf("    hi (real)     = %f\n", centre + radius);
     printf("    lo (int)      = "), fmpz_print(lo), printf("\n");
     printf("    hi (int)      = "), fmpz_print(hi), printf("\n");
     printf("    hi - lo       = "), fmpz_sub(f, hi, lo), fmpz_print(f), printf("\n");

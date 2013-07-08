@@ -18,8 +18,8 @@ int main(void)
 
     for (i = 0; i < 500; i++)
     {
-        const long n_randint(state, 5) + 2;  /* d in [2,6] */
-        const long n_randint(state, 3) + 2;  /* n in [2,4] */
+        const long d = n_randint(state, 5) + 2;  /* d in [2,6] */
+        const long n = n_randint(state, 3) + 2;  /* n in [2,4] */
         const long a = 1;
 
         const long lenB = gmc_basis_size(n, d);
