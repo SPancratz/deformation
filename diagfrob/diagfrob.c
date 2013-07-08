@@ -9,6 +9,35 @@
 #include "gmconnection.h"
 #include "diagfrob.h"
 
+/* 
+    Insertion sort for an array of length n. 
+ */
+static void _sort(long *a, long n)
+{
+    long i, j, v;
+    for (i = 1; i < n; i++)
+    {
+        v = a[i];
+        for (j = i; j > 0 && v < a[j-1]; j--)
+        {
+            a[j] = a[j-1];
+        }
+        a[j] = v;
+    }
+}
+
+/*
+    Linear search in an array a[lo], ..., a[hi-1] for the value x.
+ */
+static long _lsearch(long *a, long lo, long hi, long x)
+{
+    long i;
+    for (i = lo; i < hi; i++)
+        if (a[i] == x)
+            return i;
+    return -1;
+}
+
 /*
     Computes the expression 
     \[
@@ -184,15 +213,19 @@ void mu(fmpz_t rop, long m, long p, long N)
 
 /*
     Computes the list $\mu_0, \dotsc, \mu_M$ modulo $p^N$.
- */
 
-void precompute_mu(fmpz *list, long M, long p, long N)
+    The array (C, lenC) contains the sorted list of congruence classes 
+    modulo $p$ for which we have to compute $\mu_m$.
+ */
+ 
+void precompute_mu(fmpz *list, long M, long *C, long lenC, long p, long N)
 {
     long m;
 
     for (m = 0; m <= M; m++)
-        mu(list + m, m, p, N);
-}
+        if (_lsearch(C, 0, lenC, m % p) != -1)
+            mu(list + m, m, p, N);
+} 
 
 /*
     Let $R = \floor{M/p}$.  This functions computes the list of 
@@ -598,17 +631,19 @@ void diagfrob(padic_mat_t F, const fmpz *a, long n, long d,
         $C$ is such that $\ord_p((u'-1)! \alpha_{u+1,v+1}) \leq C$.
      */
 
-    const long C  = n + 2 * r + s;
-    const long N2 = N - n + 2 * C;
+    const long Cx = n + 2 * r + s;
+    const long N2 = N - n + 2 * Cx;
     const long M  =  (p * p * N2) / (p-1) + p * p * n_flog(N2 / (p-1) + 2, p) 
                      + p * p * 4;
 
     mon_t *B;
     long *iB, lenB, lo, hi;
 
-    long i, j, *u, *v;
+    long i, j, k, *u, *v;
 
     fmpz *alift, *dinv, *mu;
+
+    long *C, lenC;
 
     clock_t t0 = 0, t1 = 0;
     double t;
@@ -636,6 +671,44 @@ if (verbose)
 
     u = malloc((n + 1) * sizeof(long));
     v = malloc((n + 1) * sizeof(long));
+
+    /* Compute array of congruence classes for which we need mu[m] */
+    C = malloc(lenB * (n + 1) * sizeof(long));
+    lenC = 0;
+    for (i = 0; i < lenB; i++)
+        for (j = 0; j < lenB; j++)
+        {
+            for (k = 0; k <= n; k++)
+            {
+                u[k] = mon_get_exp(B[i], k);
+                v[k] = mon_get_exp(B[j], k);
+                if ((p * (u[k] + 1) - (v[k] + 1)) % d != 0)
+                {
+                    break;
+                }
+            }
+            if (k > n)
+            {
+                for (k = 0; k <= n; k++)
+                {
+                    C[lenC++] = ((p * (u[k] + 1) - (v[k] + 1)) / d) % p;
+                }
+            }
+        }
+    /* Remove duplicates */
+    k = (lenC > 0) ? 1 : 0;
+    for (i = 1; i < lenC; i++)
+    {
+        for (j = 0; j < k; j++)
+        {
+            if (C[i] == C[j])
+                break;
+        }
+        if (j == k)
+            C[k++] = C[i];
+    }
+    lenC = k;
+    _sort(C, lenC);
 
 if (verbose)
 {
@@ -676,7 +749,7 @@ if (verbose)
     t0 = clock();
 }
 
-    precompute_mu(mu, M, p, N2);
+    precompute_mu(mu, M, C, lenC, p, N2);
 
 if (verbose)
 {
@@ -694,8 +767,6 @@ if (verbose)
     for (i = 0; i < lenB; i++)
         for (j = 0; j < lenB; j++)
         {
-            long k;
-
             for (k = 0; k <= n; k++)
             {
                 u[k] = mon_get_exp(B[i], k);
@@ -705,7 +776,6 @@ if (verbose)
                      break;
                 }
             }
-
             if (k <= n)
             {
                 fmpz_zero(padic_mat_unit(F, i, j));
@@ -715,7 +785,7 @@ if (verbose)
                 long o;
 
                 entry(padic_mat_unit(F, i, j), &o, 
-                      u, v, alift, dinv, mu, M, C, n, d, p, N);
+                      u, v, alift, dinv, mu, M, Cx, n, d, p, N);
 
                 if (o != - (r + s))
                 {
@@ -746,5 +816,6 @@ if (verbose)
     free(v);
     free(B);
     free(iB);
+    free(C);
 }
 
