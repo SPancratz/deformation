@@ -6,25 +6,26 @@
 
 #include "diagfrob.h"
 
-#define DEBUG  1
+#define DEBUG  0
 
-static void _visit(mp_limb_t *a, long n, long d, mp_limb_t p, long i, int nz, 
-                   mp_limb_t *sum, mp_limb_t *pow, long *count)
+static void _visit(mp_limb_t *a, long n, long d, mp_limb_t p, mp_limb_t pinv, 
+                   long i, int nz, mp_limb_t *pow, mp_limb_t *sum, long *count)
 {
     long j;
 
     for (j = (i < n || nz) ? 0 : 1; j <= (nz ? p - 1 : 1); j++)
     {
-        pow[i] = n_powmod(j, d, p);
+        pow[i] = n_powmod2_preinv(j, d, p, pinv);
+        pow[i] = n_mulmod2_preinv(a[i], pow[i], p, pinv);
         *sum   = n_addmod(*sum, pow[i], p);
         
         if (i < n)  /* Visit next co-ordinate */
         {
-            _visit(a, n, d, p, i + 1, nz || (j > 0), sum, pow, count);
+            _visit(a, n, d, p, pinv, i + 1, nz || (j > 0), pow, sum, count);
         }
         else  /* Check this point */
         {
-            *count += (sum == 0) ? 1 : 0;
+            *count += (*sum == 0) ? 1 : 0;
         }
 
         *sum = n_submod(*sum, pow[i], p);
@@ -40,6 +41,7 @@ static long points(fmpz *a, long n, long d, mp_limb_t p)
     mp_limb_t sum = 0;
     mp_limb_t pow[MON_MAX_VARS] = {0};
     mp_limb_t b[MON_MAX_VARS];
+    mp_limb_t pinv = n_preinvert_limb(p);
     long count = 0;
     long i;
 
@@ -47,7 +49,7 @@ static long points(fmpz *a, long n, long d, mp_limb_t p)
     for (i = 0; i <= n; i++)
         b[i] = a[i];
 
-    _visit(b, n, d, p, 0, 0, &sum, pow, &count);
+    _visit(b, n, d, p, pinv, 0, 0, pow, &sum, &count);
 
     return count;
 }
@@ -62,7 +64,7 @@ int main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 1000; i++)
     {
         const long d = 4; /* n_randint(state, 5) + 2;  d in [2,6] */
         const long n = 2; /* n_randint(state, 3) + 2;  n in [2,4] */
