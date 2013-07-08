@@ -38,6 +38,22 @@ static long _lsearch(long *a, long lo, long hi, long x)
     return -1;
 }
 
+/* 
+    Binary search in an array a[lo], ..., a[hi-1] for the value x.
+ */
+static long _bsearch(long *a, long lo, long hi, long x)
+{
+    while (lo < hi)
+    {
+        long mi = lo + (hi - lo) / 2;
+        if (a[mi] < x)
+            lo = mi + 1;
+        else
+            hi = mi;
+    }
+    return (lo == hi && a[lo] == x) ? lo : -1;
+}
+
 /*
     Computes the expression 
     \[
@@ -223,7 +239,7 @@ void precompute_mu(fmpz *list, long M, long *C, long lenC, long p, long N)
     long m;
 
     for (m = 0; m <= M; m++)
-        if (_lsearch(C, 0, lenC, m % p) != -1)
+        if (_bsearch(C, 0, lenC, m % p) != -1)
             mu(list + m, m, p, N);
 } 
 
