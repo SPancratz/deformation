@@ -1,6 +1,6 @@
 /******************************************************************************
 
-    Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2012, 2013 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -551,8 +551,8 @@ void alpha(fmpz_t rop, const long *u, const long *v,
 }
 
 void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v, 
-    const fmpz *a, const fmpz *dinv, const fmpz *mu, long M, long C, 
-    long n, long d, long p, long N)
+    const fmpz *a, const fmpz *dinv, const fmpz *mu, long M, 
+    long n, long d, long p, long N, long N2)
 {
     long i, ud, vd;
     fmpz_t f, g, h, P;
@@ -585,15 +585,15 @@ void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v,
     }
 
     /*
-        Compute $g := (u'-1)! \alpha_{u+1,v+1}$ to precision $N - n + 2 C$.
+        Compute $g := (u'-1)! \alpha_{u+1,v+1}$ to precision $N2$.
      */
 
     fmpz_fac_ui(g, ud - 1);
-    alpha(h, u, v, a, dinv, mu, M, n, d, p, N - n + 2 * C);
+    alpha(h, u, v, a, dinv, mu, M, n, d, p, N2);
     fmpz_mul(g, g, h);
 
     /*
-        Set rop to the product of $f$ and $g^{-1}$.
+        Set rop to the product of $f$ and $g^{-1} mod $p^N$.
      */
 
     *rop_v = fmpz_remove(f, f, P) - fmpz_remove(g, g, P);
@@ -623,18 +623,12 @@ void diagfrob(padic_mat_t F, const fmpz *a, long n, long d,
 {
     const fmpz *P = ctx->p;
     const long p  = fmpz_get_si(P);
-    const long r  = padic_val_fac_ui(n - 1, P);
-    const long s  = (n + 1) * n_flog(n - 1, p);
     const long N  = ctx->N;
 
-    /*
-        $C$ is such that $\ord_p((u'-1)! \alpha_{u+1,v+1}) \leq C$.
-     */
-
-    const long Cx = n + 2 * r + s;
-    const long N2 = N - n + 2 * Cx;
-    const long M  =  (p * p * N2) / (p-1) + p * p * n_flog(N2 / (p-1) + 2, p) 
-                     + p * p * 4;
+    const long delta = diagfrob_delta(n, P);
+    const long N2    = N - n + 2 * (padic_val_fac_ui(n - 1, P) + n + delta);
+    const long M     = (p * p * (N2 + n_clog(N2 + 3, p) + 4) + (p - 2))
+                       / (p - 1) - 1;
 
     mon_t *B;
     long *iB, lenB, lo, hi;
@@ -785,13 +779,13 @@ if (verbose)
                 long o;
 
                 entry(padic_mat_unit(F, i, j), &o, 
-                      u, v, alift, dinv, mu, M, Cx, n, d, p, N);
+                      u, v, alift, dinv, mu, M, n, d, p, N, N2);
 
-                if (o != - (r + s))
+                if (o != - delta)
                 {
                     fmpz_t w;
                     fmpz_init(w);
-                    fmpz_pow_ui(w, P, o + (r + s));
+                    fmpz_pow_ui(w, P, o + delta);
                     fmpz_mul(padic_mat_unit(F, i, j), 
                              padic_mat_unit(F, i, j), w);
                     fmpz_clear(w);
@@ -799,7 +793,7 @@ if (verbose)
             }
         }
 
-    padic_mat_val(F) = - (r + s);
+    padic_mat_val(F) = - delta;
     _padic_mat_canonicalise(F, ctx);
 
 if (verbose)
