@@ -415,11 +415,10 @@ void dsum_p(
     long ui, long vi, long M, long n, long d, long p, long N)
 {
     long m, r;
-    fmpz_t f, g, h, P, PN;
+    fmpz_t f, g, P, PN;
 
     fmpz_init(f);
     fmpz_init(g);
-    fmpz_init(h);
     fmpz_init_set_ui(P, p);
     fmpz_init(PN);
 
@@ -432,10 +431,7 @@ void dsum_p(
 
     if (m <= M)
     {
-        fmpz_pow_ui(h, P, r - (m / p));
-        fmpz_mul(g, h, mu + m);
-        fmpz_mod(g, g, PN);
-        fmpz_add(rop, rop, g);
+        fmpz_mod(rop, mu + m, PN);
     }
 
     fmpz_one(f);
@@ -444,8 +440,6 @@ void dsum_p(
     {
         fmpz_mul_ui(f, f, ui + 1 + (r - 1) * d);
         fmpz_mul(g, f, dinv + r);
-        fmpz_pow_ui(h, P, r - (m / p));
-        fmpz_mul(g, g, h);
         fmpz_mul(g, g, mu + m);
         fmpz_mod(g, g, PN);
         fmpz_add(rop, rop, g);
@@ -455,7 +449,6 @@ void dsum_p(
 
     fmpz_clear(f);
     fmpz_clear(g);
-    fmpz_clear(h);
     fmpz_clear(P);
     fmpz_clear(PN);
 }
