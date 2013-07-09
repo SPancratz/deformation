@@ -401,7 +401,7 @@ void dsum_2(
     Computes the double sum involved in the expression for 
     $\alpha_{u+1, v+1}$ when $p$ is an odd prime, namely
     \[
-    \sum_{m,r} \Bigl(\frac{u_i + 1}{d}\Bigr)_r p^{r - \floor{m/p}} \mu_m.
+    \sum_{m,r} \Bigl(\frac{u_i + 1}{d}\Bigr)_r \mu_m.
     \]
 
     Assumptions:
@@ -431,10 +431,9 @@ void dsum_p(
 
     if (m <= M)
     {
+        fmpz_one(f);
         fmpz_mod(rop, mu + m, PN);
     }
-
-    fmpz_one(f);
 
     for (r = 1, m += p; m <= M; r++, m += p)
     {
