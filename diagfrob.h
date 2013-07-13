@@ -128,5 +128,47 @@ void _diagfrob_zetafunction(fmpz *chi, long n, long d, const fmpz_t p, long a);
 void diagfrob_zetafunction(fmpz_poly_t chi, 
                            long n, long d, const fmpz_t p, long a);
 
+static 
+int diagfrob_verify_functional_eq(const fmpz_poly_t chi, 
+                                  long n, long d, const fmpz_t p, long a)
+{
+    const long b = gmc_basis_size(n, d);
+
+    if (fmpz_poly_length(chi) != b + 1)
+    {
+        return 0;
+    }
+    else if (!fmpz_is_one(fmpz_poly_get_coeff_ptr(chi, 0)))
+    {
+        return 0;
+    }
+    else
+    {
+        const int sgn = fmpz_sgn(fmpz_poly_lead(chi));
+        long i;
+        fmpz_t q, t;
+
+        fmpz_init(q);
+        fmpz_init(t);
+        fmpz_pow_ui(q, p, a);
+
+        /* want i <= b - i, hence 2 i <= b hence i <= b/2 hence i <= floor(b/2) */
+        for (i = 0; i <= b / 2; i++)
+        {
+            fmpz_pow_ui(t, q, ((n - 1) * b) / 2 - (n - 1) * i);
+            fmpz_mul(t, t, fmpz_poly_get_coeff_ptr(chi, i));
+            if (sgn < 0)
+                fmpz_neg(t, t);
+            if (!fmpz_equal(t, fmpz_poly_get_coeff_ptr(chi, b - i)))
+                return 0;
+        }
+
+        fmpz_clear(q);
+        fmpz_clear(t);
+
+        return 1;
+    }
+}
+
 #endif
 

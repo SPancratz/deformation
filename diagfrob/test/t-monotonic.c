@@ -16,7 +16,7 @@ int main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 250; i++)
     {
         const long d = n_randint(state, 5) + 2;  /* d in [2,6] */
         const long n = n_randint(state, 3) + 2;  /* n in [2,4] */

@@ -66,7 +66,7 @@ int main(void)
 
     for (i = 0; i < 100; i++)
     {
-        const long d = n_randint(state, 5) + 2;  /* d in [2,6] */
+        const long d = n_randint(state, 3) + 2;  /* d in [2,4] */
         const long n = n_randint(state, 3) + 2;  /* n in [2,4] */
         const long a = 1;
 
@@ -98,7 +98,7 @@ int main(void)
 
         N = diagfrob_prec_phi(n, d, p, a);
 
-        padic_ctx_init(pctx, p, N, PADIC_SERIES);
+        padic_ctx_init(pctx, p, N, PADIC_VAL_UNIT);
 
         padic_mat_init(F, lenB, lenB);
         diagfrob(F, A, n, d, pctx, 0);
@@ -146,7 +146,8 @@ int main(void)
                + (n_pow(*p, n) - 1) / (*p - 1);
         pts2 = points(A, n, d, *p);
 
-        result = ((chi->coeffs[1] % chi->coeffs[0] == 0) && (pts1 == pts2));
+        result = (diagfrob_verify_functional_eq(chi, n, d, p, a) && 
+                 (chi->coeffs[1] % chi->coeffs[0] == 0) && (pts1 == pts2));
         if (!result)
         {
             printf("FAIL:\n");
@@ -154,7 +155,7 @@ int main(void)
             printf("d = %ld\n", d);
             printf("n = %ld\n", n);
             printf("p = %ld\n", *p);
-            printf("chi = "), fmpz_poly_print_pretty(chi, "T"), printf("\n");
+            printf("chi  = "), fmpz_poly_print_pretty(chi, "T"), printf("\n");
             printf("pts1 = %ld\n", pts1);
             printf("pts2 = %ld\n", pts2);
             abort();
