@@ -12,6 +12,7 @@
 #include <assert.h>
 
 #include "flint.h"
+#include "nmod_mat.h"
 #include "padic.h"
 #include "padic_mat.h"
 
@@ -169,6 +170,12 @@ int diagfrob_verify_functional_eq(const fmpz_poly_t chi,
         return 1;
     }
 }
+
+void nmod_mat_hessenberg(nmod_mat_t rop, const nmod_mat_t op);
+
+void nmod_mat_charpoly(nmod_poly_t rop, const nmod_mat_t op);
+
+void fmpz_mat_charpoly_modular(fmpz_poly_t rop, const fmpz_mat_t op);
 
 #endif
 

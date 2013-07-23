@@ -8,7 +8,7 @@
 
 #include <math.h>
 
-#define DEBUG  1
+#define DEBUG  0
 
 void _diagfrob_zetafunction(fmpz *chi, long n, long d, const fmpz_t p, long a)
 {
