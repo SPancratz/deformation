@@ -155,10 +155,6 @@ static void precompute_nu(fmpz *nu, long *v,
         fmpz_mod(nu + i, nu + i, PN2);
     }
 
-
-{
-time_t t0, t1;
-    t0 = clock();
     for (j = R, i = R + 1; i <= M; i++)
     {
         if (_bsearch(C, 0, lenC, i % p) != -1)
@@ -171,10 +167,6 @@ time_t t0, t1;
         }
     }
 
-t1 = clock();
-printf("Tx = %f\n", (double) (t1 - t0) / CLOCKS_PER_SEC);
-}
-
     _padic_inv_precompute(S, P, N2);
 
     pinv = n_precompute_inverse(p);
@@ -185,9 +177,6 @@ printf("Tx = %f\n", (double) (t1 - t0) / CLOCKS_PER_SEC);
         v[i] = - _fmpz_remove(nu + i, P, pinv);
         _padic_inv_precomp(nu + i, nu + i, S);
     }
-{
-time_t t0, t1;
-    t0 = clock();
     for (i = R + 1; i <= M; i++)
     {
         if (_bsearch(C, 0, lenC, i % p) != -1)
@@ -196,9 +185,7 @@ time_t t0, t1;
             _padic_inv_precomp(nu + i, nu + i, S);
         }
     }
-t1 = clock();
-printf("Ty = %f\n", (double) (t1 - t0) / CLOCKS_PER_SEC);
-}
+
     fmpz_clear(P);
     fmpz_clear(PN2);
     fmpz_clear(t);
@@ -248,10 +235,6 @@ void precompute_muex(fmpz *mu, long M, const long *C, long lenC, long p, long N)
             fmpz_zero(mu + m);
             for (k = 0; k <= m / p; k++)
             {
-/*
-    TODO:  Maybe prove that exp below is always equal to 1??\n
-printf("exp = %ld\n", ve + w - k + v[m - p*k] + v[k]); fflush(stdout);
- */
                 fmpz_pow_ui(f, P, ve + w - k + v[m - p*k] + v[k]);
                 fmpz_mul(g, nu + (m - p*k), nu + k);
                 fmpz_addmul(mu + m, f, g);
