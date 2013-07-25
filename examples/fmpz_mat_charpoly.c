@@ -19,7 +19,6 @@ int main(void)
 
     fmpz_mat_init(A, n, n);
     fmpz_poly_init(f);
-    fmpz_t d;
 
     fmpz_set_ui(fmpz_mat_entry(A, 0, 0), 1);
     fmpz_set_ui(fmpz_mat_entry(A, 1, 1), 1);
@@ -27,12 +26,8 @@ int main(void)
 
     fmpz_mat_charpoly_modular(f, A);
 
-    printf("A:\n");
-    fmpz_mat_print_pretty(A);
-    printf("\n");
-    printf("f = ");
-    fmpz_poly_print_pretty(f, "T");
-    printf("\n");
+    printf("A:\n"), fmpz_mat_print_pretty(A),       printf("\n");
+    printf("f = "), fmpz_poly_print_pretty(f, "T"), printf("\n");
 
     fmpz_set_si(fmpz_mat_entry(A, 0, 0),  2);
     fmpz_set_si(fmpz_mat_entry(A, 0, 1), -5);
@@ -46,12 +41,8 @@ int main(void)
 
     fmpz_mat_charpoly_modular(f, A);
 
-    printf("A:\n");
-    fmpz_mat_print_pretty(A);
-    printf("\n");
-    printf("f = ");
-    fmpz_poly_print_pretty(f, "T");
-    printf("\n");
+    printf("A:\n"), fmpz_mat_print_pretty(A),       printf("\n");
+    printf("f = "), fmpz_poly_print_pretty(f, "T"), printf("\n");
 
     fmpz_mat_clear(A);
     fmpz_poly_clear(f);

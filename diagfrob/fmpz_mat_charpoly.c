@@ -23,30 +23,28 @@ static void _fmpz_mat_charpoly_small_3x3(fmpz *rop, fmpz ** const x)
     fmpz_init(a + 0);
     fmpz_init(a + 1);
 
-    fmpz_mul(a + 0, &x[1][0], &x[2][1]);
-    fmpz_submul(a + 0, &x[1][1], &x[2][0]);
-    fmpz_set(a + 1, &x[2][0]);
-    fmpz_mul(rop + 0, a + 0, &x[0][2]);
-    fmpz_neg(rop + 0, rop + 0);
-    fmpz_mul(rop + 1, a + 1, &x[0][2]);
-    fmpz_neg(rop + 1, rop + 1);
+    fmpz_mul(   a + 0,   &x[1][0], &x[2][1]);
+    fmpz_submul(a + 0,   &x[1][1], &x[2][0]);
+    fmpz_mul(   rop + 0, a + 0,    &x[0][2]);
+    fmpz_neg(   rop + 0, rop + 0);
+    fmpz_mul(   rop + 1, &x[2][0], &x[0][2]);
+    fmpz_neg(   rop + 1, rop + 1);
 
-    fmpz_mul(a + 0, &x[1][2], &x[2][0]);
-    fmpz_submul(a + 0, &x[1][0], &x[2][2]);
-    fmpz_set(a + 1, &x[1][0]);
-    fmpz_submul(rop + 0, a + 0, &x[0][1]);
-    fmpz_submul(rop + 1, a + 1, &x[0][1]);
+    fmpz_mul(   a + 0,   &x[1][2], &x[2][0]);
+    fmpz_submul(a + 0,   &x[1][0], &x[2][2]);
+    fmpz_submul(rop + 0, a + 0,    &x[0][1]);
+    fmpz_submul(rop + 1, &x[1][0], &x[0][1]);
 
-    fmpz_mul(a + 0, &x[1][1], &x[2][2]);
-    fmpz_add(a + 1, &x[1][1], &x[2][2]);
-    fmpz_neg(a + 1, a + 1);
-    fmpz_submul(a + 0, &x[1][2], &x[2][1]);
+    fmpz_mul(   a + 0,   &x[1][1], &x[2][2]);
+    fmpz_add(   a + 1,   &x[1][1], &x[2][2]);
+    fmpz_neg(   a + 1,   a + 1);
+    fmpz_submul(a + 0,   &x[1][2], &x[2][1]);
 
-    fmpz_submul(rop + 0, a + 0, &x[0][0]);
-    fmpz_submul(rop + 1, a + 1, &x[0][0]);
-    fmpz_add(rop + 1, rop + 1, a + 0);
-    fmpz_sub(rop + 2, a + 1, &x[0][0]);
-    fmpz_one(rop + 3);
+    fmpz_submul(rop + 0, a + 0,    &x[0][0]);
+    fmpz_submul(rop + 1, a + 1,    &x[0][0]);
+    fmpz_add(   rop + 1, rop + 1,  a + 0);
+    fmpz_sub(   rop + 2, a + 1,    &x[0][0]);
+    fmpz_one(   rop + 3);
 
     fmpz_clear(a + 0);
     fmpz_clear(a + 1);
