@@ -144,8 +144,8 @@ static void precompute_nu(fmpz *nu, long *v,
     fmpz_init(t);
 
     /*
-        Step 1.  Compute $i!$ mod $p^{N_2}$ where $N_2 = N + \max \ord_p (i!)$.
-        Step 2.  Invert the unit part of $i!$ modulo $p^N$.
+        Step 1. Compute $i! mod p^{N_2}$ where $N_2 \geq N + \max \ord_p (i!)$
+        Step 2. Invert the unit part of $i!$ modulo $p^N$
      */
 
     fmpz_one(nu + 0);
@@ -155,9 +155,10 @@ static void precompute_nu(fmpz *nu, long *v,
         fmpz_mod(nu + i, nu + i, PN2);
     }
 
+    /* Let j denote the greatest index s.t. nu[j] has been computed */
     for (j = R, i = R + 1; i <= M; i++)
     {
-        if (_bsearch(C, 0, lenC, i % p) != -1)
+        /* if (_bsearch(C, 0, lenC, i % p) != -1) */
         {
             /* fmpz_rfac_uiui(t, j + 1, i - j); */
             fmpz_mod_rfac_uiui(t, j + 1, i - j, PN2);
@@ -167,7 +168,7 @@ static void precompute_nu(fmpz *nu, long *v,
         }
     }
 
-    _padic_inv_precompute(S, P, N2);
+    _padic_inv_precompute(S, P, N);
 
     pinv = n_precompute_inverse(p);
 
@@ -179,7 +180,7 @@ static void precompute_nu(fmpz *nu, long *v,
     }
     for (i = R + 1; i <= M; i++)
     {
-        if (_bsearch(C, 0, lenC, i % p) != -1)
+        /* if (_bsearch(C, 0, lenC, i % p) != -1) */
         {
             v[i] = - _fmpz_remove(nu + i, P, pinv);
             _padic_inv_precomp(nu + i, nu + i, S);
@@ -193,252 +194,93 @@ static void precompute_nu(fmpz *nu, long *v,
 }
 
 /*
-    Computes the sequence $\mu_0, \dotsc, \mu_M$ modulo $p^N$.
+    Computes the sequences $\mu_{i,0}, \dotsc, \mu_{i,M}$ modulo $p^N$.
 
     The array (C, lenC) contains the sorted list of congruence classes 
     modulo $p$ for which we have to compute $\mu_m$.
  */
  
-void precompute_muex(fmpz *mu, long M, const long *C, long lenC, long p, long N)
+void precompute_muex(fmpz **mu, long M, const long *C, long lenC, 
+                     const fmpz *a, long n, long p, long N)
 {
-    fmpz *nu;
-    long *v;
-    long m;
-    fmpz_t f, g, h, P, pN;
+    long i;
 
-    const long ve = (p == 2) ? M / 4 + 1 : M / (p * (p - 1)) + 1;
-
-    fmpz_init(f);
-    fmpz_init(g);
-    fmpz_init(h);
-    fmpz_init_set_ui(P, p);
-    fmpz_init(pN);
-    fmpz_pow_ui(pN, P, N + ve);
-    fmpz_pow_ui(h, P, ve);
-
-    nu = _fmpz_vec_init(M + 1);
-    v  = malloc((M + 1) * sizeof(long));
-
-    precompute_nu(nu, v, M, C, lenC, p, N + ve);
-
-    for (m = 0; m <= M; m++)
-        if (_bsearch(C, 0, lenC, m % p) != -1)
-        {
-            /*
-                Note that $\mu_m$ is equal to 
-                $\sum_{k=0}^{\floor{m/p}} p^{\floor{m/p}-k} \nu_{m-pk} \nu_{k}$
-                where $\nu_i$ denotes the $p$-adic number with unit part nu[i] 
-                and valuation v[i].
-             */
-            const long w = (p == 2) ? (3 * m) / 4 - (m == 3 || m == 7) : m / p;
-            long k;
-            fmpz_zero(mu + m);
-            for (k = 0; k <= m / p; k++)
-            {
-                fmpz_pow_ui(f, P, ve + w - k + v[m - p*k] + v[k]);
-                fmpz_mul(g, nu + (m - p*k), nu + k);
-                fmpz_addmul(mu + m, f, g);
-                fmpz_mod(mu + m, mu + m, pN);
-            }
-            fmpz_divexact(mu + m, mu + m, h);
-        }
-
-    fmpz_clear(f);
-    fmpz_clear(g);
-    fmpz_clear(h);
-    fmpz_clear(P);
-    fmpz_clear(pN);
-    _fmpz_vec_clear(nu, M + 1);
-    free(v);
-} 
-
-/*
-    Computes the expression 
-    \[
-    \mu_m = 
-        \sum_{k=0}^{\floor{m/2}} 2^{\floor{3m/4}-\nu_m-k} \frac{1}{(m-2k)! k!}
-    \]
-    modulo $p^N$ in the case that $p = 2$.
-
-    Assumptions:
-
-        * $m \geq 0$
-        * $3 m$ fits into a signed long
-        * The computation does fit into the MPIR model; 
-          in particular $m!$ and $2^{\floor{3m/4}}$ have 
-          to fit into a signed int
- */
-
-static void mu_2(fmpz_t rop, long m, long N)
-{
-    const fmpz_t P = {2L};
-
-    if (m == 3)  /* 4/3 */
+    for (i = 0; i <= n; i++)
     {
-        if (2 >= N)
-            fmpz_zero(rop);
-        else
-        {
-            fmpz_set_ui(rop, 3);
-            _padic_inv(rop, rop, P, N - 2);
-            fmpz_mul_2exp(rop, rop, 2);
-        }
-    }
-    else if (m == 7)  /* 232/315 = 8*29/315 */
-    {
-        if (3 >= N)
-            fmpz_zero(rop);
-        else
-        {
-            fmpz_set_ui(rop, 315);
-            _padic_inv(rop, rop, P, N - 3);
-            fmpz_mul_ui(rop, rop, 29);
-            fmpz_fdiv_r_2exp(rop, rop, N - 3);
-            fmpz_mul_2exp(rop, rop, 3);
-        }
-    }
-    else
-    {
-        fmpz_t f, s, t;
-        long k, v;
+        fmpz *nu;
+        long *v;
 
+        long m;
+        fmpz_t f, g, h, P, pNe, pe;
+        fmpz_t apow;
+
+        const long ve = (p == 2) ? M / 4 + 1 : M / (p * (p - 1)) + 1;
+
+        /* Compute apow = 1 / a[i]^(p-1) mod p^N */
         fmpz_init(f);
-        fmpz_init(s);
-        fmpz_init(t);
+        fmpz_init(g);
+        fmpz_init(h);
+        fmpz_init_set_ui(P, p);
+        fmpz_init(pNe);
+        fmpz_init(pe);
+        fmpz_pow_ui(pNe, P, N + ve);
+        fmpz_pow_ui(pe, P, ve);
 
-        fmpz_fac_ui(f, m);
-        fmpz_one(s);
-        fmpz_one(t);
+        fmpz_init(apow);
+        fmpz_invmod(apow, a + i, pNe);
+        fmpz_powm_ui(apow, apow, p - 1, pNe);
 
-        for (k = 0; k < m / 2; k++)
+        /* Precompute $(l!)^{-1}$ */
+        nu = _fmpz_vec_init(M + 1);
+        v  = malloc((M + 1) * sizeof(long));
+
+        precompute_nu(nu, v, M, C, lenC, p, N + ve);
+
+        for (m = 0; m <= M; m++)
         {
-            ulong h = ((m - 2 * k - 1) * (m - 2 * k)) / 2;
+            /* if (_bsearch(C, 0, lenC, m % p) != -1) */
+            {
+                /*
+                    Note that $\mu_m$ is equal to 
+                    $\sum_{k=0}^{\floor{m/p}} p^{\floor{m/p}-k} \nu_{m-pk} \nu_{k}$
+                    where $\nu_i$ denotes the $p$-adic number with unit part nu[i] 
+                    and valuation v[i].
+                 */
+                const long w = (p == 2) ? (3 * m) / 4 - (m == 3 || m == 7) : m / p;
+                long j;
+                fmpz *z = mu[i] + m;
+                fmpz_zero(z);
+                fmpz_one(h);
+                for (j = 0; j <= m / p; j++)
+                {
+                    fmpz_pow_ui(f, P, ve + w - j + v[m - p*j] + v[j]);
+                    fmpz_mul(g, nu + (m - p*j), nu + j);
 
-            fmpz_mul_ui(t, t, h);
-            fmpz_divexact_si(t, t, (k + 1));
-            fmpz_add(s, s, t);
+                    fmpz_mul(f, f, g);
+                    fmpz_mul(f, f, h);
+
+                    fmpz_add(z, z, f);
+                    fmpz_mod(z, z, pNe);
+
+                    /* Set h = a[i]^(- (j+1) (p-1)) mod p^(N + e) */
+                    fmpz_mul(h, h, apow);
+                    fmpz_mod(h, h, pNe);
+                }
+                fmpz_divexact(z, z, pe);
+            }
         }
 
-        /*
-            Now we have that 
-                f = m!
-                s = \sum_{k=0}^{\floor{m/2}} 
-                        2^{-k} \frac{m!}{(m-pk)! k!}
-         */
-
-        v  = fmpz_remove(s, s, P) - fmpz_remove(f, f, P) + (3*m)/4;
-
-        if (v >= N)
-        {
-            fmpz_zero(rop);
-        }
-        else
-        {
-            _padic_inv(f, f, P, N - v);
-            fmpz_mul(rop, f, s);
-            fmpz_fdiv_r_2exp(rop, rop, N - v);
-            fmpz_mul_2exp(rop, rop, v);
-        }
-
+        fmpz_clear(apow);
         fmpz_clear(f);
-        fmpz_clear(s);
-        fmpz_clear(t);
+        fmpz_clear(g);
+        fmpz_clear(h);
+        fmpz_clear(P);
+        fmpz_clear(pNe);
+        fmpz_clear(pe);
+        _fmpz_vec_clear(nu, M + 1);
+        free(v);
     }
-}
-
-/*
-    Computes the expression 
-    \[
-    \mu_m = \sum_{k=0}^{\floor{m/p}} p^{\floor{m/p} - k} \frac{1}{(m-pk)! k!}
-    \]
-    modulo $p^N$ in the case that $p > 2$ is an odd prime.
-
-    The restriction that $p > 2$ is crucial as otherwise 
-    the expression is not $p$-adically integral.
-
-    Assumptions:
-
-        * $m \geq 0$
-        * The computation does fit into the MPIR model
- */
-
-static void mu_p(fmpz_t rop, long m, long p, long N)
-{
-    fmpz_t f, s, t, P;
-    long k, v;
-
-    fmpz_init(f);
-    fmpz_init(s);
-    fmpz_init(t);
-    fmpz_init(P);
-
-    fmpz_set_si(P, p);
-
-    fmpz_one(s);
-    fmpz_one(t);
-
-    for (k = 0; k < m / p; k++)
-    {
-        fmpz_rfac_uiui(f, m - p*k - (p-1), p);
-        fmpz_mul(t, t, f);
-        fmpz_divexact_si(t, t, p * (k + 1));
-        fmpz_add(s, s, t);
-    }
-
-    fmpz_fac_ui(f, m);
-
-    /*
-        Now we have that 
-            f = m!
-            s = \sum_{k=0}^{\floor{m/p}} 
-                    p^{-k} \frac{m!}{(m-pk)! k!}
-            P = p
-     */
-
-    v = fmpz_remove(s, s, P) - fmpz_remove(f, f, P) + m / p;
-
-    if (v >= N)
-    {
-        fmpz_zero(rop);
-    }
-    else
-    {
-        _padic_inv(f, f, P, N - v);
-        fmpz_pow_ui(t, P, N - v);
-        fmpz_mul(rop, f, s);
-        fmpz_mod(rop, rop, t);
-        fmpz_pow_ui(t, P, v);
-        fmpz_mul(rop, rop, t);
-    }
-
-    fmpz_clear(f);
-    fmpz_clear(s);
-    fmpz_clear(t);
-    fmpz_clear(P);
-}
-
-static void mu(fmpz_t rop, long m, long p, long N)
-{
-    if (p == 2)
-        mu_2(rop, m, N);
-    else
-        mu_p(rop, m, p, N);
-}
-
-/*
-    Computes the list $\mu_0, \dotsc, \mu_M$ modulo $p^N$.
-
-    The array (C, lenC) contains the sorted list of congruence classes 
-    modulo $p$ for which we have to compute $\mu_m$.
- */
- 
-void precompute_mu(fmpz *list, long M, const long *C, long lenC, long p, long N)
-{
-    long m;
-    for (m = 0; m <= M; m++)
-        if (_bsearch(C, 0, lenC, m % p) != -1)
-            mu(list + m, m, p, N);
-}
+} 
 
 /*
     Let $R = \floor{M/p}$.  This functions computes the list of 
@@ -531,7 +373,7 @@ static void precompute_dinv(fmpz *list, long M, long d, long p, long N)
  */
 
 static void dsum_2(
-    fmpz_t rop, const fmpz *dinv, const fmpz *mu, 
+    fmpz_t rop, const fmpz_t a, const fmpz *dinv, const fmpz *mu, 
     long ui, long vi, long M, long n, long d, long N)
 {
     const fmpz_t P = {2L};
@@ -539,8 +381,9 @@ static void dsum_2(
     const long u   = ui + 1;
 
     long m, r;
-    fmpz_t f0, f1, f2, g;
+    fmpz_t apow, f0, f1, f2, g;
 
+    fmpz_init(apow);
     fmpz_init(f0);
     fmpz_init(f1);
     fmpz_init(f2);
@@ -573,12 +416,24 @@ static void dsum_2(
             fmpz_fdiv_r_2exp(f2, f2, N);
         }
 
+        if (r == 0)
+        {
+            fmpz_one(apow);
+        }
+        else
+        {
+            fmpz_mul(apow, apow, a);
+            fmpz_fdiv_r_2exp(apow, apow, N);
+        }
+
         /*
-            g = f_{r} d^{-r} \mu_m
-              = f2 * dinv[r] * mu[m]
+            g = a_i^r f_{r} d^{-r} \mu_m
+              = h * f2 * dinv[r] * mu[m]
          */
 
         fmpz_mul(g, f2, dinv + r);
+        fmpz_fdiv_r_2exp(g, g, N);
+        fmpz_mul(g, g, apow);
         fmpz_fdiv_r_2exp(g, g, N);
         fmpz_mul(g, g, mu + m);
         fmpz_fdiv_r_2exp(g, g, N);
@@ -588,6 +443,7 @@ static void dsum_2(
 
     fmpz_fdiv_r_2exp(rop, rop, N);
 
+    fmpz_clear(apow);
     fmpz_clear(f0);
     fmpz_clear(f1);
     fmpz_clear(f2);
@@ -608,12 +464,14 @@ static void dsum_2(
  */
 
 static void dsum_p(
-    fmpz_t rop, const fmpz *dinv, const fmpz *mu, 
+    fmpz_t rop, const fmpz_t a, const fmpz *dinv, const fmpz *mu, 
     long ui, long vi, long M, long n, long d, long p, long N)
 {
     long m, r;
-    fmpz_t f, g, P, PN;
+    fmpz_t apm1, apow, f, g, P, PN;
 
+    fmpz_init(apm1);
+    fmpz_init(apow);
     fmpz_init(f);
     fmpz_init(g);
     fmpz_init_set_ui(P, p);
@@ -628,14 +486,20 @@ static void dsum_p(
 
     if (m <= M)
     {
+        fmpz_powm_ui(apm1, a, p - 1, PN);
+        fmpz_one(apow);
         fmpz_one(f);
         fmpz_mod(rop, mu + m, PN);
     }
 
     for (r = 1, m += p; m <= M; r++, m += p)
     {
+        fmpz_mul(apow, apow, apm1);
+        fmpz_mod(apow, apow, PN);
         fmpz_mul_ui(f, f, ui + 1 + (r - 1) * d);
+        fmpz_mod(f, f, PN);
         fmpz_mul(g, f, dinv + r);
+        fmpz_mul(g, g, apow);
         fmpz_mul(g, g, mu + m);
         fmpz_mod(g, g, PN);
         fmpz_add(rop, rop, g);
@@ -643,6 +507,8 @@ static void dsum_p(
 
     fmpz_mod(rop, rop, PN);
 
+    fmpz_clear(apm1);
+    fmpz_clear(apow);
     fmpz_clear(f);
     fmpz_clear(g);
     fmpz_clear(P);
@@ -650,13 +516,13 @@ static void dsum_p(
 }
 
 static void dsum(
-    fmpz_t rop, const fmpz *dinv, const fmpz *mu, 
+    fmpz_t rop, const fmpz_t a, const fmpz *dinv, const fmpz *mu, 
     long ui, long vi, long M, long n, long d, long p, long N)
 {
     if (p == 2)
-        dsum_2(rop, dinv, mu, ui, vi, M, n, d, N);
+        dsum_2(rop, a, dinv, mu, ui, vi, M, n, d, N);
     else
-        dsum_p(rop, dinv, mu, ui, vi, M, n, d, p, N);
+        dsum_p(rop, a, dinv, mu, ui, vi, M, n, d, p, N);
 }
 
 /*
@@ -664,7 +530,7 @@ static void dsum(
  */
 
 static void alpha_2(fmpz_t rop, const long *u, const long *v, 
-    const fmpz *dinv, const fmpz *mu, long M, 
+    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, 
     long n, long d, long N)
 {
     const fmpz_t P = {2L};
@@ -684,7 +550,7 @@ static void alpha_2(fmpz_t rop, const long *u, const long *v,
 
     for (i = 0; i <= n; i++)
     {
-        dsum(g, dinv, mu, u[i], v[i], M, n, d, 2, N);
+        dsum(g, a + i, dinv, mu[i], u[i], v[i], M, n, d, 2, N);
         fmpz_mul(rop, rop, g);
         fmpz_fdiv_r_2exp(rop, rop, N);
     }
@@ -704,7 +570,7 @@ static void alpha_2(fmpz_t rop, const long *u, const long *v,
  */
 
 static void alpha_p(fmpz_t rop, const long *u, const long *v, 
-    const fmpz *a, const fmpz *dinv, const fmpz *mu, long M, 
+    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, 
     long n, long d, long p, long N)
 {
     long e, i, ud;
@@ -728,7 +594,7 @@ static void alpha_p(fmpz_t rop, const long *u, const long *v,
     {
         e = (p * (u[i] + 1) - (v[i] + 1)) / d;
         fmpz_powm_ui(f, a + i, e, PN);
-        dsum(g, dinv, mu, u[i], v[i], M, n, d, p, N);
+        dsum(g, a + i, dinv, mu[i], u[i], v[i], M, n, d, p, N);
         fmpz_mul(rop, rop, f);
         fmpz_mul(rop, rop, g);
         fmpz_mod(rop, rop, PN);
@@ -746,17 +612,17 @@ static void alpha_p(fmpz_t rop, const long *u, const long *v,
 }
 
 static void alpha(fmpz_t rop, const long *u, const long *v, 
-    const fmpz *a, const fmpz *dinv, const fmpz *mu, long M, 
+    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, 
     long n, long d, long p, long N)
 {
     if (p == 2)
-        alpha_2(rop, u, v, dinv, mu, M, n, d, N);
+        alpha_2(rop, u, v, a, dinv, mu, M, n, d, N);
     else
         alpha_p(rop, u, v, a, dinv, mu, M, n, d, p, N);
 }
 
 static void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v, 
-    const fmpz *a, const fmpz *dinv, const fmpz *mu, long M, 
+    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, 
     long n, long d, long p, long N, long N2)
 {
     long i, ud, vd;
@@ -840,7 +706,7 @@ void diagfrob(padic_mat_t F, const fmpz *a, long n, long d,
 
     long i, j, k, *u, *v;
 
-    fmpz *alift, *dinv, *mu;
+    fmpz *dinv, **mu;
 
     long *C, lenC;
 
@@ -864,9 +730,12 @@ if (verbose)
     printf("\n");
 }
 
-    alift = _fmpz_vec_init(n + 1);
     dinv  = _fmpz_vec_init(M/p + 1);
-    mu    = _fmpz_vec_init(M + 1);
+    mu    = malloc((n + 1) * sizeof(fmpz *));
+    for (i = 0; i <= n; i++)
+    {
+        mu[i] = _fmpz_vec_init(M + 1);
+    }
 
     u = malloc((n + 1) * sizeof(long));
     v = malloc((n + 1) * sizeof(long));
@@ -911,24 +780,6 @@ if (verbose)
 
 if (verbose)
 {
-    printf("Teichmuller lifts\n");
-    t0 = clock();
-}
-
-    for (i = 0; i <= n; i++)
-    {
-        _padic_teichmuller(alift + i, a + i, P, N2);
-    }
-
-if (verbose)
-{
-    t1 = clock();
-    t  = (double) (t1 - t0) / CLOCKS_PER_SEC;
-    printf("T = %f\n", t);
-}
-
-if (verbose)
-{
     printf("Sequence d^{-r}\n");
     t0 = clock();
 }
@@ -948,7 +799,7 @@ if (verbose)
     t0 = clock();
 }
 
-    precompute_muex(mu, M, C, lenC, p, N2);
+    precompute_muex(mu, M, C, lenC, a, n, p, N2);
 
 if (verbose)
 {
@@ -984,7 +835,7 @@ if (verbose)
                 long o;
 
                 entry(padic_mat_unit(F, i, j), &o, 
-                      u, v, alift, dinv, mu, M, n, d, p, N, N2);
+                      u, v, a, dinv, (const fmpz **) mu, M, n, d, p, N, N2);
 
                 if (o != - delta)
                 {
@@ -1008,9 +859,12 @@ if (verbose)
     printf("T = %f\n", t);
 }
 
-    _fmpz_vec_clear(alift, n + 1);
     _fmpz_vec_clear(dinv, M/p + 1);
-    _fmpz_vec_clear(mu, M + 1);
+    for (i = 0; i <= n; i++)
+    {
+        _fmpz_vec_clear(mu[i], M + 1);
+    }
+    free(mu);
     free(u);
     free(v);
     free(B);
