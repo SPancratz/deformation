@@ -54,6 +54,57 @@ static long _bsearch(const long *a, long lo, long hi, long x)
     return (lo == hi && a[lo] == x) ? lo : -1;
 }
 
+/*
+    Computes array C of congruence classes $m \mod p$ for which we need mu[m].
+    Returns the number of elements written into the array as as lenC.  Note 
+    that 1 <= lenC <= lenB.
+ */
+void _congruence_class(long *C, long *lenC, long ind, const mon_t *B, long lenB, 
+                       long n, long d, long p)
+{
+    long i, j, k, u, v;
+
+    *lenC = 0;
+    for (i = 0; i < lenB; i++)
+        for (j = 0; j < lenB; j++)
+        {
+            for (k = 0; k <= n; k++)
+            {
+                u = mon_get_exp(B[i], k);
+                v = mon_get_exp(B[j], k);
+                if ((p * (u + 1) - (v + 1)) % d != 0)
+                {
+                    break;
+                }
+            }
+
+            if (k > n)
+            {
+                u = mon_get_exp(B[i], ind);
+                v = mon_get_exp(B[j], ind);
+                C[(*lenC)++] = ((p * (u + 1) - (v + 1)) / d) % p;
+            }
+        }
+
+    /* Remove duplicates */
+    k = (*lenC > 0) ? 1 : 0;
+    for (i = 1; i < *lenC; i++)
+    {
+        for (j = 0; j < k; j++)
+        {
+            if (C[i] == C[j])
+                break;
+        }
+        if (j == k)
+            C[k++] = C[i];
+    }
+    *lenC = k;
+    _sort(C, *lenC);
+}
+
+/*
+    Computes the rising factorial $\prod_{i=0}^{n-1} (x+i) mod m$.
+ */
 void fmpz_mod_rfac_uiui(fmpz_t r, ulong x, ulong n, const fmpz_t m)
 {
     /* TODO: Assert that m > 0, and x + (n - 1) does not overflow */
@@ -158,7 +209,7 @@ static void precompute_nu(fmpz *nu, long *v,
     /* Let j denote the greatest index s.t. nu[j] has been computed */
     for (j = R, i = R + 1; i <= M; i++)
     {
-        /* if (_bsearch(C, 0, lenC, i % p) != -1) */
+        if (_bsearch(C, 0, lenC, i % p) != -1)
         {
             /* fmpz_rfac_uiui(t, j + 1, i - j); */
             fmpz_mod_rfac_uiui(t, j + 1, i - j, PN2);
@@ -180,7 +231,7 @@ static void precompute_nu(fmpz *nu, long *v,
     }
     for (i = R + 1; i <= M; i++)
     {
-        /* if (_bsearch(C, 0, lenC, i % p) != -1) */
+        if (_bsearch(C, 0, lenC, i % p) != -1)
         {
             v[i] = - _fmpz_remove(nu + i, P, pinv);
             _padic_inv_precomp(nu + i, nu + i, S);
@@ -200,7 +251,8 @@ static void precompute_nu(fmpz *nu, long *v,
     modulo $p$ for which we have to compute $\mu_m$.
  */
  
-void precompute_muex(fmpz **mu, long M, const long *C, long lenC, 
+void precompute_muex(fmpz **mu, long M, 
+                     const long **C, const long *lenC, 
                      const fmpz *a, long n, long p, long N)
 {
     long i;
@@ -216,7 +268,6 @@ void precompute_muex(fmpz **mu, long M, const long *C, long lenC,
 
         const long ve = (p == 2) ? M / 4 + 1 : M / (p * (p - 1)) + 1;
 
-        /* Compute apow = 1 / a[i]^(p-1) mod p^N */
         fmpz_init(f);
         fmpz_init(g);
         fmpz_init(h);
@@ -226,6 +277,7 @@ void precompute_muex(fmpz **mu, long M, const long *C, long lenC,
         fmpz_pow_ui(pNe, P, N + ve);
         fmpz_pow_ui(pe, P, ve);
 
+        /* Compute apow = 1 / a[i]^(p-1) mod p^N */
         fmpz_init(apow);
         fmpz_invmod(apow, a + i, pNe);
         fmpz_powm_ui(apow, apow, p - 1, pNe);
@@ -234,11 +286,11 @@ void precompute_muex(fmpz **mu, long M, const long *C, long lenC,
         nu = _fmpz_vec_init(M + 1);
         v  = malloc((M + 1) * sizeof(long));
 
-        precompute_nu(nu, v, M, C, lenC, p, N + ve);
+        precompute_nu(nu, v, M, C[i], lenC[i], p, N + ve);
 
         for (m = 0; m <= M; m++)
         {
-            /* if (_bsearch(C, 0, lenC, m % p) != -1) */
+            if (_bsearch(C[i], 0, lenC[i], m % p) != -1)
             {
                 /*
                     Note that $\mu_m$ is equal to 
@@ -706,9 +758,9 @@ void diagfrob(padic_mat_t F, const fmpz *a, long n, long d,
 
     long i, j, k, *u, *v;
 
-    fmpz *dinv, **mu;
+    long **C, *lenC;
 
-    long *C, lenC;
+    fmpz *dinv, **mu;
 
     clock_t t0 = 0, t1 = 0;
     double t;
@@ -730,6 +782,13 @@ if (verbose)
     printf("\n");
 }
 
+    C = malloc((n + 1) * sizeof(long *));
+    for (i = 0; i <= n; i++)
+    {
+        C[i] = malloc(lenB * sizeof(long));
+    }
+    lenC = malloc((n + 1) * sizeof(long));
+
     dinv  = _fmpz_vec_init(M/p + 1);
     mu    = malloc((n + 1) * sizeof(fmpz *));
     for (i = 0; i <= n; i++)
@@ -740,43 +799,10 @@ if (verbose)
     u = malloc((n + 1) * sizeof(long));
     v = malloc((n + 1) * sizeof(long));
 
-    /* Compute array of congruence classes for which we need mu[m] */
-    C = malloc(lenB * (n + 1) * sizeof(long));
-    lenC = 0;
-    for (i = 0; i < lenB; i++)
-        for (j = 0; j < lenB; j++)
-        {
-            for (k = 0; k <= n; k++)
-            {
-                u[k] = mon_get_exp(B[i], k);
-                v[k] = mon_get_exp(B[j], k);
-                if ((p * (u[k] + 1) - (v[k] + 1)) % d != 0)
-                {
-                    break;
-                }
-            }
-            if (k > n)
-            {
-                for (k = 0; k <= n; k++)
-                {
-                    C[lenC++] = ((p * (u[k] + 1) - (v[k] + 1)) / d) % p;
-                }
-            }
-        }
-    /* Remove duplicates */
-    k = (lenC > 0) ? 1 : 0;
-    for (i = 1; i < lenC; i++)
+    for (i = 0; i <= n; i++)
     {
-        for (j = 0; j < k; j++)
-        {
-            if (C[i] == C[j])
-                break;
-        }
-        if (j == k)
-            C[k++] = C[i];
+        _congruence_class(C[i], &lenC[i], i, B, lenB, n, d, p);
     }
-    lenC = k;
-    _sort(C, lenC);
 
 if (verbose)
 {
@@ -799,7 +825,7 @@ if (verbose)
     t0 = clock();
 }
 
-    precompute_muex(mu, M, C, lenC, a, n, p, N2);
+    precompute_muex(mu, M, (const long **) C, lenC, a, n, p, N2);  /* XXX */
 
 if (verbose)
 {
@@ -859,6 +885,12 @@ if (verbose)
     printf("T = %f\n", t);
 }
 
+    for (i = 0; i <= n; i++)
+    {
+        free(C[i]);
+    }
+    free(C);
+    free(lenC);
     _fmpz_vec_clear(dinv, M/p + 1);
     for (i = 0; i <= n; i++)
     {
@@ -869,6 +901,5 @@ if (verbose)
     free(v);
     free(B);
     free(iB);
-    free(C);
 }
 
