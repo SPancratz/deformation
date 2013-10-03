@@ -55,6 +55,28 @@ static long _bsearch(const long *a, long lo, long hi, long x)
 }
 
 /*
+    Moves the unique elements of {C, *lenC} to the front of the array 
+    and sets *lenC to number of these.
+ */
+static void _remove_duplicates(long *C, long *lenC)
+{
+    long i, j, k;
+
+    k = (*lenC > 0) ? 1 : 0;
+    for (i = 1; i < *lenC; i++)
+    {
+        for (j = 0; j < k; j++)
+        {
+            if (C[i] == C[j])
+                break;
+        }
+        if (j == k)
+            C[k++] = C[i];
+    }
+    *lenC = k;
+}
+
+/*
     Computes array C of congruence classes $m \mod p$ for which we need mu[m].
     Returns the number of elements written into the array as as lenC.  Note 
     that 1 <= lenC <= lenB.
@@ -87,18 +109,7 @@ void _congruence_class(long *C, long *lenC, long ind, const mon_t *B, long lenB,
         }
 
     /* Remove duplicates */
-    k = (*lenC > 0) ? 1 : 0;
-    for (i = 1; i < *lenC; i++)
-    {
-        for (j = 0; j < k; j++)
-        {
-            if (C[i] == C[j])
-                break;
-        }
-        if (j == k)
-            C[k++] = C[i];
-    }
-    *lenC = k;
+    _remove_duplicates(C, lenC);
     _sort(C, *lenC);
 }
 
