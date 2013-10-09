@@ -43,6 +43,7 @@ static long _lsearch(const long *a, long lo, long hi, long x)
  */
 static long _bsearch(const long *a, long lo, long hi, long x)
 {
+    hi--;
     while (lo < hi)
     {
         long mi = lo + (hi - lo) / 2;
@@ -202,6 +203,7 @@ static void precompute_nu(fmpz *nu, long *v,
     long i, j;
 
     fmpz_init_set_ui(P, p);
+    fmpz_init(PN2);
     fmpz_pow_ui(PN2, P, N2);
     fmpz_init(t);
 
