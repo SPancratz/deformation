@@ -66,8 +66,9 @@ int main(void)
 
     for (i = 0; i < 50; i++)
     {
-        const long d = 2 + n_randint(state, 3);  /* d in [2,4] */
-        const long n = 2 + n_randint(state, 3);  /* n in [2,4] */
+        const long n = n_randint(state, 3) + 2;             /* n in [2,4] */
+        const long d = (n % 2L) ? n_randint(state, 3) + 2   /* d in [2,4] */
+                                : n_randint(state, 2) + 3;  /* d in [3,4] */
         const long a = 1;
 
         const long lenB = gmc_basis_size(n, d);
