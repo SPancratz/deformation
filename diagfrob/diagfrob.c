@@ -271,11 +271,12 @@ void precompute_muex(fmpz **mu, long M,
     const long ve = (p == 2) ? M / 4 + 1 : M / (p * (p - 1)) + 1;
 
     fmpz_t P, pNe, pe;
+    fmpz_t apow, f, g, h;
 
     fmpz *nu;
     long *v;
 
-    long i;
+    long i, j, m;
 
     fmpz_init_set_ui(P, p);
     fmpz_init(pNe);
@@ -283,26 +284,40 @@ void precompute_muex(fmpz **mu, long M,
     fmpz_pow_ui(pNe, P, N + ve);
     fmpz_pow_ui(pe, P, ve);
 
+    fmpz_init(apow);
+    fmpz_init(f);
+    fmpz_init(g);
+    fmpz_init(h);
+
     /* Precompute $(l!)^{-1}$ */
     nu = _fmpz_vec_init(M + 1);
     v  = malloc((M + 1) * sizeof(long));
 
+    {
+        long *D, lenD = 0, k = 0;
+
+        for (i = 0; i <= n; i++)
+            lenD += lenC[i];
+
+        D = malloc(lenD * sizeof(long));
+
+        for (i = 0; i <= n; i++)
+            for (j = 0; j < lenC[i]; j++)
+                D[k++] = C[i][j];
+
+        _remove_duplicates(D, &lenD);
+        _sort(D, lenD);
+
+        precompute_nu(nu, v, M, D, lenD, p, N + ve);
+
+        free(D);
+    }
+
     for (i = 0; i <= n; i++)
     {
-        fmpz_t apow;
-        fmpz_t f, g, h;
-        long m;
-
-        fmpz_init(apow);
-        fmpz_init(f);
-        fmpz_init(g);
-        fmpz_init(h);
-
-        /* Compute apow = 1 / a[i]^(p-1) mod p^N */
+        /* Set apow = a[i]^{-(p-1)} mod p^N */
         fmpz_invmod(apow, a + i, pNe);
         fmpz_powm_ui(apow, apow, p - 1, pNe);
-
-        precompute_nu(nu, v, M, C[i], lenC[i], p, N + ve);
 
         for (m = 0; m <= M; m++)
         {
@@ -310,12 +325,12 @@ void precompute_muex(fmpz **mu, long M,
             {
                 /*
                     Note that $\mu_m$ is equal to 
-                    $\sum_{k=0}^{\floor{m/p}} p^{\floor{m/p}-k} \nu_{m-pk} \nu_{k}$
-                    where $\nu_i$ denotes the $p$-adic number with unit part nu[i] 
+                    $\sum_{k=0}^{\floor{m/p}} p^{\floor{m/p}-k}\nu_{m-pk}\nu_k$
+                    where $\nu_i$ denotes the number with unit part nu[i] 
                     and valuation v[i].
                  */
-                const long w = (p == 2) ? (3 * m) / 4 - (m == 3 || m == 7) : m / p;
-                long j;
+                const long w = (p == 2) ? (3 * m) / 4 - (m == 3 || m == 7) 
+                                        : m / p;
                 fmpz *z = mu[i] + m;
                 fmpz_zero(z);
                 fmpz_one(h);
@@ -330,23 +345,23 @@ void precompute_muex(fmpz **mu, long M,
                     fmpz_add(z, z, f);
                     fmpz_mod(z, z, pNe);
 
-                    /* Set h = a[i]^(- (j+1) (p-1)) mod p^(N + e) */
+                    /* Set h = a[i]^{- (j+1)(p-1)} mod p^{N+e} */
                     fmpz_mul(h, h, apow);
                     fmpz_mod(h, h, pNe);
                 }
                 fmpz_divexact(z, z, pe);
             }
         }
-
-        fmpz_clear(apow);
-        fmpz_clear(f);
-        fmpz_clear(g);
-        fmpz_clear(h);
     }
 
     fmpz_clear(P);
     fmpz_clear(pNe);
     fmpz_clear(pe);
+
+    fmpz_clear(apow);
+    fmpz_clear(f);
+    fmpz_clear(g);
+    fmpz_clear(h);
 
     _fmpz_vec_clear(nu, M + 1);
     free(v);
