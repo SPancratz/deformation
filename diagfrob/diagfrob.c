@@ -78,11 +78,14 @@ static void _remove_duplicates(long *C, long *lenC)
 }
 
 /*
-    Computes array C of congruence classes $m \mod p$ for which we need mu[m].
-    Returns the number of elements written into the array as as lenC.  Note 
-    that 1 <= lenC <= lenB.
+    Computes the array {C,lenB} of congruence classes $m \mod p$ 
+    for which we need to $\mu_i(m)$, in ascending order.
+
+    Returns the number of elements written into the array as 
+    as lenC.  Note that 1 <= lenC <= lenB.
  */
-void _congruence_class(long *C, long *lenC, long ind, const mon_t *B, long lenB, 
+void _congruence_class(long *C, long *lenC, long ind, 
+                       const mon_t *B, long lenB, 
                        long n, long d, long p)
 {
     long i, j, k, u, v;
@@ -119,7 +122,12 @@ void _congruence_class(long *C, long *lenC, long ind, const mon_t *B, long lenB,
  */
 void fmpz_mod_rfac_uiui(fmpz_t r, ulong x, ulong n, const fmpz_t m)
 {
-    /* TODO: Assert that m > 0, and x + (n - 1) does not overflow */
+    if (fmpz_sgn(m) <= 0)
+    {
+        printf("Exception (fmpz_mod_rfac_uiui).  m < 0.");
+        abort();
+    }
+
     if (fmpz_is_one(m))
     {
         fmpz_zero(r);
@@ -144,7 +152,16 @@ void fmpz_mod_rfac_uiui(fmpz_t r, ulong x, ulong n, const fmpz_t m)
             this rising factorial without overflow mod m
          */
         ulong i, l;
-        l = FLINT_CLOG2(x + (n - 1));
+
+        /* Set l = log_2(x + n - 1), avoiding overflow */
+        {
+            fmpz_t t;
+
+            fmpz_init_set_ui(t, x);
+            fmpz_add_ui(t, t, n - 1);
+            l = fmpz_clog_ui(t, 2);
+            fmpz_clear(t);
+        }
         l = (fmpz_clog_ui(m, 2) + (l - 1)) / l - 1;
 
         if (l > 1)
@@ -175,7 +192,7 @@ void fmpz_mod_rfac_uiui(fmpz_t r, ulong x, ulong n, const fmpz_t m)
 }
 
 /*
-    Computes the sequence of inverses of the quantities $i!$ to relative 
+    Computes the sequence of inverses of $i!$ to relative 
     $p$-adic precision $N$, where $i$ is one of the following:
 
         o Equal to $m - p k$ for some $m$ such that we have to compute 
@@ -190,8 +207,8 @@ void fmpz_mod_rfac_uiui(fmpz_t r, ulong x, ulong n, const fmpz_t m)
     specialised implementation of the same algorithm.
  */
 
-static void precompute_nu(fmpz *nu, long *v,  
-                          long M, const long *C, long lenC, long p, long N)
+static void precompute_nu(fmpz *nu, long *v, long M, 
+                          const long *C, long lenC, long p, long N)
 {
     const long R  = M / p;
     const long N2 = N + (M / (p - 1));
@@ -224,7 +241,6 @@ static void precompute_nu(fmpz *nu, long *v,
     {
         if (_bsearch(C, 0, lenC, i % p) != -1)
         {
-            /* fmpz_rfac_uiui(t, j + 1, i - j); */
             fmpz_mod_rfac_uiui(t, j + 1, i - j, PN2);
             fmpz_mul(nu + i, nu + j, t);
             fmpz_mod(nu + i, nu + i, PN2);
@@ -382,12 +398,11 @@ void precompute_muex(fmpz **mu, long M,
 
 static void precompute_dinv_2(fmpz *list, long M, long d, long N)
 {
-    const fmpz_t P = {2L};
-
     fmpz_one(list + 0);
 
     if (M >= 2)
     {
+        const fmpz_t P = {2L};
         long r;
 
         fmpz_set_ui(list + 1, d);
@@ -407,13 +422,11 @@ static void precompute_dinv_p(fmpz *list, long M, long d, long p, long N)
 
     if (M >= p)
     {
-        long r;
         fmpz_t P, PN;
+        long r;
 
-        fmpz_init(P);
+        fmpz_init_set_ui(P, p);
         fmpz_init(PN);
-
-        fmpz_set_ui(P, p);
         fmpz_pow_ui(PN, P, N);
 
         fmpz_set_ui(list + 1, d);
@@ -569,7 +582,7 @@ static void dsum_p(
     r = 0;
     m = (p * (ui + 1) - (vi + 1)) / d;
 
-    if (m <= M)
+    if (m <= M)  /* Step {r = 0} */
     {
         fmpz_powm_ui(apm1, a, p - 1, PN);
         fmpz_one(apow);
@@ -658,7 +671,7 @@ static void alpha_p(fmpz_t rop, const long *u, const long *v,
     const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, 
     long n, long d, long p, long N)
 {
-    long e, i, ud;
+    long i, ud;
     fmpz_t f, g, P, PN;
 
     ud = n + 1;
@@ -677,7 +690,8 @@ static void alpha_p(fmpz_t rop, const long *u, const long *v,
 
     for (i = 0; i <= n; i++)
     {
-        e = (p * (u[i] + 1) - (v[i] + 1)) / d;
+        long e = (p * (u[i] + 1) - (v[i] + 1)) / d;
+
         fmpz_powm_ui(f, a + i, e, PN);
         dsum(g, a + i, dinv, mu[i], u[i], v[i], M, n, d, p, N);
         fmpz_mul(rop, rop, f);
