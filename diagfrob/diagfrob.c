@@ -292,7 +292,7 @@ void precompute_muex(fmpz **mu, long M,
     fmpz *nu;
     long *v;
 
-    long i, j, m;
+    long i, j;
 
     fmpz_init_set_ui(P, p);
     fmpz_init(pNe);
@@ -331,23 +331,34 @@ void precompute_muex(fmpz **mu, long M,
 
     for (i = 0; i <= n; i++)
     {
+        long m = 0, quo, idx, w;
+        fmpz *z;
+
         /* Set apow = a[i]^{-(p-1)} mod p^N */
         fmpz_invmod(apow, a + i, pNe);
         fmpz_powm_ui(apow, apow, p - 1, pNe);
 
-        for (m = 0; m <= M; m++)
+        /*
+            Run over all relevant m in [0, M]. 
+            Note that lenC[i] > 0 for all i.
+         */
+        for (quo = 0; m <= M; quo++)
         {
-            if (_bsearch(C[i], 0, lenC[i], m % p) != -1)
+            for (idx = 0; idx < lenC[i]; idx++)
             {
+                m = quo * p + C[i][idx];
+
+                if (m > M)
+                    break;
+
                 /*
                     Note that $\mu_m$ is equal to 
                     $\sum_{k=0}^{\floor{m/p}} p^{\floor{m/p}-k}\nu_{m-pk}\nu_k$
                     where $\nu_i$ denotes the number with unit part nu[i] 
                     and valuation v[i].
                  */
-                const long w = (p == 2) ? (3 * m) / 4 - (m == 3 || m == 7) 
-                                        : m / p;
-                fmpz *z = mu[i] + m;
+                w = (p == 2) ? (3 * m) / 4 - (m == 3 || m == 7) : m / p;
+                z = mu[i] + lenC[i] * quo + idx;
                 fmpz_zero(z);
                 fmpz_one(h);
                 for (j = 0; j <= m / p; j++)
@@ -472,7 +483,7 @@ static void precompute_dinv(fmpz *list, long M, long d, long p, long N)
 
 static void dsum_2(
     fmpz_t rop, const fmpz_t a, const fmpz *dinv, const fmpz *mu, 
-    long ui, long vi, long M, long n, long d, long N)
+    long ui, long vi, long M, const long *C, long lenC, long n, long d, long N)
 {
     const fmpz_t P = {2L};
     const long m0  = (2 * (ui + 1) - (vi + 1)) / d;
@@ -491,6 +502,7 @@ static void dsum_2(
 
     for (m = m0; m <= M; m += 2)
     {
+        /* Note that r = 0 in the first iteration */
         r = m / 2;
 
         switch (r)
@@ -563,9 +575,9 @@ static void dsum_2(
 
 static void dsum_p(
     fmpz_t rop, const fmpz_t a, const fmpz *dinv, const fmpz *mu, 
-    long ui, long vi, long M, long n, long d, long p, long N)
+    long ui, long vi, long M, const long *C, long lenC, long n, long d, long p, long N)
 {
-    long m, r;
+    long m, r, idx;
     fmpz_t apm1, apow, f, g, P, PN;
 
     fmpz_init(apm1);
@@ -584,21 +596,25 @@ static void dsum_p(
 
     if (m <= M)  /* Step {r = 0} */
     {
+        idx = _bsearch(C, 0, lenC, m % p);
+
         fmpz_powm_ui(apm1, a, p - 1, PN);
         fmpz_one(apow);
         fmpz_one(f);
-        fmpz_mod(rop, mu + m, PN);
+        fmpz_mod(rop, mu + idx + lenC * (m / p), PN);
     }
 
     for (r = 1, m += p; m <= M; r++, m += p)
     {
+        idx = _bsearch(C, 0, lenC, m % p);
+
         fmpz_mul(apow, apow, apm1);
         fmpz_mod(apow, apow, PN);
         fmpz_mul_ui(f, f, ui + 1 + (r - 1) * d);
         fmpz_mod(f, f, PN);
         fmpz_mul(g, f, dinv + r);
         fmpz_mul(g, g, apow);
-        fmpz_mul(g, g, mu + m);
+        fmpz_mul(g, g, mu + idx + lenC * (m / p));
         fmpz_mod(g, g, PN);
         fmpz_add(rop, rop, g);
     }
@@ -615,12 +631,12 @@ static void dsum_p(
 
 static void dsum(
     fmpz_t rop, const fmpz_t a, const fmpz *dinv, const fmpz *mu, 
-    long ui, long vi, long M, long n, long d, long p, long N)
+    long ui, long vi, long M, const long *C, long lenC, long n, long d, long p, long N)
 {
     if (p == 2)
-        dsum_2(rop, a, dinv, mu, ui, vi, M, n, d, N);
+        dsum_2(rop, a, dinv, mu, ui, vi, M, C, lenC, n, d, N);
     else
-        dsum_p(rop, a, dinv, mu, ui, vi, M, n, d, p, N);
+        dsum_p(rop, a, dinv, mu, ui, vi, M, C, lenC, n, d, p, N);
 }
 
 /*
@@ -628,39 +644,47 @@ static void dsum(
  */
 
 static void alpha_2(fmpz_t rop, const long *u, const long *v, 
-    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, 
+    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, const long **C, const long *lenC, 
     long n, long d, long N)
 {
-    const fmpz_t P = {2L};
+    const fmpz_t P  = {2L};
 
     long i, ud;
-    fmpz_t g;
+    fmpz_t f, g, PN;
 
     ud = n + 1;
     for (i = 0; i <= n; i++)
         ud += u[i];
     ud /= d;
 
+    fmpz_init(f);
     fmpz_init(g);
+    fmpz_init(PN);
+
+    fmpz_setbit(PN, N);
 
     fmpz_zero(rop);
     fmpz_setbit(rop, ud);
 
     for (i = 0; i <= n; i++)
     {
-        dsum(g, a + i, dinv, mu[i], u[i], v[i], M, n, d, 2, N);
+        long e = (2 * (u[i] + 1) - (v[i] + 1)) / d;
+
+        fmpz_powm_ui(f, a + i, e, PN);
+        dsum(g, a + i, dinv, mu[i], u[i], v[i], M, C[i], lenC[i], n, d, 2, N);
+        fmpz_mul(rop, rop, f);
         fmpz_mul(rop, rop, g);
         fmpz_fdiv_r_2exp(rop, rop, N);
     }
 
     if (ud % 2 != 0 && !fmpz_is_zero(rop))
     {
-        fmpz_zero(g);
-        fmpz_setbit(g, N);
-        fmpz_sub(rop, g, rop);
+        fmpz_sub(rop, PN, rop);
     }
 
+    fmpz_clear(f);
     fmpz_clear(g);
+    fmpz_clear(PN);
 }
 
 /*
@@ -668,7 +692,7 @@ static void alpha_2(fmpz_t rop, const long *u, const long *v,
  */
 
 static void alpha_p(fmpz_t rop, const long *u, const long *v, 
-    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, 
+    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, const long **C, const long *lenC, 
     long n, long d, long p, long N)
 {
     long i, ud;
@@ -693,7 +717,7 @@ static void alpha_p(fmpz_t rop, const long *u, const long *v,
         long e = (p * (u[i] + 1) - (v[i] + 1)) / d;
 
         fmpz_powm_ui(f, a + i, e, PN);
-        dsum(g, a + i, dinv, mu[i], u[i], v[i], M, n, d, p, N);
+        dsum(g, a + i, dinv, mu[i], u[i], v[i], M, C[i], lenC[i], n, d, p, N);
         fmpz_mul(rop, rop, f);
         fmpz_mul(rop, rop, g);
         fmpz_mod(rop, rop, PN);
@@ -711,17 +735,17 @@ static void alpha_p(fmpz_t rop, const long *u, const long *v,
 }
 
 static void alpha(fmpz_t rop, const long *u, const long *v, 
-    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, 
+    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, const long **C, const long *lenC, 
     long n, long d, long p, long N)
 {
     if (p == 2)
-        alpha_2(rop, u, v, a, dinv, mu, M, n, d, N);
+        alpha_2(rop, u, v, a, dinv, mu, M, C, lenC, n, d, N);
     else
-        alpha_p(rop, u, v, a, dinv, mu, M, n, d, p, N);
+        alpha_p(rop, u, v, a, dinv, mu, M, C, lenC, n, d, p, N);
 }
 
 static void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v, 
-    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, 
+    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, const long **C, const long *lenC, 
     long n, long d, long p, long N, long N2)
 {
     long i, ud, vd;
@@ -759,7 +783,7 @@ static void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v,
      */
 
     fmpz_fac_ui(g, ud - 1);
-    alpha(h, u, v, a, dinv, mu, M, n, d, p, N2);
+    alpha(h, u, v, a, dinv, mu, M, C, lenC, n, d, p, N2);
     fmpz_mul(g, g, h);
 
     /*
@@ -836,20 +860,21 @@ if (verbose)
     }
     lenC = malloc((n + 1) * sizeof(long));
 
-    dinv  = _fmpz_vec_init(M/p + 1);
-    mu    = malloc((n + 1) * sizeof(fmpz *));
-    for (i = 0; i <= n; i++)
-    {
-        mu[i] = _fmpz_vec_init(M + 1);
-    }
-
-    u = malloc((n + 1) * sizeof(long));
-    v = malloc((n + 1) * sizeof(long));
 
     for (i = 0; i <= n; i++)
     {
         _congruence_class(C[i], &lenC[i], i, B, lenB, n, d, p);
     }
+
+    dinv  = _fmpz_vec_init(M/p + 1);
+    mu    = malloc((n + 1) * sizeof(fmpz *));
+    for (i = 0; i <= n; i++)
+    {
+        mu[i] = _fmpz_vec_init(((M + 1 + p - 1) / p) * lenC[i]);
+    }
+
+    u = malloc((n + 1) * sizeof(long));
+    v = malloc((n + 1) * sizeof(long));
 
 if (verbose)
 {
@@ -908,7 +933,7 @@ if (verbose)
                 long o;
 
                 entry(padic_mat_unit(F, i, j), &o, 
-                      u, v, a, dinv, (const fmpz **) mu, M, n, d, p, N, N2);
+                      u, v, a, dinv, (const fmpz **) mu, M, (const long **) C, lenC, n, d, p, N, N2);
 
                 if (o != - delta)
                 {
@@ -932,18 +957,18 @@ if (verbose)
     printf("T = %f\n", t);
 }
 
+    _fmpz_vec_clear(dinv, M/p + 1);
+    for (i = 0; i <= n; i++)
+    {
+        _fmpz_vec_clear(mu[i], ((M + 1 + p - 1) / p) * lenC[i]);
+    }
+    free(mu);
     for (i = 0; i <= n; i++)
     {
         free(C[i]);
     }
     free(C);
     free(lenC);
-    _fmpz_vec_clear(dinv, M/p + 1);
-    for (i = 0; i <= n; i++)
-    {
-        _fmpz_vec_clear(mu[i], M + 1);
-    }
-    free(mu);
     free(u);
     free(v);
     free(B);
