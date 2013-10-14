@@ -640,58 +640,10 @@ static void dsum(
 }
 
 /*
-    Computes $\alpha_{u+1,v+1}$ modulo $p^N$ in the case when $p = 2$.
+    Computes $\alpha_{u+1,v+1}$ modulo $p^N$.
  */
 
-static void alpha_2(fmpz_t rop, const long *u, const long *v, 
-    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, const long **C, const long *lenC, 
-    long n, long d, long N)
-{
-    const fmpz_t P  = {2L};
-
-    long i, ud;
-    fmpz_t f, g, PN;
-
-    ud = n + 1;
-    for (i = 0; i <= n; i++)
-        ud += u[i];
-    ud /= d;
-
-    fmpz_init(f);
-    fmpz_init(g);
-    fmpz_init(PN);
-
-    fmpz_setbit(PN, N);
-
-    fmpz_zero(rop);
-    fmpz_setbit(rop, ud);
-
-    for (i = 0; i <= n; i++)
-    {
-        long e = (2 * (u[i] + 1) - (v[i] + 1)) / d;
-
-        fmpz_powm_ui(f, a + i, e, PN);
-        dsum(g, a + i, dinv, mu[i], u[i], v[i], M, C[i], lenC[i], n, d, 2, N);
-        fmpz_mul(rop, rop, f);
-        fmpz_mul(rop, rop, g);
-        fmpz_fdiv_r_2exp(rop, rop, N);
-    }
-
-    if (ud % 2 != 0 && !fmpz_is_zero(rop))
-    {
-        fmpz_sub(rop, PN, rop);
-    }
-
-    fmpz_clear(f);
-    fmpz_clear(g);
-    fmpz_clear(PN);
-}
-
-/*
-    Computes $\alpha_{u+1,v+1}$ modulo $p^N$ when $p > 2$ is an odd prime.
- */
-
-static void alpha_p(fmpz_t rop, const long *u, const long *v, 
+static void alpha(fmpz_t rop, const long *u, const long *v, 
     const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, const long **C, const long *lenC, 
     long n, long d, long p, long N)
 {
@@ -707,7 +659,6 @@ static void alpha_p(fmpz_t rop, const long *u, const long *v,
     fmpz_init(g);
     fmpz_init_set_ui(P, p);
     fmpz_init(PN);
-
     fmpz_pow_ui(PN, P, N);
 
     fmpz_pow_ui(rop, P, ud);
@@ -732,16 +683,6 @@ static void alpha_p(fmpz_t rop, const long *u, const long *v,
     fmpz_clear(g);
     fmpz_clear(P);
     fmpz_clear(PN);
-}
-
-static void alpha(fmpz_t rop, const long *u, const long *v, 
-    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, const long **C, const long *lenC, 
-    long n, long d, long p, long N)
-{
-    if (p == 2)
-        alpha_2(rop, u, v, a, dinv, mu, M, C, lenC, n, d, N);
-    else
-        alpha_p(rop, u, v, a, dinv, mu, M, C, lenC, n, d, p, N);
 }
 
 static void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v, 
