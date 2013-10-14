@@ -133,8 +133,11 @@ int main(void)
         fmpz_poly_t chi;
 
         fmpz_init(p);
-        do 
-            *p = n_randprime(state, 5, 1);
+        do
+        {
+            ulong bits = n_randint(state, 5) + 2;
+            *p = n_randprime(state, bits, 1);
+        }
         while (d % *p == 0);
 
         A = _fmpz_vec_init(n + 1);
