@@ -331,7 +331,7 @@ void precompute_muex(fmpz **mu, long M,
 
     for (i = 0; i <= n; i++)
     {
-        long m = 0, quo, idx, w;
+        long m = -1, quo, idx, w;
         fmpz *z;
 
         /* Set apow = a[i]^{-(p-1)} mod p^N */
@@ -482,8 +482,9 @@ static void precompute_dinv(fmpz *list, long M, long d, long p, long N)
  */
 
 static void dsum_2(
-    fmpz_t rop, const fmpz_t a, const fmpz *dinv, const fmpz *mu, 
-    long ui, long vi, long M, const long *C, long lenC, long n, long d, long N)
+    fmpz_t rop, 
+    const fmpz *dinv, const fmpz *mu, long M, const long *C, long lenC, 
+    const fmpz_t a, long ui, long vi, long n, long d, long N)
 {
     const fmpz_t P = {2L};
     const long m0  = (2 * (ui + 1) - (vi + 1)) / d;
@@ -574,8 +575,9 @@ static void dsum_2(
  */
 
 static void dsum_p(
-    fmpz_t rop, const fmpz_t a, const fmpz *dinv, const fmpz *mu, 
-    long ui, long vi, long M, const long *C, long lenC, long n, long d, long p, long N)
+    fmpz_t rop, 
+    const fmpz *dinv, const fmpz *mu, long M, const long *C, long lenC, 
+    const fmpz_t a, long ui, long vi, long n, long d, long p, long N)
 {
     long m, r, idx;
     fmpz_t apm1, apow, f, g, P, PN;
@@ -630,13 +632,14 @@ static void dsum_p(
 }
 
 static void dsum(
-    fmpz_t rop, const fmpz_t a, const fmpz *dinv, const fmpz *mu, 
-    long ui, long vi, long M, const long *C, long lenC, long n, long d, long p, long N)
+    fmpz_t rop, 
+    const fmpz *dinv, const fmpz *mu, long M, const long *C, long lenC, 
+    const fmpz_t a, long ui, long vi, long n, long d, long p, long N)
 {
     if (p == 2)
-        dsum_2(rop, a, dinv, mu, ui, vi, M, C, lenC, n, d, N);
+        dsum_2(rop, dinv, mu, M, C, lenC, a, ui, vi, n, d, N);
     else
-        dsum_p(rop, a, dinv, mu, ui, vi, M, C, lenC, n, d, p, N);
+        dsum_p(rop, dinv, mu, M, C, lenC, a, ui, vi, n, d, p, N);
 }
 
 /*
@@ -647,13 +650,10 @@ static void alpha(fmpz_t rop, const long *u, const long *v,
     const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, const long **C, const long *lenC, 
     long n, long d, long p, long N)
 {
-    long i, ud;
-    fmpz_t f, g, P, PN;
+    const long ku = diagfrob_k(u, n, d);
 
-    ud = n + 1;
-    for (i = 0; i <= n; i++)
-        ud += u[i];
-    ud /= d;
+    long i;
+    fmpz_t f, g, P, PN;
 
     fmpz_init(f);
     fmpz_init(g);
@@ -661,20 +661,21 @@ static void alpha(fmpz_t rop, const long *u, const long *v,
     fmpz_init(PN);
     fmpz_pow_ui(PN, P, N);
 
-    fmpz_pow_ui(rop, P, ud);
+    fmpz_pow_ui(rop, P, ku);
+    fmpz_mod(rop, rop, PN);
 
     for (i = 0; i <= n; i++)
     {
         long e = (p * (u[i] + 1) - (v[i] + 1)) / d;
 
         fmpz_powm_ui(f, a + i, e, PN);
-        dsum(g, a + i, dinv, mu[i], u[i], v[i], M, C[i], lenC[i], n, d, p, N);
+        dsum(g, dinv, mu[i], M, C[i], lenC[i], a + i, u[i], v[i], n, d, p, N);
         fmpz_mul(rop, rop, f);
         fmpz_mul(rop, rop, g);
         fmpz_mod(rop, rop, PN);
     }
 
-    if (ud % 2 != 0 && !fmpz_is_zero(rop))
+    if (ku % 2 != 0 && !fmpz_is_zero(rop))
     {
         fmpz_sub(rop, PN, rop);
     }
@@ -689,7 +690,11 @@ static void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v,
     const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, const long **C, const long *lenC, 
     long n, long d, long p, long N, long N2)
 {
-    long i, ud, vd;
+
+    const long ku = diagfrob_k(u, n, d);
+    const long kv = diagfrob_k(v, n, d);
+
+    long i;
     fmpz_t f, g, h, P;
 
     fmpz_init(f);
@@ -701,20 +706,10 @@ static void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v,
         Compute $f := (-1)^{u'+v'} (v'-1)! p^n$ exactly.
      */
 
-    ud = n + 1;
-    for (i = 0; i <= n; i++)
-        ud += u[i];
-    ud /= d;
-
-    vd = n + 1;
-    for (i = 0; i <= n; i++)
-        vd += v[i];
-    vd /= d;
-
-    fmpz_fac_ui(f, vd - 1);
+    fmpz_fac_ui(f, kv - 1);
     fmpz_pow_ui(h, P, n);
     fmpz_mul(f, f, h);
-    if ((ud + vd) % 2 != 0)
+    if ((ku + kv) % 2 != 0)
     {
         fmpz_neg(f, f);
     }
@@ -723,7 +718,7 @@ static void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v,
         Compute $g := (u'-1)! \alpha_{u+1,v+1}$ to precision $N2$.
      */
 
-    fmpz_fac_ui(g, ud - 1);
+    fmpz_fac_ui(g, ku - 1);
     alpha(h, u, v, a, dinv, mu, M, C, lenC, n, d, p, N2);
     fmpz_mul(g, g, h);
 
@@ -794,13 +789,13 @@ if (verbose)
     printf("\n");
 }
 
-    C = malloc((n + 1) * sizeof(long *));
-    for (i = 0; i <= n; i++)
+    C    = malloc((n + 1) * sizeof(long *));
+    C[0] = malloc((n + 1) * lenB * sizeof(long));
+    for (i = 1; i <= n; i++)
     {
-        C[i] = malloc(lenB * sizeof(long));
+        C[i] = C[i-1] + lenB;
     }
     lenC = malloc((n + 1) * sizeof(long));
-
 
     for (i = 0; i <= n; i++)
     {
@@ -904,10 +899,7 @@ if (verbose)
         _fmpz_vec_clear(mu[i], ((M + 1 + p - 1) / p) * lenC[i]);
     }
     free(mu);
-    for (i = 0; i <= n; i++)
-    {
-        free(C[i]);
-    }
+    free(C[0]);
     free(C);
     free(lenC);
     free(u);
