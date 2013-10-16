@@ -686,47 +686,43 @@ static void alpha(fmpz_t rop, const long *u, const long *v,
     fmpz_clear(PN);
 }
 
-static void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v, 
-    const fmpz *a, const fmpz *dinv, const fmpz **mu, long M, const long **C, const long *lenC, 
+static void entry(fmpz_t rop_u, long *rop_v, 
+    const long *u, const long *v, const fmpz *a, const fmpz *dinv, 
+    const fmpz **mu, long M, const long **C, const long *lenC, 
     long n, long d, long p, long N, long N2)
 {
-
     const long ku = diagfrob_k(u, n, d);
     const long kv = diagfrob_k(v, n, d);
 
-    long i;
-    fmpz_t f, g, h, P;
+    fmpz_t f, g, P;
 
     fmpz_init(f);
     fmpz_init(g);
-    fmpz_init(h);
     fmpz_init_set_ui(P, p);
 
     /*
-        Compute $f := (-1)^{u'+v'} (v'-1)! p^n$ exactly.
+        Compute $g := (u'-1)! \alpha_{u+1,v+1}$ to precision $N2$.
+     */
+
+    fmpz_fac_ui(f, ku - 1);
+    alpha(g, u, v, a, dinv, mu, M, C, lenC, n, d, p, N2);
+    fmpz_mul(g, f, g);
+
+    /*
+        Compute $f := (-1)^{u'+v'} (v'-1)!$ exactly.
      */
 
     fmpz_fac_ui(f, kv - 1);
-    fmpz_pow_ui(h, P, n);
-    fmpz_mul(f, f, h);
     if ((ku + kv) % 2 != 0)
     {
         fmpz_neg(f, f);
     }
 
     /*
-        Compute $g := (u'-1)! \alpha_{u+1,v+1}$ to precision $N2$.
-     */
-
-    fmpz_fac_ui(g, ku - 1);
-    alpha(h, u, v, a, dinv, mu, M, C, lenC, n, d, p, N2);
-    fmpz_mul(g, g, h);
-
-    /*
         Set rop to the product of $f$ and $g^{-1} mod $p^N$.
      */
 
-    *rop_v = fmpz_remove(f, f, P) - fmpz_remove(g, g, P);
+    *rop_v = fmpz_remove(f, f, P) + n - fmpz_remove(g, g, P);
 
     if (*rop_v >= N)
     {
@@ -738,13 +734,12 @@ static void entry(fmpz_t rop_u, long *rop_v, const long *u, const long *v,
         _padic_inv(g, g, P, N - *rop_v);
 
         fmpz_mul(rop_u, f, g);
-        fmpz_pow_ui(h, P, N - *rop_v);
-        fmpz_mod(rop_u, rop_u, h);
+        fmpz_pow_ui(f, P, N - *rop_v);
+        fmpz_mod(rop_u, rop_u, f);
     }
 
     fmpz_clear(f);
     fmpz_clear(g);
-    fmpz_clear(h);
     fmpz_clear(P);
 }
 
