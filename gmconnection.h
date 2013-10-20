@@ -1,9 +1,11 @@
-/*
-    Copyright (C) 2010, 2011, 2012 Sebastian Pancratz
- */
+/******************************************************************************
 
-#ifndef MAT_DENSE_H
-#define MAT_DENSE_H
+    Copyright (C) 2010, 2011, 2012 Sebastian Pancratz
+
+******************************************************************************/
+
+#ifndef GMCONNECTION_H
+#define GMCONNECTION_H
 
 #include <stdlib.h>
 
@@ -63,3 +65,4 @@ void gmc_convert(fmpz_poly_mat_t numM, fmpz_poly_t denM,
                  const mat_t M, const ctx_t ctx);
 
 #endif
+
