@@ -1,3 +1,9 @@
+/******************************************************************************
+
+    Copyright (C) 2013 Sebastian Pancratz
+ 
+******************************************************************************/
+
 #include "gmconnection.h"
 
 void gmc_array2poly(mpoly_t poly, const char *c, const mon_t *m, long len,

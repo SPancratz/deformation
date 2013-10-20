@@ -1,3 +1,9 @@
+/******************************************************************************
+
+    Copyright (C) 2013 Sebastian Pancratz
+ 
+******************************************************************************/
+
 #include "gmconnection.h"
 
 void gmc_decompose_poly(mpoly_t * A, const mpoly_t poly, 

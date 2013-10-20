@@ -1,3 +1,9 @@
+/******************************************************************************
+
+    Copyright (C) 2013 Sebastian Pancratz
+ 
+******************************************************************************/
+
 #include "gmconnection.h"
 
 void gmc_basis_sets(mon_t **B, long **iB, long *lenB, long *l, long *u, 

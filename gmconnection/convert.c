@@ -1,3 +1,9 @@
+/******************************************************************************
+
+    Copyright (C) 2013 Sebastian Pancratz
+ 
+******************************************************************************/
+
 #include "gmconnection.h"
 
 void gmc_convert(fmpz_poly_mat_t numM, fmpz_poly_t denM, 

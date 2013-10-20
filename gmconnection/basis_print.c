@@ -1,11 +1,17 @@
+/******************************************************************************
+
+    Copyright (C) 2013 Sebastian Pancratz
+ 
+******************************************************************************/
+
 #include "gmconnection.h"
 
 void gmc_basis_print(const mon_t *B, const long *iB, long lenB, long n, long d)
 {
-    long i, k;
-
     const long u = ((n + 1) * (d - 1)) / d;
     const long l = (n + 1) - u;
+
+    long i, k;
 
     printf("[");
     for (k = 1; k < l; k++)

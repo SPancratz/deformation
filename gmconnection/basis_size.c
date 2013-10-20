@@ -1,10 +1,15 @@
+/******************************************************************************
+
+    Copyright (C) 2013 Sebastian Pancratz
+ 
+******************************************************************************/
+
 #include "gmconnection.h"
 
 long gmc_basis_size(long n, long d)
 {
-    long a, ans, i;
+    long a = d - 1, ans, i;
 
-    a = d - 1;
     ans = a;
     for (i = 1; i < n; i++)
         ans *= a;
