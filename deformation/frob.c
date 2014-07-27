@@ -258,7 +258,7 @@ static
 void fmpz_poly_evaluate_qadic(qadic_t rop, 
     const fmpz_poly_t op1, const qadic_t op2, const qadic_ctx_t ctx)
 {
-    const long N = (&ctx->pctx)->N;
+    const long N = qadic_prec(rop);
     const long d = qadic_ctx_degree(ctx);
 
     if (N <= 0 || op2->val != 0 || rop == op2)
@@ -285,7 +285,7 @@ void fmpz_poly_evaluate_qadic(qadic_t rop,
         fmpz_pow_ui(pN, (&ctx->pctx)->p, N);
 
         padic_poly_fit_length(rop, d);
-        _fmpz_mod_poly_compose_mod(rop->coeffs, 
+        _fmpz_mod_poly_compose_smod(rop->coeffs, 
             op1->coeffs, op1->length, op2->coeffs, op2->length, 
             ctx->a, ctx->j, ctx->len, pN);
         _padic_poly_set_length(rop, d);
@@ -441,13 +441,13 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
     {
         qadic_t t;
 
-        qadic_init(t);
+        qadic_init2(t, 1);
         fmpz_poly_evaluate_qadic(t, r, t1, Qq);
 
         if (qadic_is_zero(t))
         {
             printf("Exception (deformation_frob).\n");
-            printf("The resultant r evaluates to zero at t1.\n");
+            printf("The resultant r evaluates to zero (mod p) at t1.\n");
             abort();
         }
         qadic_clear(t);
@@ -485,7 +485,7 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
 
     /* Initialisation ********************************************************/
 
-    padic_mat_init(F0, b, b);
+    padic_mat_init2(F0, b, b, prec->N4);
 
     fmpz_poly_mat_init(C, b, b);
     fmpz_poly_mat_init(Cinv, b, b);
@@ -504,13 +504,14 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
         padic_ctx_t pctx_F0;
         fmpz *t;
 
-        padic_ctx_init(pctx_F0, p, prec->N4, PADIC_VAL_UNIT);
+        padic_ctx_init(pctx_F0, p, FLINT_MIN(prec->N4 - 10, 0), prec->N4, PADIC_VAL_UNIT);
         t = _fmpz_vec_init(n + 1);
 
         c0 = clock();
 
         mpoly_diagonal_fibre(t, P, ctxFracQt);
-        diagfrob(F0, t, n, d, pctx_F0, 0);
+
+        diagfrob(F0, t, n, d, prec->N4, pctx_F0, 0);
         padic_mat_transpose(F0, F0);
 
         c1 = clock();
@@ -541,11 +542,7 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
         const long K = prec->K;
         padic_mat_struct *A;
 
-        A    = malloc(K * sizeof(padic_mat_struct));
-        for(i = 0; i < K; i++)
-            padic_mat_init(A + i, b, b);
-
-        gmde_solve(A, K, p, prec->N3, prec->N3w, M, ctxFracQt);
+        gmde_solve(&A, K, p, prec->N3, prec->N3w, M, ctxFracQt);
         gmde_convert_soln(C, &vC, A, K, p);
 
         for(i = 0; i < K; i++)
@@ -567,14 +564,10 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
         mat_t Mt;
         padic_mat_struct *Ainv;
 
-        Ainv = malloc(K * sizeof(padic_mat_struct));
-        for(i = 0; i < K; i++)
-            padic_mat_init(Ainv + i, b, b);
-
         mat_init(Mt, b, b, ctxFracQt);
         mat_transpose(Mt, M, ctxFracQt);
         mat_neg(Mt, Mt, ctxFracQt);
-        gmde_solve(Ainv, K, p, prec->N3i, prec->N3iw, Mt, ctxFracQt);
+        gmde_solve(&Ainv, K, p, prec->N3i, prec->N3iw, Mt, ctxFracQt);
         gmde_convert_soln(Cinv, &vCinv, Ainv, K, p);
 
         fmpz_poly_mat_transpose(Cinv, Cinv);
@@ -613,7 +606,7 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
         {
             /* Find the unique k s.t. F0(i,k) is non-zero */
             for (k = 0; k < b; k++) 
-                if (!fmpz_is_zero(padic_mat_unit(F0, i, k)))
+                if (!fmpz_is_zero(padic_mat_entry(F0, i, k)))
                     break;
             if (k == b)
             {
@@ -625,7 +618,7 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
             {
                 fmpz_poly_scalar_mul_fmpz(fmpz_poly_mat_entry(T, i, j), 
                                           fmpz_poly_mat_entry(Cinv, k, j), 
-                                          padic_mat_unit(F0, i, k));
+                                          padic_mat_entry(F0, i, k));
             }
         }
 
@@ -814,18 +807,18 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
             {
                 fmpz_t e;
                 fmpz_init_set_ui(e, prec->m);
-                _fmpz_mod_poly_compose_mod(g, r->coeffs, r->length, f, a, 
-                                              Qq->a, Qq->j, Qq->len, pN);
+                _fmpz_mod_poly_compose_smod(g, r->coeffs, r->length, f, a, 
+                                               Qq->a, Qq->j, Qq->len, pN);
                 _qadic_pow(t, g, a, e, Qq->a, Qq->j, Qq->len, pN);
                 fmpz_clear(e);
             }
             else
             {
     _fmpz_mod_poly_reduce(prec->denR->coeffs, prec->denR->length, Qq->a, Qq->j, Qq->len, pN);
-    _fmpz_mod_poly_normalise(prec->denR);
+    _fmpz_poly_normalise(prec->denR);
 
-                _fmpz_mod_poly_compose_mod(t, prec->denR->coeffs, prec->denR->length, f, a, 
-                                              Qq->a, Qq->j, Qq->len, pN);
+                _fmpz_mod_poly_compose_smod(t, prec->denR->coeffs, prec->denR->length, f, a, 
+                                               Qq->a, Qq->j, Qq->len, pN);
             }
             _qadic_inv(g, t, a, Qq->a, Qq->j, Qq->len, p, N);
 
@@ -844,8 +837,8 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
                     }
                     else
                     {
-                        _fmpz_mod_poly_compose_mod(t, poly->coeffs, len, f, a, 
-                                                      Qq->a, Qq->j, Qq->len, pN);
+                        _fmpz_mod_poly_compose_smod(t, poly->coeffs, len, f, a, 
+                                                       Qq->a, Qq->j, Qq->len, pN);
 
                         fmpz_poly_fit_length(poly2, 2 * a - 1);
                         _fmpz_poly_mul(poly2->coeffs, g, a, t, a);

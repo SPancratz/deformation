@@ -60,9 +60,9 @@ void gmde_convert_soln(fmpz_poly_mat_t A, long *vA,
         {
             for (i = 0; i < A->r; i++)
                 for (j = 0; j < A->c; j++)
-                    if (!fmpz_is_zero(padic_mat_unit(C + k, i, j)))
+                    if (!fmpz_is_zero(padic_mat_entry(C + k, i, j)))
                         fmpz_poly_set_coeff_fmpz(fmpz_poly_mat_entry(A, i, j), k, 
-                                                 padic_mat_unit(C + k, i, j));
+                                                 padic_mat_entry(C + k, i, j));
         }
         else
         {
@@ -70,9 +70,9 @@ void gmde_convert_soln(fmpz_poly_mat_t A, long *vA,
 
             for (i = 0; i < A->r; i++)
                 for (j = 0; j < A->c; j++)
-                    if (!fmpz_is_zero(padic_mat_unit(C + k, i, j)))
+                    if (!fmpz_is_zero(padic_mat_entry(C + k, i, j)))
                     {
-                        fmpz_mul(t, s, padic_mat_unit(C + k, i, j));
+                        fmpz_mul(t, s, padic_mat_entry(C + k, i, j));
                         fmpz_poly_set_coeff_fmpz(fmpz_poly_mat_entry(A, i, j), 
                                                  k, t);
                     }

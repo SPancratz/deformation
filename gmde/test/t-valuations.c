@@ -83,11 +83,7 @@ int main(void)
     fmpz_init(p);
     fmpz_set_ui(p, 5);
 
-    C = malloc(K * sizeof(padic_mat_struct));
-    for(i = 0; i < K; i++)
-        padic_mat_init(C + i, b, b);
-
-    gmde_solve(C, K, p, N, Nw, M, ctxM);
+    gmde_solve(&C, K, p, N, Nw, M, ctxM);
 
     printf("Valuations\n");
 

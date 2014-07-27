@@ -743,12 +743,11 @@ static void entry(fmpz_t rop_u, long *rop_v,
     fmpz_clear(P);
 }
 
-void diagfrob(padic_mat_t F, const fmpz *a, long n, long d, 
+void diagfrob(padic_mat_t F, const fmpz *a, long n, long d, long N, 
               const padic_ctx_t ctx, const int verbose)
 {
     const fmpz *P = ctx->p;
     const long p  = fmpz_get_si(P);
-    const long N  = ctx->N;
 
     const long delta = diagfrob_delta(n, P);
     const long N2    = N - n + 2 * (padic_val_fac_ui(n - 1, P) + n + delta);
@@ -857,13 +856,13 @@ if (verbose)
             }
             if (k <= n)
             {
-                fmpz_zero(padic_mat_unit(F, i, j));
+                fmpz_zero(padic_mat_entry(F, i, j));
             }
             else
             {
                 long o;
 
-                entry(padic_mat_unit(F, i, j), &o, 
+                entry(padic_mat_entry(F, i, j), &o, 
                       u, v, a, dinv, (const fmpz **) mu, M, (const long **) C, lenC, n, d, p, N, N2);
 
                 if (o != - delta)
@@ -871,8 +870,8 @@ if (verbose)
                     fmpz_t w;
                     fmpz_init(w);
                     fmpz_pow_ui(w, P, o + delta);
-                    fmpz_mul(padic_mat_unit(F, i, j), 
-                             padic_mat_unit(F, i, j), w);
+                    fmpz_mul(padic_mat_entry(F, i, j), 
+                             padic_mat_entry(F, i, j), w);
                     fmpz_clear(w);
                 }
             }

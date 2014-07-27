@@ -1,2 +1,2 @@
-export LD_LIBRARY_PATH=/usr/local/lib:/home/user/FLINT/flint-2:/home/user/deformation:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/lib:/home/suser/FLINT/flint2:/home/suser/deformation:$LD_LIBRARY_PATH
 

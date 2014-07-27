@@ -17,6 +17,8 @@
 #include "padic_mat.h"
 #include "qadic.h"
 
+#include "flint_ex.h"
+
 #include "gmconnection.h"
 
 typedef struct {

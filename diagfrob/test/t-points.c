@@ -99,10 +99,10 @@ int main(void)
 
         N = diagfrob_prec_phi(n, d, p, a);
 
-        padic_ctx_init(pctx, p, N, PADIC_VAL_UNIT);
+        padic_ctx_init(pctx, p, FLINT_MAX(0, N-10), N, PADIC_VAL_UNIT);
 
-        padic_mat_init(F, lenB, lenB);
-        diagfrob(F, A, n, d, pctx, 0);
+        padic_mat_init2(F, lenB, lenB, N);
+        diagfrob(F, A, n, d, N, pctx, 0);
 
         fmpz_poly_init(chi);
         diagfrob_revcharpoly(chi, F, pctx);

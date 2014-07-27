@@ -118,7 +118,7 @@ long diagfrob_prec_phi(long n, long d, const fmpz_t p, long a)
     return prec;
 }
 
-void diagfrob(padic_mat_t F, const fmpz *a, long n, long d, 
+void diagfrob(padic_mat_t F, const fmpz *a, long n, long d, long N, 
               const padic_ctx_t ctx, int verbose);
 
 void diagfrob_revcharpoly(fmpz_poly_t chi, 

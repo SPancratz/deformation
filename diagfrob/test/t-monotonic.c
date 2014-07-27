@@ -46,18 +46,17 @@ int main(void)
         N2 = n_randint(state, 50) + 1;
         N1 = n_randint(state, N2) + 1;
 
-        padic_ctx_init(ctx1, p, N1, PADIC_SERIES);
-        padic_ctx_init(ctx2, p, N2, PADIC_SERIES);
+        padic_ctx_init(ctx1, p, FLINT_MAX(0, N1-5), N1, PADIC_SERIES);
+        padic_ctx_init(ctx2, p, FLINT_MAX(0, N2-5), N2, PADIC_SERIES);
 
-        padic_mat_init(F1, lenB, lenB);
-        padic_mat_init(F2, lenB, lenB);
-        padic_mat_init(F3, lenB, lenB);
+        padic_mat_init2(F1, lenB, lenB, N1);
+        padic_mat_init2(F2, lenB, lenB, N2);
+        padic_mat_init2(F3, lenB, lenB, N1);
 
-        diagfrob(F1, A, n, d, ctx1, 0);
-        diagfrob(F2, A, n, d, ctx2, 0);
+        diagfrob(F1, A, n, d, N1, ctx1, 0);
+        diagfrob(F2, A, n, d, N2, ctx2, 0);
 
-        padic_mat_set(F3, F2);
-        padic_mat_reduce(F3, ctx1);
+        padic_mat_set(F3, F2, ctx1);
 
         result = padic_mat_equal(F1, F3);
         if (!result)

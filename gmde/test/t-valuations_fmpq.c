@@ -92,11 +92,7 @@ int main(void)
     mat_print(M, ctxM);
     printf("\n");
 
-    C = malloc(N * sizeof(fmpq_mat_struct));
-    for(i = 0; i < N; i++)
-        fmpq_mat_init(C + i, b, b);
-
-    gmde_solve_fmpq(C, N, M, ctxM);
+    gmde_solve_fmpq(&C, N, M, ctxM);
 
     fmpz_init(p);
     fmpz_set_ui(p, 3);

@@ -9,7 +9,7 @@
 
 #include "gmde.h"
 
-void gmde_solve_fmpq(fmpq_mat_struct *C, long K, 
+void gmde_solve_fmpq(fmpq_mat_struct **C, long K, 
                      const mat_t M, const ctx_t ctxM)
 {
     const long n = M->m;
@@ -26,6 +26,11 @@ void gmde_solve_fmpq(fmpq_mat_struct *C, long K,
     /* Initialisation */
     fmpz_poly_init(r);
 
+    /* Initialise C */
+    *C = malloc(K * sizeof(fmpq_mat_struct));
+    for (i = 0; i < K; i++)
+        fmpq_mat_init(*C + i, n, n);
+
     /* Express M as B / r */
     gmde_convert_gmc_fmpq(&B, &lenB, r, M, ctxM);
 
@@ -40,18 +45,18 @@ void gmde_solve_fmpq(fmpq_mat_struct *C, long K,
         fmpq_mat_init(mat, n, n);
         fmpz_init(coeff);
 
-        fmpq_mat_one(C + 0);
+        fmpq_mat_one(*C + 0);
 
         for (i = 0; i < K - 1; i++)
         {
-            fmpq_mat_zero(C + (i + 1));
+            fmpq_mat_zero(*C + (i + 1));
 
             j = FLINT_MAX(0, i - lenB + 1);
             for ( ; j <= i; j++)
             {
                 /* C[i+1] = C[i+1] + b[i-j] * C[j]; */
-                fmpq_mat_mul(mat, B + (i - j), C + j);
-                fmpq_mat_add(C + (i + 1), C + (i + 1), mat);
+                fmpq_mat_mul(mat, B + (i - j), *C + j);
+                fmpq_mat_add(*C + (i + 1), *C + (i + 1), mat);
             }
 
             j = FLINT_MAX(0, i - lenR + 1) + 1;
@@ -59,12 +64,12 @@ void gmde_solve_fmpq(fmpq_mat_struct *C, long K,
             {
                 /* C[i+1] = C[i+1] + r[i-j+1] * j * C[j]; */
                 fmpz_mul_ui(coeff, fmpz_poly_get_coeff_ptr(r, i - j + 1), j);
-                fmpq_mat_scalar_mul_fmpz(mat, C + j, coeff);
-                fmpq_mat_add(C + (i + 1), C + (i + 1), mat);
+                fmpq_mat_scalar_mul_fmpz(mat, *C + j, coeff);
+                fmpq_mat_add(*C + (i + 1), *C + (i + 1), mat);
             }
 
             fmpz_mul_si(coeff, r0, -(i + 1));
-            fmpq_mat_scalar_div_fmpz(C + (i + 1), C + (i + 1), coeff);
+            fmpq_mat_scalar_div_fmpz(*C + (i + 1), *C + (i + 1), coeff);
         }
 
         fmpq_mat_clear(mat);

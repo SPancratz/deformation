@@ -12,7 +12,7 @@
 
 void 
 gmde_convert_gmc(padic_mat_struct **numM, long *lenM, fmpz_poly_t denM, 
-                 const padic_ctx_t pctx, 
+                 long N, const padic_ctx_t pctx, 
                  const mat_t M, const ctx_t ctxM)
 {
     long i, j, k, n = M->m;
@@ -39,7 +39,7 @@ gmde_convert_gmc(padic_mat_struct **numM, long *lenM, fmpz_poly_t denM,
     }
 
     for (i = 0; i < *lenM; i++)
-        padic_mat_init(*numM + i, n, n);
+        padic_mat_init2(*numM + i, n, n, N);
     
     for (i = 0; i < n; i++)
         for (j = 0; j < n; j++)
@@ -48,7 +48,7 @@ gmde_convert_gmc(padic_mat_struct **numM, long *lenM, fmpz_poly_t denM,
 
             for (k = 0; k < fmpz_poly_length(poly); k++)
             {
-                fmpz_set(padic_mat_unit(*numM + k, i, j), 
+                fmpz_set(padic_mat_entry(*numM + k, i, j), 
                          fmpz_poly_get_coeff_ptr(poly, k));
             }
         }

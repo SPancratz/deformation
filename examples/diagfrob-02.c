@@ -28,10 +28,10 @@ int main(void)
 
     long i, lenB = gmc_basis_size(n, d);
 
-    padic_ctx_init(pctx, p, N, PADIC_VAL_UNIT);
+    padic_ctx_init(pctx, p, FLINT_MAX(0, N), N, PADIC_VAL_UNIT);
 
-    padic_mat_init(F, lenB, lenB);
-    diagfrob(F, a, n, d, pctx, 1);
+    padic_mat_init2(F, lenB, lenB, N);
+    diagfrob(F, a, n, d, N, pctx, 1);
 
     padic_mat_print_pretty(F, pctx);
     printf("\n\n");

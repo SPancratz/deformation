@@ -71,16 +71,8 @@ int main(void)
     mat_transpose(Mt, M, ctxM);
     mat_neg(Mt, Mt, ctxM);
 
-    C    = malloc(N * sizeof(fmpq_mat_struct));
-    Cinv = malloc(N * sizeof(fmpq_mat_struct));
-    for(i = 0; i < N; i++)
-    {
-        fmpq_mat_init(C + i, b, b);
-        fmpq_mat_init(Cinv + i, b, b);
-    }
-
-    gmde_solve_fmpq(C, N, M, ctxM);
-    gmde_solve_fmpq(Cinv, N, Mt, ctxM);
+    gmde_solve_fmpq(&C,    N, M,  ctxM);
+    gmde_solve_fmpq(&Cinv, N, Mt, ctxM);
     gmde_convert_soln_fmpq(B, ctxB, C, N);
     gmde_convert_soln_fmpq(Binv, ctxB, Cinv, N);
 

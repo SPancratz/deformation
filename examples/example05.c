@@ -39,10 +39,10 @@ main(void)
         prec_t prec, prec_in;
 
         ctx_init_fmpz_poly_q(ctxFracQt);
-        qadic_ctx_init_conway(Qq, p, d, 1, "X", PADIC_SERIES);
+        qadic_ctx_init_conway(Qq, p, d, 1, 1, "X", PADIC_SERIES);
 
-        qadic_init(t1);
-        qadic_one(t1, Qq);
+        qadic_init2(t1, 1);
+        qadic_one(t1);
 
         mpoly_init(P, n + 1, ctxFracQt);
         mpoly_set_str(P, str, ctxFracQt);

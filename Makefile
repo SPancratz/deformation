@@ -2,8 +2,8 @@ DEFORMATION_MPIR_LIB_DIR=/usr/local/lib
 DEFORMATION_MPIR_INCLUDE_DIR=/usr/local/include
 DEFORMATION_MPFR_LIB_DIR=/usr/local/lib
 DEFORMATION_MPFR_INCLUDE_DIR=/usr/local/include
-DEFORMATION_FLINT_LIB_DIR=/home/user/FLINT/flint-2
-DEFORMATION_FLINT_INCLUDE_DIR=/home/user/FLINT/flint-2
+DEFORMATION_FLINT_LIB_DIR=/home/suser/FLINT/flint2
+DEFORMATION_FLINT_INCLUDE_DIR=/home/suser/FLINT/flint2
 
 DEFORMATION_LIB=libdeformation.so
 CC=gcc
@@ -97,5 +97,5 @@ install: library
 #     mat_coo
 #     queue
 
-BUILD_DIRS = perm vec mat mat_csr mon stack rbtree mpoly gmconnection diagfrob gmde deformation
+BUILD_DIRS = perm vec mat mat_csr mon stack rbtree mpoly flint_ex gmconnection diagfrob gmde deformation
 

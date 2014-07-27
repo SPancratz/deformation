@@ -91,11 +91,7 @@ int main(void)
     mat_print(M, ctxM);
     printf("\n");
 
-    C = malloc(K * sizeof(padic_mat_struct));
-    for(i = 0; i < K; i++)
-        padic_mat_init(C + i, b, b);
-
-    gmde_solve(C, K, p, N, Nw, M, ctxM);
+    gmde_solve(&C, K, p, N, Nw, M, ctxM);
     gmde_convert_soln(B, &vB, C, K, p);
 
     printf("Solution to (d/dt + M) C = 0:\n");
