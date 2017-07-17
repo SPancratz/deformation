@@ -9,9 +9,9 @@
 
 #include "stack.h"
 #include "generics.h"
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
+#include "flint/flint.h"
+#include "flint/fmpz.h"
+#include "flint/ulong_extras.h"
 
 STACK_PROTOTYPE(ulong, ulong, static)
 

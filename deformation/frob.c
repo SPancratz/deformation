@@ -7,11 +7,11 @@
 #include "diagfrob.h"
 #include "gmde.h"
 
-#include "flint.h"
-#include "fmpq_mat.h"
-#include "padic_mat.h"
-#include "fmpz_poly_mat.h"
-#include "fmpz_mod_poly.h"
+#include "flint/flint.h"
+#include "flint/fmpq_mat.h"
+#include "flint/padic_mat.h"
+#include "flint/fmpz_poly_mat.h"
+#include "flint/fmpz_mod_poly.h"
 
 #include "deformation.h"
 

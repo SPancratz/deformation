@@ -1,7 +1,7 @@
 #include "perm.h"
 
-#include "flint.h"
-#include "ulong_extras.h"
+#include "flint/flint.h"
+#include "flint/ulong_extras.h"
 
 void _perm_randtest(long *vec, long n, flint_rand_t state)
 {

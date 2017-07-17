@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "flint.h"
+#include "flint/flint.h"
 
 /* Memory management *********************************************************/
 

@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <mpir.h>
 
-#include "flint.h"
+#include "flint/flint.h"
 #include "diagfrob.h"
 
 int main(void)

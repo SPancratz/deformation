@@ -4,9 +4,9 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz.h"
-#include "padic.h"
+#include "flint/flint.h"
+#include "flint/fmpz.h"
+#include "flint/padic.h"
 
 #include "deformation.h"
 #include "gmconnection.h"

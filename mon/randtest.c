@@ -6,8 +6,8 @@
 
 #include "mon.h"
 
-#include "flint.h"
-#include "ulong_extras.h"
+#include "flint/flint.h"
+#include "flint/ulong_extras.h"
 
 mon_t _mon_randtest(flint_rand_t state, int n, exp_t k)
 {

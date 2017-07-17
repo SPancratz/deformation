@@ -10,11 +10,11 @@
 #include <stdlib.h>
 
 #include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_q.h"
-#include "fmpz_poly_mat.h"
+#include "flint/flint.h"
+#include "flint/fmpz.h"
+#include "flint/fmpz_poly.h"
+#include "flint/fmpz_poly_q.h"
+#include "flint/fmpz_poly_mat.h"
 
 #include "generics.h"
 #include "mat.h"

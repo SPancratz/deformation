@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "fmpz_poly_mat.h"
+#include "flint/fmpz_poly_mat.h"
 #include "gmconnection.h"
 #include "gmde.h"
 

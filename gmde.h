@@ -9,10 +9,10 @@
 
 #include "generics.h"
 #include "mat.h"
-#include "fmpz_poly.h"
-#include "fmpq_mat.h"
-#include "padic_mat.h"
-#include "fmpz_poly_mat.h"
+#include "flint/fmpz_poly.h"
+#include "flint/fmpq_mat.h"
+#include "flint/padic_mat.h"
+#include "flint/fmpz_poly_mat.h"
 
 void gmde_convert_gmc_fmpq(fmpq_mat_struct **numM, long *lenM, fmpz_poly_t denM, 
                            const mat_t M, const ctx_t ctxM);

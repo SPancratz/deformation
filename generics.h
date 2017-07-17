@@ -11,14 +11,14 @@
 
 #include <mpir.h>
 
-#include "flint.h"
-#include "long_extras.h"
-#include "ulong_extras.h"
+#include "flint/flint.h"
+#include "flint/long_extras.h"
+#include "flint/ulong_extras.h"
 
-#include "fmpq_poly.h"
-#include "fmpz_poly_q.h"
-#include "padic.h"
-#include "padic_poly.h"
+#include "flint/fmpq_poly.h"
+#include "flint/fmpz_poly_q.h"
+#include "flint/padic.h"
+#include "flint/padic_poly.h"
 
 /* Layout of the generic structure *******************************************/
 

@@ -13,10 +13,10 @@
 #include "gmconnection.h"
 #include "gmde.h"
 
-#include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
-#include "fmpz_poly_q.h"
+#include "flint/flint.h"
+#include "flint/fmpz_poly.h"
+#include "flint/fmpq_poly.h"
+#include "flint/fmpz_poly_q.h"
 
 static long fmpq_mat_ord_p(const fmpq_mat_t M, const fmpz_t p)
 {

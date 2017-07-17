@@ -12,10 +12,10 @@
 #include "mat.h"
 #include "mpoly.h"
 
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "padic_mat.h"
-#include "qadic.h"
+#include "flint/fmpz.h"
+#include "flint/fmpz_poly.h"
+#include "flint/padic_mat.h"
+#include "flint/qadic.h"
 
 #include "flint_ex.h"
 

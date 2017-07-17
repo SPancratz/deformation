@@ -11,10 +11,10 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "flint.h"
-#include "nmod_mat.h"
-#include "padic.h"
-#include "padic_mat.h"
+#include "flint/flint.h"
+#include "flint/nmod_mat.h"
+#include "flint/padic.h"
+#include "flint/padic_mat.h"
 
 #include "gmconnection.h"
 #include "mon.h"

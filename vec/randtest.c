@@ -2,8 +2,8 @@
 
 #include "vec.h"
 
-#include "flint.h"
-#include "ulong_extras.h"
+#include "flint/flint.h"
+#include "flint/ulong_extras.h"
 
 void _vec_randtest(char *vec, long n, flint_rand_t state, const ctx_t ctx)
 {

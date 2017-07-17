@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #include <mpir.h>
 
-#include "flint.h"
-#include "ulong_extras.h"
+#include "flint/flint.h"
+#include "flint/ulong_extras.h"
 #include "gmconnection.h"
 #include "diagfrob.h"
 

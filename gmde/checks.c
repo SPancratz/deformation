@@ -4,8 +4,8 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpq_poly.h"
+#include "flint/flint.h"
+#include "flint/fmpq_poly.h"
 
 #include "gmde.h"
 

@@ -8,9 +8,9 @@
 #include <stdio.h>
 
 #include "queue.h"
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
+#include "flint/flint.h"
+#include "flint/fmpz.h"
+#include "flint/ulong_extras.h"
 
 QUEUE_PROTOTYPE(ulong, ulong, static)
 

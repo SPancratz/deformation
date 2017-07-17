@@ -4,9 +4,9 @@
  
 ******************************************************************************/
 
-#include "fmpz_mod_poly.h"
-#include "ulong_extras.h"
-#include "qadic.h"
+#include "flint/fmpz_mod_poly.h"
+#include "flint/ulong_extras.h"
+#include "flint/qadic.h"
 
 /*
     Assumes that \code{len1} and \code{len2} are positive but at 

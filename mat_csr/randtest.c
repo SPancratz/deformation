@@ -1,7 +1,7 @@
 #include "mat_csr.h"
 
-#include "flint.h"
-#include "ulong_extras.h"
+#include "flint/flint.h"
+#include "flint/ulong_extras.h"
 
 void 
 mat_csr_randtest(mat_csr_t A, 

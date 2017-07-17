@@ -11,10 +11,10 @@
 #include "gmconnection.h"
 #include "gmde.h"
 
-#include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
-#include "fmpz_poly_q.h"
+#include "flint/flint.h"
+#include "flint/fmpz_poly.h"
+#include "flint/fmpq_poly.h"
+#include "flint/fmpz_poly_q.h"
 
 static int 
 __fmpz_poly_q_print_pretty(const struct __ctx_struct * ctx, const void *op)

@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "flint.h"
+#include "flint/flint.h"
 
 typedef unsigned long mon_t;
 typedef unsigned long exp_t;

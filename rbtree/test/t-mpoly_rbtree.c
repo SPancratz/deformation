@@ -6,10 +6,10 @@
 #include "mon.h"
 
 #include "generics.h"
-#include "flint.h"
-#include "fmpz.h"
-#include "long_extras.h"
-#include "ulong_extras.h"
+#include "flint/flint.h"
+#include "flint/fmpz.h"
+#include "flint/long_extras.h"
+#include "flint/ulong_extras.h"
 
 static int mon_compare(const mon_t x, const mon_t y)
 {

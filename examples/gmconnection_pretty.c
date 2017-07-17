@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include <mpir.h>
 
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
+#include "flint/flint.h"
+#include "flint/fmpz.h"
+#include "flint/ulong_extras.h"
 
 #include "mpoly.h"
 #include "mat_csr.h"
 #include "gmconnection.h"
-#include "fmpz_poly.h"
+#include "flint/fmpz_poly.h"
 
 static int 
 _mat_print_magma(char ** const rows, long m, long n, const ctx_t ctx)

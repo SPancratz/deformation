@@ -4,12 +4,12 @@
 
 ******************************************************************************/
 
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_mat.h"
-#include "padic_mat.h"
-#include "qadic.h"
+#include "flint/fmpz.h"
+#include "flint/fmpz_mat.h"
+#include "flint/fmpz_poly.h"
+#include "flint/fmpz_poly_mat.h"
+#include "flint/padic_mat.h"
+#include "flint/qadic.h"
 
 /*
     Computes the reverse characteristic polynomial (cp, n+1) 

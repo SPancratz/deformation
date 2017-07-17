@@ -7,8 +7,8 @@
 
 #include "mat.h"
 
-#include "flint.h"
-#include "ulong_extras.h"
+#include "flint/flint.h"
+#include "flint/ulong_extras.h"
 
 void mat_randops(mat_t mat, flint_rand_t state, long count, 
                        const ctx_t ctx)
