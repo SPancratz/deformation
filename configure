@@ -8,10 +8,9 @@
 # soname version
 #
 # deformation     => soname
-# 2.7.0   => 0.0.0
-DEFORMATION_MAJOR=2
-DEFORMATION_MINOR=2
-DEFORMATION_PATCH=1
+DEFORMATION_MAJOR=0
+DEFORMATION_MINOR=0
+DEFORMATION_PATCH=0
 
 PREFIX="/usr/local"
 GMP_DIR="/usr/local"
