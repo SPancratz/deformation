@@ -354,7 +354,8 @@ void _qadic_mat_mul(fmpz_poly_mat_t C,
     modulo $p^{N_1}$.
  */
 
-void frob(const mpoly_t P, const ctx_t ctxFracQt, 
+void frob_ret(fmpz_poly_t cp,
+          const mpoly_t P, const ctx_t ctxFracQt, 
           const qadic_t t1, const qadic_ctx_t Qq, 
           prec_t *prec, const prec_t *prec_in, 
           int verbose)
@@ -386,8 +387,6 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
 
     fmpz_poly_mat_t F1;
     long vF1;
-
-    fmpz_poly_t cp;
 
     clock_t c0, c1;
     double c;
@@ -495,8 +494,6 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
 
     fmpz_poly_mat_init(F1, b, b);
     vF1 = 0;
-
-    fmpz_poly_init(cp);
 
     /* Step 2 {F0} ***********************************************************/
 
@@ -947,6 +944,15 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
 
     fmpz_poly_mat_clear(F);
     fmpz_poly_mat_clear(F1);
-    fmpz_poly_clear(cp);
 }
 
+void frob(const mpoly_t P, const ctx_t ctxFracQt, 
+          const qadic_t t1, const qadic_ctx_t Qq, 
+          prec_t *prec, const prec_t *prec_in, 
+          int verbose)
+{
+    fmpz_poly_t cp;
+    fmpz_poly_init(cp);
+    frob_ret(cp, P, ctxFracQt, t1, Qq, prec, prec_in, verbose);
+    fmpz_poly_clear(cp);
+}

@@ -103,5 +103,11 @@ void frob(const mpoly_t P, const ctx_t ctxFracQt,
           prec_t *prec, const prec_t *prec_in,
           int verbose);
 
+void frob_ret(fmpz_poly_t cp,
+          const mpoly_t P, const ctx_t ctxFracQt, 
+          const qadic_t t1, const qadic_ctx_t Qq, 
+          prec_t *prec, const prec_t *prec_in,
+          int verbose);
+
 #endif
 
