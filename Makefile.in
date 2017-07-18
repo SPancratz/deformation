@@ -22,7 +22,7 @@ export
 SOURCES = 
 LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))  $(patsubst %, %/*.c, $(TEMPLATE_DIRS))
 
-HEADERS = $(patsubst %, %.h, $(BUILD_DIRS))
+HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) generics.h queue.h rbtree.h stack.h
 
 OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))
@@ -163,7 +163,7 @@ endif
 
 install: library
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBDIR)
-	mkdir -p $(DESTDIR)$(PREFIX)/include
+	mkdir -p $(DESTDIR)$(PREFIX)/include/deformation
 	$(AT)if [ "$(DEFORMATION_SHARED)" -eq "1" ]; then \
 		cp $(DEFORMATION_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
 		cp -a $(shell ls $(DEFORMATION_LIBNAME)*) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
@@ -171,9 +171,9 @@ install: library
 	$(AT)if [ "$(DEFORMATION_STATIC)" -eq "1" ]; then \
 		cp libdeformation.a $(DESTDIR)$(PREFIX)/$(LIBDIR); \
 	fi
-	cp $(HEADERS) $(DESTDIR)$(PREFIX)/include
+	cp $(HEADERS) $(DESTDIR)$(PREFIX)/include/deformation
 	$(AT)if [ ! -z $(EXT_HEADERS) ]; then \
-		cp $(EXT_HEADERS) $(DESTDIR)$(PREFIX)/include; \
+		cp $(EXT_HEADERS) $(DESTDIR)$(PREFIX)/include/deformation; \
 	fi
 
 build:
