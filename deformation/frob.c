@@ -501,7 +501,7 @@ void frob_ret(fmpz_poly_t cp,
         padic_ctx_t pctx_F0;
         fmpz *t;
 
-        padic_ctx_init(pctx_F0, p, FLINT_MIN(prec->N4 - 10, 0), prec->N4, PADIC_VAL_UNIT);
+        padic_ctx_init(pctx_F0, p, FLINT_MAX(prec->N4 - 10, 0), prec->N4, PADIC_VAL_UNIT);
         t = _fmpz_vec_init(n + 1);
 
         c0 = clock();
